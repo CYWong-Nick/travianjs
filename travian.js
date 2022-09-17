@@ -249,7 +249,7 @@ function render() {
     <div class="flex-row">
       <div class="flex">
         <h5>Summary</h5>
-        <div>Current: ${pageType || 'Unknown'}</div>
+        <div>Current: ${pageType || 'Unknown'} (${new Date()})</div>
         <div>Wood: ${wood} Brick: ${brick} Metal: ${metal} Grass: ${grass}</div>
         ${buildingList.map(e => 
           `<div>${e.name} ${e.time}</div>`
@@ -270,5 +270,4 @@ function render() {
 }
 
 render()
-setInterval(render, 5000)
-
+setInterval(render, 30000)
