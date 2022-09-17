@@ -91,6 +91,15 @@ $('#footer').before(`
   <div id="console"/>
 `)
 
+// Random number in range [x, y]
+function randomNumber(x, y) {
+  return Math.random() * (y - x) + x
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 function getState(key, defaultValue) {
     const item = localStorage.getItem(key)
     if (item === null)
@@ -173,6 +182,7 @@ function tryBuild(buildingList, wood, brick, metal, grass) {
     if (wood < woodReq || brick < brickReq || metal < metalReq || grass < grassReq)
         return
  
+    await sleep(randomNumber(1, 5))
     if (parseInt(id) <= 18) {
       if (type === RESOURCE_FIELD_PAGE)
         $(`a[href="/build.php?id=${id}"]`)[0].click()
@@ -205,6 +215,7 @@ function tryBuild(buildingList, wood, brick, metal, grass) {
 
   let bulidButton = $('.section1 > button.green')
   if (wood >= woodReq && brick >= brickReq && metal >= metalReq && grass >= grassReq && bulidButton.length) {
+    await sleep(randomNumber(1, 5))
     removeFromPending(0, false)
     bulidButton.click()
   }
