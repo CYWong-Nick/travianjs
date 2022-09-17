@@ -250,7 +250,7 @@ function render() {
       <div class="flex">
         <h5>Summary</h5>
         <div>Current: ${pageType || 'Unknown'}</div>
-        <div>${wood} ${brick} ${metal} ${grass}</div>
+        <div>Wood: ${wood} Brick: ${brick} Metal: ${metal} Grass: ${grass}</div>
         ${buildingList.map(e => 
           `<div>${e.name} ${e.time}</div>`
         ).join('')}
