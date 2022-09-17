@@ -5,10 +5,6 @@ style.textContent = `
     margin: 0 20px; 
     border-radius: 10px; 
     padding: 5px; 
-    position: absolute;
-    bottom: 10px;
-    width: 90vw;
-    z-index: 10000;
   }
   
   #console .flex-row {
