@@ -208,8 +208,6 @@ function tryBuild(buildingList, wood, brick, metal, grass) {
   if (wood >= woodReq && brick >= brickReq && metal >= metalReq && grass >= grassReq && bulidButton.length) {
     removeFromPending(0)
     bulidButton.click()
-  } else {
-    return
   }
 }
 
