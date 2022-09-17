@@ -142,6 +142,7 @@ function addCurrentBuildingToPending() {
 }
 
 function removeFromPending(i) {
+  console.log(`Removing ${i}`)
   let pendingBuildList = getState(PENDING_BUILD_LIST_KEY, [])
   pendingBuildList.splice(i, 1)
   setState(PENDING_BUILD_LIST_KEY, pendingBuildList)
