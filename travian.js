@@ -37,50 +37,50 @@ const BUILDING_PAGE = 'Building'
 const TOWN_PAGE = 'Town'
 const RESOURCE_FIELD_PAGE = 'Resource fields'
 const GID_MAP = {
-    "1": "Woodcutter",
-    "2": "Clay Pit",
-    "3": "Iron Mine",
-    "4": "Cropland",
-    "5": "Sawmill",
-    "6": "Brickyard",
-    "7": "Iron Foundry",
-    "8": "Grain Mill",
-    "9": "Bakery",
-    "10": "Warehouse",
-    "11": "Granary",
-    "13": "Smithy",
-    "14": "Tournament Square",
-    "15": "Main Building",
-    "16": "Rally Point",
-    "17": "Marketplace",
-    "18": "Embassy",
-    "19": "Barracks",
-    "21": "Workshop",
-    "23": "Cranny",
-    "24": "Town Hall",
-    "25": "Residence",
-    "26": "Palace",
-    "27": "Treasury",
-    "28": "Trade Office",
-    "29": "Great Barracks",
-    "31": "City Wall",
-    "32": "Earth Wall",
-    "33": "Palisade",
-    "34": "Stonemason's Lodge",
-    "35": "Brewery",
-    "36": "Trapper",
-    "37": "Hero's Mansion",
-    "38": "Great Warehouse",
-    "39": "Great Granary",
-    "41": "Horse Drinking Trough",
-    "42": "Stone Wall",
-    "43": "Makeshift Wall",
-    "44": "Command Center",
-    "45": "Waterworks",
-    "20": "Stable",
-    "22": "Academy",
-    "30": "Great Stable",
-    "40": "Wonder of the World"
+  "1": "Woodcutter",
+  "2": "Clay Pit",
+  "3": "Iron Mine",
+  "4": "Cropland",
+  "5": "Sawmill",
+  "6": "Brickyard",
+  "7": "Iron Foundry",
+  "8": "Grain Mill",
+  "9": "Bakery",
+  "10": "Warehouse",
+  "11": "Granary",
+  "13": "Smithy",
+  "14": "Tournament Square",
+  "15": "Main Building",
+  "16": "Rally Point",
+  "17": "Marketplace",
+  "18": "Embassy",
+  "19": "Barracks",
+  "21": "Workshop",
+  "23": "Cranny",
+  "24": "Town Hall",
+  "25": "Residence",
+  "26": "Palace",
+  "27": "Treasury",
+  "28": "Trade Office",
+  "29": "Great Barracks",
+  "31": "City Wall",
+  "32": "Earth Wall",
+  "33": "Palisade",
+  "34": "Stonemason's Lodge",
+  "35": "Brewery",
+  "36": "Trapper",
+  "37": "Hero's Mansion",
+  "38": "Great Warehouse",
+  "39": "Great Granary",
+  "41": "Horse Drinking Trough",
+  "42": "Stone Wall",
+  "43": "Makeshift Wall",
+  "44": "Command Center",
+  "45": "Waterworks",
+  "20": "Stable",
+  "22": "Academy",
+  "30": "Great Stable",
+  "40": "Wonder of the World"
 }
 
 $('#footer').before(`
@@ -97,15 +97,15 @@ function sleep(ms) {
 }
 
 function getState(key, defaultValue) {
-    const item = localStorage.getItem(key)
-    if (item === null)
-        return defaultValue
-    else
-        return JSON.parse(item)
+  const item = localStorage.getItem(key)
+  if (item === null)
+    return defaultValue
+  else
+    return JSON.parse(item)
 }
 
 function setState(key, value) {
-    localStorage.setItem(key, JSON.stringify(value))
+  localStorage.setItem(key, JSON.stringify(value))
 }
 
 function parseIntIgnoreSep(s) {
@@ -176,8 +176,8 @@ async function tryBuild(buildingList, wood, brick, metal, grass) {
     let grassReq = pendingBuildList[0].grassReq
 
     if (wood < woodReq || brick < brickReq || metal < metalReq || grass < grassReq)
-        return
- 
+      return
+
     await sleep(randomNumber(1, 5))
     if (parseInt(id) <= 18) {
       if (type === RESOURCE_FIELD_PAGE)
@@ -185,19 +185,23 @@ async function tryBuild(buildingList, wood, brick, metal, grass) {
       else
         $('.village.resourceView')[0].click()
     } else {
-      if (type === TOWN_PAGE)
-        $(`a[href="/build.php?id=${id}&gid=${gid}"]`)[0].click()
-      else
+      if (type === TOWN_PAGE) {
+        if (id === '40')
+          $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path')[0].click()
+        else
+          $(`a[href="/build.php?id=${id}&gid=${gid}"]`)[0].click()
+      } else {
         $('.village.buildingView')[0].click()
+      }
     }
   }
-  
+
   // Wrong building
   let params = new URLSearchParams(window.location.search);
   if (pendingBuildList[0].id !== params.get('id') || pendingBuildList[0].gid !== params.get('gid')) {
     return
   }
-  
+
   // Cannot find requirement
   let resourceRequirementEle = $('#contract .value')
   if (!resourceRequirementEle.length) {
@@ -249,7 +253,7 @@ async function render() {
   if (enableAutoBuild) {
     await tryBuild(buildingList, wood, brick, metal, grass)
   }
-  
+
   $('#console').html(`
     <h4>Console</h4>
     <div class="flex-row">
@@ -257,9 +261,9 @@ async function render() {
         <h5>Summary</h5>
         <div>Current: ${pageType || 'Unknown'} (${new Date()})</div>
         <div>Wood: ${wood} Brick: ${brick} Metal: ${metal} Grass: ${grass}</div>
-        ${buildingList.map(e => 
-          `<div>${e.name} ${e.time}</div>`
-        ).join('')}
+        ${buildingList.map(e =>
+    `<div>${e.name} ${e.time}</div>`
+  ).join('')}
       </div>
       <div class="flex">
         <div class="flex-row">
@@ -267,9 +271,9 @@ async function render() {
           ${pageType === BUILDING_PAGE ? '<button class="ml-5" onClick="addCurrentBuildingToPending()">Add Current</button>' : ''}
           <input class="ml-5" type="checkbox" ${enableAutoBuild ? 'checked' : ''} onChange="toggleAutoBuild()" /> Enable auto build
         </div>
-        ${pendingBuildList.map((e, i) => 
-          `<div><span>Position: ${e.id}</span> <span>${GID_MAP[e.gid]}</span> <button onClick="removeFromPending(${i}, true)">x</button></div>`
-        ).join('')}
+        ${pendingBuildList.map((e, i) =>
+    `<div><span>Position: ${e.id}</span> <span>${GID_MAP[e.gid]}</span> <button onClick="removeFromPending(${i}, true)">x</button></div>`
+  ).join('')}
       </div>
     </div>
   `)
