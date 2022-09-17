@@ -204,7 +204,7 @@ function tryBuild(buildingList, wood, brick, metal, grass) {
   let metalReq = parseIntIgnoreSep(resourceRequirementEle[2].innerText)
   let grassReq = parseIntIgnoreSep(resourceRequirementEle[3].innerText)
 
-  let bulidButton = $('.section1 > button.green')
+  let bulidButton = $('.section1 > button')
   if (wood >= woodReq && brick >= brickReq && metal >= metalReq && grass >= grassReq && bulidButton.length) {
     removeFromPending(0)
     bulidButton.click()
