@@ -164,7 +164,7 @@ function toggleAutoBuild() {
   render()
 }
 
-function tryBuild(buildingList, wood, brick, metal, grass) {
+async function tryBuild(buildingList, wood, brick, metal, grass) {
   let pendingBuildList = getState(PENDING_BUILD_LIST_KEY, [])
   if (!pendingBuildList.length)
     return
@@ -231,7 +231,7 @@ function getCurrentPageType() {
     return BUILDING_PAGE
 }
 
-function render() {
+async function render() {
   let pageType = getCurrentPageType()
   let pendingBuildList = getState(PENDING_BUILD_LIST_KEY, [])
   let enableAutoBuild = getState(ENABLE_AUTO_BUILD_KEY, false)
@@ -251,7 +251,7 @@ function render() {
   }
 
   if (enableAutoBuild) {
-    tryBuild(buildingList, wood, brick, metal, grass)
+    await tryBuild(buildingList, wood, brick, metal, grass)
   }
   
   $('#console').html(`
