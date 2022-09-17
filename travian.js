@@ -107,7 +107,7 @@ function parseIntIgnoreSep(s) {
   return parseInt(s.replace('.', '').replace(',', ''))
 }
 
-function addCurrentPageToPending() {
+function addCurrentBuildingToPending() {
   let pendingBuildList = getState(PENDING_BUILD_LIST_KEY, [])
 
   let params = new URLSearchParams(window.location.search);
@@ -260,7 +260,7 @@ function render() {
       <div class="flex">
         <div class="flex-row">
           <h5>Pending List</h5>
-          ${pageType === BUILDING_PAGE ? '<button class="ml-5" onClick="addToPending()">Add Current</button>' : ''}
+          ${pageType === BUILDING_PAGE ? '<button class="ml-5" onClick="addCurrentBuildingToPending()">Add Current</button>' : ''}
           <input class="ml-5" type="checkbox" ${enableAutoBuild ? 'checked' : ''} onChange="toggleAutoBuild()" /> Enable auto build
         </div>
         ${pendingBuildList.map((e, i) => 
