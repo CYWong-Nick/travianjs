@@ -161,7 +161,7 @@ function tryBuild(buildingList, wood, brick, metal, grass) {
 
   let type = getCurrentPageType()
 
-  if ((type === RESOURCE_FIELD_PAGE || type === TOWN_PAGE) && buildingList.length < 2) {
+  if ((type === RESOURCE_FIELD_PAGE || type === TOWN_PAGE) && buildingList.length < 4) {
     let id = pendingBuildList[0].id
     let gid = pendingBuildList[0].gid
     let woodReq = pendingBuildList[0].woodReq
