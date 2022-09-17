@@ -249,7 +249,7 @@ function render() {
     <div class="flex-row">
       <div class="flex">
         <h5>Summary</h5>
-        <div>Current: ${pageType}</div>
+        <div>Current: ${pageType || 'Unknown'}</div>
         <div>${wood} ${brick} ${metal} ${grass}</div>
         ${buildingList.map(e => 
           `<div>${e.name} ${e.time}</div>`
