@@ -1,3 +1,4 @@
+console.log("HI")
 const style = document.createElement('style');
 style.textContent = `
   #console {
