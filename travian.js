@@ -141,12 +141,12 @@ function addCurrentBuildingToPending() {
   render()
 }
 
-function removeFromPending(i) {
-  console.log(`Removing ${i}`)
+function removeFromPending(i, rerender) {
   let pendingBuildList = getState(PENDING_BUILD_LIST_KEY, [])
   pendingBuildList.splice(i, 1)
   setState(PENDING_BUILD_LIST_KEY, pendingBuildList)
-  render()
+  if (rerender)
+    render()
 }
 
 function toggleAutoBuild() {
@@ -162,7 +162,7 @@ function tryBuild(buildingList, wood, brick, metal, grass) {
 
   let type = getCurrentPageType()
 
-  if ((type === RESOURCE_FIELD_PAGE || type === TOWN_PAGE) && buildingList.length < 4) {
+  if ((type === RESOURCE_FIELD_PAGE || type === TOWN_PAGE) && buildingList.length < 2) {
     let id = pendingBuildList[0].id
     let gid = pendingBuildList[0].gid
     let woodReq = pendingBuildList[0].woodReq
@@ -184,8 +184,6 @@ function tryBuild(buildingList, wood, brick, metal, grass) {
       else
         $('.village.buildingView')[0].click()
     }
-    
-    return
   }
   
   // Wrong building
@@ -205,9 +203,9 @@ function tryBuild(buildingList, wood, brick, metal, grass) {
   let metalReq = parseIntIgnoreSep(resourceRequirementEle[2].innerText)
   let grassReq = parseIntIgnoreSep(resourceRequirementEle[3].innerText)
 
-  let bulidButton = $('.section1 > button')
+  let bulidButton = $('.section1 > button.green')
   if (wood >= woodReq && brick >= brickReq && metal >= metalReq && grass >= grassReq && bulidButton.length) {
-    removeFromPending(0)
+    removeFromPending(0, false)
     bulidButton.click()
   }
 }
@@ -263,7 +261,7 @@ function render() {
           <input class="ml-5" type="checkbox" ${enableAutoBuild ? 'checked' : ''} onChange="toggleAutoBuild()" /> Enable auto build
         </div>
         ${pendingBuildList.map((e, i) => 
-          `<div><span>Position: ${e.id}</span> <span>${GID_MAP[e.gid]}</span> <button onClick="removeFromPending(${i})">x</button></div>`
+          `<div><span>Position: ${e.id}</span> <span>${GID_MAP[e.gid]}</span> <button onClick="removeFromPending(${i}, true)">x</button></div>`
         ).join('')}
       </div>
     </div>
