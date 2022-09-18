@@ -187,7 +187,7 @@ async function tryBuild(buildingList, wood, brick, metal, grass) {
     } else {
       if (type === TOWN_PAGE) {
         if (id === '40')
-          $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path')[0].click()
+          $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').click()
         else
           $(`a[href="/build.php?id=${id}&gid=${gid}"]`)[0].click()
       } else {
