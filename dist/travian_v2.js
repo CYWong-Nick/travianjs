@@ -15,8 +15,8 @@ class StateHandler {
             else
                 return JSON.parse(item);
         };
-        this.set = (obj, prop) => {
-            localStorage.setItem(prop, JSON.stringify(obj));
+        this.set = (obj, prop, value) => {
+            localStorage.setItem(prop, JSON.stringify(value));
             this.render(obj);
             return true;
         };

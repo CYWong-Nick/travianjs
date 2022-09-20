@@ -4,7 +4,8 @@
   "description": "",
   "main": "travian.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "deploy": "tsc && git add . && git commit -am Deploy && git push"
   },
   "repository": {
     "type": "git",

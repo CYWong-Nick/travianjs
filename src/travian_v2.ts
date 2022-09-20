@@ -34,13 +34,12 @@ class StateHandler implements ProxyHandler<State> {
             return JSON.parse(item)
     }
 
-    set = (obj: State, prop: string) => {
-        localStorage.setItem(prop, JSON.stringify(obj))
+    set = (obj: State, prop: string, value: any) => {
+        localStorage.setItem(prop, JSON.stringify(value))
         this.render(obj)
         return true
     }
 }
-
 
 const render: RenderFunction = (state: State) => {
     $('#console').html(`
