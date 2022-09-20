@@ -120,8 +120,8 @@ const updateVillageList = (state) => {
             currentVillageId = id;
         const name = $(ele).find('.name')[0].innerText;
         const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes;
-        const x = parseIntIgnoreSep(((_b = coordinateAttributes.getNamedItem('data-x')) === null || _b === void 0 ? void 0 : _b.value) || '');
-        const y = parseIntIgnoreSep(((_c = coordinateAttributes.getNamedItem('data-y')) === null || _c === void 0 ? void 0 : _c.value) || '');
+        const x = Utils.parseIntIgnoreSep(((_b = coordinateAttributes.getNamedItem('data-x')) === null || _b === void 0 ? void 0 : _b.value) || '');
+        const y = Utils.parseIntIgnoreSep(((_c = coordinateAttributes.getNamedItem('data-y')) === null || _c === void 0 ? void 0 : _c.value) || '');
         const villageDefaults = {
             currentBuildTasks: [],
             pendingBuildTasks: [],
@@ -163,7 +163,7 @@ const render = (state) => {
                     <div>
                         ${id} ${village.name} ${village.resources.lumber} ${village.resources.clay} ${village.resources.iron} ${village.resources.crop}
                     </div>
-                `).join()}
+                `).join('')}
             </div>
             <div class="flex">
                 <div class="flex-row">
