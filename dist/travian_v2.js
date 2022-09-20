@@ -41,6 +41,9 @@ class Utils {
 Utils.parseIntIgnoreSep = (s) => {
     return parseInt(s.replace('.', '').replace(',', ''));
 };
+Utils.addToDate = (date, hour, minute, second) => {
+    return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000);
+};
 var TroopMovementType;
 (function (TroopMovementType) {
     TroopMovementType["REINFORCE"] = "REINFORCE";
@@ -149,6 +152,21 @@ const updateVillageStatus = (state) => {
     let iron = Utils.parseIntIgnoreSep($('#l3')[0].innerText);
     let crop = Utils.parseIntIgnoreSep($('#l4')[0].innerText);
     villages[currentVillageId].resources = { lumber, clay, iron, crop };
+    const currentBuildTasks = [];
+    $('.buildingList > ul > li').each((_, ele) => {
+        const nameAndLevelEle = $(ele).find('.name').contents();
+        const name = $(nameAndLevelEle[0]).text().trim();
+        const level = $(nameAndLevelEle[1]).text().trim();
+        const timer = $(ele).find('.timer').text();
+        const timerParts = timer.split(":");
+        const finishTime = Utils.addToDate(new Date(), Utils.parseIntIgnoreSep(timerParts[0]), Utils.parseIntIgnoreSep(timerParts[1]), Utils.parseIntIgnoreSep(timerParts[2]));
+        currentBuildTasks.push({
+            name,
+            level,
+            finishTime
+        });
+    });
+    villages[currentVillageId].currentBuildTasks = currentBuildTasks;
     state.villages = villages;
 };
 const render = (state) => {
