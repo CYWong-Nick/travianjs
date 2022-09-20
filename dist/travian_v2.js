@@ -38,6 +38,9 @@ StateHandler.INITIAL_STATE = {
 };
 class Utils {
 }
+Utils.parseIntIgnoreSep = (s) => {
+    return parseInt(s.replace('.', '').replace(',', ''));
+};
 var TroopMovementType;
 (function (TroopMovementType) {
     TroopMovementType["REINFORCE"] = "REINFORCE";
@@ -106,16 +109,19 @@ const updateCurrentPage = (state) => {
 const updateVillageList = (state) => {
     const villages = state.villages;
     const villageListEle = $('.villageList .listEntry');
+    let currentVillageId;
     villageListEle.each((_, ele) => {
         var _a, _b, _c;
         const id = (_a = ele.attributes.getNamedItem('data-did')) === null || _a === void 0 ? void 0 : _a.value;
         if (!id) {
             return;
         }
+        if (ele.className.includes('active'))
+            currentVillageId = id;
         const name = $(ele).find('.name')[0].innerText;
         const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes;
-        const x = parseInt(((_b = coordinateAttributes.getNamedItem('data-x')) === null || _b === void 0 ? void 0 : _b.value) || '');
-        const y = parseInt(((_c = coordinateAttributes.getNamedItem('data-y')) === null || _c === void 0 ? void 0 : _c.value) || '');
+        const x = parseIntIgnoreSep(((_b = coordinateAttributes.getNamedItem('data-x')) === null || _b === void 0 ? void 0 : _b.value) || '');
+        const y = parseIntIgnoreSep(((_c = coordinateAttributes.getNamedItem('data-y')) === null || _c === void 0 ? void 0 : _c.value) || '');
         const villageDefaults = {
             currentBuildTasks: [],
             pendingBuildTasks: [],
@@ -132,8 +138,18 @@ const updateVillageList = (state) => {
             name, position: { x, y } });
     });
     state.villages = villages;
+    if (currentVillageId)
+        state.currentVillageId = currentVillageId;
 };
 const updateVillageStatus = (state) => {
+    const villages = state.villages;
+    const currentVillageId = state.currentVillageId;
+    let lumber = Utils.parseIntIgnoreSep($('#l1')[0].innerText);
+    let clay = Utils.parseIntIgnoreSep($('#l2')[0].innerText);
+    let iron = Utils.parseIntIgnoreSep($('#l3')[0].innerText);
+    let crop = Utils.parseIntIgnoreSep($('#l4')[0].innerText);
+    villages[currentVillageId].resources = { lumber, clay, iron, crop };
+    state.villages = villages;
 };
 const render = (state) => {
     $('#console').html(`
@@ -168,6 +184,6 @@ const initialize = () => {
     createContainer();
     render(state);
     run(state);
-    setInterval(run, 30000);
+    setInterval(() => run(state), 30000);
 };
 initialize();

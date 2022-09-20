@@ -55,7 +55,9 @@ class StateHandler implements ProxyHandler<State> {
 }
 
 class Utils {
-
+    static parseIntIgnoreSep = (s: string) => {
+        return parseInt(s.replace('.', '').replace(',', ''))
+    }
 }
 
 interface Resource {
@@ -169,6 +171,7 @@ const updateVillageList = (state: State) => {
     const villages = state.villages
 
     const villageListEle = $('.villageList .listEntry')
+    let currentVillageId
 
     villageListEle.each((_, ele) => {
         const id = ele.attributes.getNamedItem('data-did')?.value
@@ -176,10 +179,12 @@ const updateVillageList = (state: State) => {
             return
         }
 
+        if (ele.className.includes('active'))
+            currentVillageId = id
         const name = $(ele).find('.name')[0].innerText
         const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes
-        const x = parseInt(coordinateAttributes.getNamedItem('data-x')?.value || '')
-        const y = parseInt(coordinateAttributes.getNamedItem('data-y')?.value || '')
+        const x = parseIntIgnoreSep(coordinateAttributes.getNamedItem('data-x')?.value || '')
+        const y = parseIntIgnoreSep(coordinateAttributes.getNamedItem('data-y')?.value || '')
 
         const villageDefaults = {
             currentBuildTasks: [],
@@ -204,10 +209,22 @@ const updateVillageList = (state: State) => {
     })
 
     state.villages = villages
+    if (currentVillageId)
+        state.currentVillageId = currentVillageId
 }
 
 const updateVillageStatus = (state: State) => {
+    const villages = state.villages
+    const currentVillageId = state.currentVillageId
 
+    let lumber = Utils.parseIntIgnoreSep($('#l1')[0].innerText)
+    let clay = Utils.parseIntIgnoreSep($('#l2')[0].innerText)
+    let iron = Utils.parseIntIgnoreSep($('#l3')[0].innerText)
+    let crop = Utils.parseIntIgnoreSep($('#l4')[0].innerText)
+
+    villages[currentVillageId].resources = { lumber, clay, iron, crop }
+
+    state.villages = villages
 }
 
 const render: RenderFunction = (state: State) => {
@@ -246,7 +263,7 @@ const initialize = () => {
     createContainer()
     render(state)
     run(state)
-    setInterval(run, 30000)
+    setInterval(() => run(state), 30000)
 }
 
 initialize()
