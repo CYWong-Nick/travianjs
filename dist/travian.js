@@ -139,19 +139,19 @@ function addCurrentBuildingToPending() {
         grassReq
     });
     setState(PENDING_BUILD_LIST_KEY, pendingBuildList);
-    render();
+    _render();
 }
 function removeFromPending(i, rerender) {
     let pendingBuildList = getState(PENDING_BUILD_LIST_KEY, []);
     pendingBuildList.splice(i, 1);
     setState(PENDING_BUILD_LIST_KEY, pendingBuildList);
     if (rerender)
-        render();
+        _render();
 }
 function toggleAutoBuild() {
     let enableAutoBuild = getState(ENABLE_AUTO_BUILD_KEY, false);
     setState(ENABLE_AUTO_BUILD_KEY, !enableAutoBuild);
-    render();
+    _render();
 }
 function tryBuild(buildingList, wood, brick, metal, grass) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -218,7 +218,7 @@ function getCurrentPageType() {
     if (loc.includes('build.php'))
         return BUILDING_PAGE;
 }
-function render() {
+function _render() {
     return __awaiter(this, void 0, void 0, function* () {
         let pageType = getCurrentPageType();
         let pendingBuildList = getState(PENDING_BUILD_LIST_KEY, []);
@@ -259,5 +259,5 @@ function render() {
   `);
     });
 }
-render();
-setInterval(render, 30000);
+_render();
+setInterval(_render, 30000);

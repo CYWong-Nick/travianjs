@@ -143,7 +143,7 @@ function addCurrentBuildingToPending() {
   })
 
   setState(PENDING_BUILD_LIST_KEY, pendingBuildList)
-  render()
+  _render()
 }
 
 function removeFromPending(i, rerender) {
@@ -151,13 +151,13 @@ function removeFromPending(i, rerender) {
   pendingBuildList.splice(i, 1)
   setState(PENDING_BUILD_LIST_KEY, pendingBuildList)
   if (rerender)
-    render()
+    _render()
 }
 
 function toggleAutoBuild() {
   let enableAutoBuild = getState(ENABLE_AUTO_BUILD_KEY, false)
   setState(ENABLE_AUTO_BUILD_KEY, !enableAutoBuild)
-  render()
+  _render()
 }
 
 async function tryBuild(buildingList, wood, brick, metal, grass) {
@@ -231,7 +231,7 @@ function getCurrentPageType() {
     return BUILDING_PAGE
 }
 
-async function render() {
+async function _render() {
   let pageType = getCurrentPageType()
   let pendingBuildList = getState(PENDING_BUILD_LIST_KEY, [])
   let enableAutoBuild = getState(ENABLE_AUTO_BUILD_KEY, false)
@@ -279,5 +279,5 @@ async function render() {
   `)
 }
 
-render()
-setInterval(render, 30000)
+_render()
+setInterval(_render, 30000)
