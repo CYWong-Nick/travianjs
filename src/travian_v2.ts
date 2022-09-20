@@ -21,12 +21,17 @@ class StateHandler implements ProxyHandler<State> {
     }
 
     private render: RenderFunction
+    private state: State 
 
     constructor(render: RenderFunction) {
         this.render = render
+        this.state = Object.fromEntries(
+            Object.keys(StateHandler.INITIAL_STATE)
+                .map(k => [k, this.parseState(k as keyof State)] )
+        ) as State
     }
 
-    get = (obj: State, prop: keyof State) => {
+    private parseState = (prop: keyof State) => {
         let item = localStorage.getItem(prop)
         if (item === null)
             return StateHandler.INITIAL_STATE[prop]
@@ -34,9 +39,14 @@ class StateHandler implements ProxyHandler<State> {
             return JSON.parse(item)
     }
 
-    set = (obj: State, prop: string, value: any) => {
+    get = (obj: State, prop: keyof State) => {
+        return this.state[prop]
+    }
+
+    set = (obj: State, prop: keyof State, value: any) => {
         localStorage.setItem(prop, JSON.stringify(value))
-        this.render(obj)
+        this.state[prop] = value
+        this.render(this.state)
         return true
     }
 }

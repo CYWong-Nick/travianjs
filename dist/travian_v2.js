@@ -8,19 +8,25 @@ var CurrentPageEnum;
 })(CurrentPageEnum || (CurrentPageEnum = {}));
 class StateHandler {
     constructor(render) {
-        this.get = (obj, prop) => {
+        this.parseState = (prop) => {
             let item = localStorage.getItem(prop);
             if (item === null)
                 return StateHandler.INITIAL_STATE[prop];
             else
                 return JSON.parse(item);
         };
+        this.get = (obj, prop) => {
+            return this.state[prop];
+        };
         this.set = (obj, prop, value) => {
             localStorage.setItem(prop, JSON.stringify(value));
-            this.render(obj);
+            this.state[prop] = value;
+            this.render(this.state);
             return true;
         };
         this.render = render;
+        this.state = Object.fromEntries(Object.keys(StateHandler.INITIAL_STATE)
+            .map(k => [k, this.parseState(k)]));
     }
 }
 StateHandler.INITIAL_STATE = {
