@@ -152,13 +152,18 @@ const updateVillageStatus = (state) => {
     state.villages = villages;
 };
 const render = (state) => {
+    const villages = state.villages;
     $('#console').html(`
         <h4>Console</h4>
         <div class="flex-row">
             <div class="flex">
                 <h5>Summary</h5>
                 <div>Current: ${state.currentPage} (Last render: ${new Date()})</div>
-                <div>${state.villages}</div>
+                ${Object.entries(villages).map(([id, village]) => `
+                    <div>
+                        ${id} ${village.name} ${village.resources.lumber} ${village.resources.clay} ${village.resources.iron} ${village.resources.crop}
+                    </div>
+                `).join()}
             </div>
             <div class="flex">
                 <div class="flex-row">
