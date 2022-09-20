@@ -1,11 +1,18 @@
+enum CurrentPageEnum {
+    FIELDS = "FIELDS",
+    TOWN = "TOWN",
+    BUILDING = "BUILDING"
+}
+
 class StateHandler implements ProxyHandler<State> {
     static INITIAL_STATE: State = {
-        currentBuildingList: [],
-        pendingBuildingList: []
+        currentPage: CurrentPageEnum.FIELDS,
+        currentVillageId: "",
+        villages: {}
     }
 
-    get = (obj: State, prop: string) => {
-        let item = localStorage.getItem(prop)
+    get = (obj: State, prop: keyof State) => {
+        let item =  localStorage.getItem(prop)
         if (item === null)
             return StateHandler.INITIAL_STATE[prop]
         else
@@ -66,12 +73,6 @@ interface PendingBuildTask {
     resources: Resource
 }
 
-enum CurrentPageEnum {
-    FIELDS = "FIELDS",
-    TOWN = "TOWN",
-    BUILDING = "BUILDING"
-}
-
 interface State {
     currentVillageId: string
     currentPage: CurrentPageEnum
@@ -80,9 +81,14 @@ interface State {
 
 const state: State = new Proxy(StateHandler.INITIAL_STATE, new StateHandler())
 
-const render = () => {
-    updateVillageStatus()
-    alertAttack() 
-    tryBuild() 
-    alertEmptyBuildQueue()
+const updateVillageStatus = () => {
+    // state.currentVillageId = 
+}
+
+const run = () => {
+    // updateVillageList()
+    // updateVillageStatus()
+    // alertAttack() 
+    // tryBuild() 
+    // alertEmptyBuildQueue()
 }
