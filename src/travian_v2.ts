@@ -20,14 +20,13 @@ class StateHandler implements ProxyHandler<State> {
         villages: {}
     }
 
-    private render: RenderFunction
-    private state: State 
+    private state: State
+    private callback?: () => any
 
-    constructor(render: RenderFunction) {
-        this.render = render
+    constructor() {
         this.state = Object.fromEntries(
             Object.keys(StateHandler.INITIAL_STATE)
-                .map(k => [k, this.parseState(k as keyof State)] )
+                .map(k => [k, this.parseState(k as keyof State)])
         ) as State
     }
 
@@ -46,28 +45,14 @@ class StateHandler implements ProxyHandler<State> {
     set = (obj: State, prop: keyof State, value: any) => {
         localStorage.setItem(prop, JSON.stringify(value))
         this.state[prop] = value
-        this.render(this.state)
+        this.callback && this.callback()
         return true
     }
-}
 
-const render: RenderFunction = (state: State) => {
-    $('#console').html(`
-    <h4>Console</h4>
-    <div class="flex-row">
-      <div class="flex">
-        <h5>Summary</h5>
-        <div>Current: ${state.currentPage} (Last render: ${new Date()})</div>
-      </div>
-      <div class="flex">
-        <div class="flex-row">
-          <h5>Pending Build Tasks</h5>
-        </div>
-      </div>
-    </div>
-  `)
+    setCallback = (callback: () => any) => {
+        this.callback = callback
+    }
 }
-
 
 class Utils {
 
@@ -117,7 +102,48 @@ interface PendingBuildTask {
     resources: Resource
 }
 
-const updateCurrentPage = () => {
+const createStyle = () => {
+    const style = document.createElement('style');
+    style.textContent = `
+        #console {
+            background: white; 
+            margin: 0 20px; 
+            border-radius: 10px; 
+            padding: 5px; 
+        }
+        
+        #console .flex-row {
+            display: flex;
+            flex-direction: row;
+        }
+        
+        #console .flex {
+            flex: 1 1 auto;
+        }
+        
+        #console .ml-5 {
+            margin-left: 5px;
+        }
+        
+        #console .mr-5 {
+            margin-right: 5px;
+        }
+        
+        #console button {
+            border: 1px solid black;
+            border-radius: 3px;
+        }
+    `;
+    document.head.append(style);
+}
+
+const createContainer = () => {
+    $('#footer').before(`
+      <div id="console"/>
+    `)
+}
+
+const updateCurrentPage = (state: State) => {
     let pathname = window.location.pathname
     switch (pathname) {
         case '/dorf1.php': {
@@ -139,18 +165,88 @@ const updateCurrentPage = () => {
     }
 }
 
-const run = () => {
-    updateCurrentPage()
-    // updateVillageStatus()
+const updateVillageList = (state: State) => {
+    const villages = state.villages
+
+    const villageListEle = $('.villageList .listEntry')
+
+    villageListEle.each((_, ele) => {
+        const id = ele.attributes.getNamedItem('data-did')?.value
+        if (!id) {
+            return
+        }
+
+        const name = $(ele).find('.name')[0].innerText
+        const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes
+        const x = parseInt(coordinateAttributes.getNamedItem('data-x')?.value || '')
+        const y = parseInt(coordinateAttributes.getNamedItem('data-y')?.value || '')
+
+        const villageDefaults = {
+            currentBuildTasks: [],
+            pendingBuildTasks: [],
+            incomingTroops: [],
+            outgoingTroops: [],
+            resources: {
+                lumber: 0,
+                clay: 0,
+                iron: 0,
+                crop: 0
+            },
+        }
+
+        villages[id] = {
+            ...villageDefaults,
+            ...villages[id],
+            id,
+            name,
+            position: { x, y },
+        }
+    })
+
+    state.villages = villages
+}
+
+const updateVillageStatus = (state: State) => {
+
+}
+
+const render: RenderFunction = (state: State) => {
+    $('#console').html(`
+        <h4>Console</h4>
+        <div class="flex-row">
+            <div class="flex">
+                <h5>Summary</h5>
+                <div>Current: ${state.currentPage} (Last render: ${new Date()})</div>
+                <div>${state.villages}</div>
+            </div>
+            <div class="flex">
+                <div class="flex-row">
+                <h5>Pending Build Tasks</h5>
+                </div>
+            </div>
+        </div>
+    `)
+}
+
+const run = (state: State) => {
+    updateCurrentPage(state)
+    updateVillageList(state)
+    updateVillageStatus(state)
     // alertAttack()
     // tryBuild()
     // alertEmptyBuildQueue()
 }
 
-const state: State = new Proxy(StateHandler.INITIAL_STATE, new StateHandler(render))
-$('#footer').before(`
-  <div id="console"/>
-`)
-render(state)
-run()
-setInterval(run, 30000)
+const initialize = () => {
+    const handler = new StateHandler()
+    const state: State = new Proxy(StateHandler.INITIAL_STATE, handler)
+    handler.setCallback(() => render(state))
+
+    createStyle()
+    createContainer()
+    render(state)
+    run(state)
+    setInterval(run, 30000)
+}
+
+initialize()
