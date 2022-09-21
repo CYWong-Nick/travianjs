@@ -44,6 +44,10 @@ Utils.parseIntIgnoreSep = (s) => {
 Utils.addToDate = (date, hour, minute, second) => {
     return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000);
 };
+Utils.formatDate = (dateInput) => {
+    const date = new Date(dateInput);
+    return `${date.getFullYear()}/${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+};
 var TroopMovementType;
 (function (TroopMovementType) {
     TroopMovementType["REINFORCE"] = "REINFORCE";
@@ -176,13 +180,13 @@ const render = (state) => {
         <div class="flex-row">
             <div class="flex">
                 <h5>Summary</h5>
-                <div>Current: ${state.currentPage} (Last render: ${new Date()})</div>
+                <div>Current: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
                 ${Object.entries(villages).map(([id, village]) => `
                     <div>
                         <h5>${village.name} (${id})</h5>
                         <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
                         ${village.currentBuildTasks.map(task => `
-                        <div>${task.name} ${task.level} ${new Date(task.finishTime)}</div>
+                        <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
                         `).join('')}
                     </div>
                 `).join('')}

@@ -62,6 +62,11 @@ class Utils {
     static addToDate = (date: Date, hour: number, minute: number, second: number) => {
         return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000)
     }
+
+    static formatDate = (dateInput: Date) => {
+        const date = new Date(dateInput)
+        return `${date.getFullYear()}/${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+    }
 }
 
 interface Resource {
@@ -261,13 +266,13 @@ const render: RenderFunction = (state: State) => {
         <div class="flex-row">
             <div class="flex">
                 <h5>Summary</h5>
-                <div>Current: ${state.currentPage} (Last render: ${new Date()})</div>
+                <div>Current: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
                 ${Object.entries(villages).map(([id, village]) => `
                     <div>
                         <h5>${village.name} (${id})</h5>
                         <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
                         ${village.currentBuildTasks.map(task => `
-                        <div>${task.name} ${task.level} ${new Date(task.finishTime)}</div>
+                        <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
                         `).join('')}
                     </div>
                 `).join('')}
