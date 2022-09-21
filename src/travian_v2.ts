@@ -264,7 +264,11 @@ const render: RenderFunction = (state: State) => {
                 <div>Current: ${state.currentPage} (Last render: ${new Date()})</div>
                 ${Object.entries(villages).map(([id, village]) => `
                     <div>
-                        ${id} ${village.name} ${village.resources.lumber} ${village.resources.clay} ${village.resources.iron} ${village.resources.crop}
+                        <h5>${village.name} (${id})</h5>
+                        <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
+                        ${village.currentBuildTasks.map(task => `
+                        <div>${task.name} ${task.level} ${new Date(task.finishTime)}</div>
+                        `).join('')}
                     </div>
                 `).join('')}
             </div>
