@@ -275,43 +275,6 @@ const updateCurrentVillageStatus = (state: State) => {
 const render: RenderFunction = (state: State) => {
     const villages = state.villages
 
-    $('#addCurrentButton').on('click', () => {
-        console.log('ADD')
-        const villages = state.villages
-        const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
-        
-        const params = new URLSearchParams(window.location.search);
-        const aid = params.get('id')
-        const gid = params.get('gid')
-        
-        if (!aid || !gid) {
-            return
-        }
-        
-        const resourceRequirementEle = $('#contract .value')
-        if (!resourceRequirementEle.length) {
-            return
-        }
-        
-        const lumber = Utils.parseIntIgnoreSep(resourceRequirementEle[0].innerText)
-        const clay = Utils.parseIntIgnoreSep(resourceRequirementEle[1].innerText)
-        const iron = Utils.parseIntIgnoreSep(resourceRequirementEle[2].innerText)
-        const crop = Utils.parseIntIgnoreSep(resourceRequirementEle[3].innerText)
-        
-        pendingBuildTasks.push({
-            aid: Utils.parseIntIgnoreSep(aid),
-            gid:  Utils.parseIntIgnoreSep(gid),
-            resources : {
-                lumber,
-                clay,
-                iron,
-                crop
-            }
-        })
-        
-        state.villages = villages
-    })
-
     $('#console').html(`
         <h4>Console</h4>
         <div class="flex-row">
@@ -336,6 +299,43 @@ const render: RenderFunction = (state: State) => {
             </div>
         </div>
     `)
+
+    $('#addCurrentButton').on('click', () => {
+        console.log('ADD')
+        const villages = state.villages
+        const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
+
+        const params = new URLSearchParams(window.location.search);
+        const aid = params.get('id')
+        const gid = params.get('gid')
+
+        if (!aid || !gid) {
+            return
+        }
+
+        const resourceRequirementEle = $('#contract .value')
+        if (!resourceRequirementEle.length) {
+            return
+        }
+
+        const lumber = Utils.parseIntIgnoreSep(resourceRequirementEle[0].innerText)
+        const clay = Utils.parseIntIgnoreSep(resourceRequirementEle[1].innerText)
+        const iron = Utils.parseIntIgnoreSep(resourceRequirementEle[2].innerText)
+        const crop = Utils.parseIntIgnoreSep(resourceRequirementEle[3].innerText)
+
+        pendingBuildTasks.push({
+            aid: Utils.parseIntIgnoreSep(aid),
+            gid: Utils.parseIntIgnoreSep(gid),
+            resources: {
+                lumber,
+                clay,
+                iron,
+                crop
+            }
+        })
+
+        state.villages = villages
+    })
 }
 
 const run = (state: State) => {

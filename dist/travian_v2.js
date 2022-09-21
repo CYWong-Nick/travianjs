@@ -186,6 +186,30 @@ const updateCurrentVillageStatus = (state) => {
 };
 const render = (state) => {
     const villages = state.villages;
+    $('#console').html(`
+        <h4>Console</h4>
+        <div class="flex-row">
+            <div class="flex">
+                <h5>Summary</h5>
+                <div>Current: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
+                ${Object.entries(villages).map(([id, village]) => `
+                    <div>
+                        <h5>${village.name} (${id})</h5>
+                        <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
+                        ${village.currentBuildTasks.map(task => `
+                        <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
+                        `).join('')}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="flex">
+                <div class="flex-row">
+                    <h5>Pending Build Tasks</h5>
+                    <button id="addCurrentButton">Add Current</button>
+                </div>
+            </div>
+        </div>
+    `);
     $('#addCurrentButton').on('click', () => {
         console.log('ADD');
         const villages = state.villages;
@@ -216,30 +240,6 @@ const render = (state) => {
         });
         state.villages = villages;
     });
-    $('#console').html(`
-        <h4>Console</h4>
-        <div class="flex-row">
-            <div class="flex">
-                <h5>Summary</h5>
-                <div>Current: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
-                ${Object.entries(villages).map(([id, village]) => `
-                    <div>
-                        <h5>${village.name} (${id})</h5>
-                        <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
-                        ${village.currentBuildTasks.map(task => `
-                        <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
-                        `).join('')}
-                    </div>
-                `).join('')}
-            </div>
-            <div class="flex">
-                <div class="flex-row">
-                    <h5>Pending Build Tasks</h5>
-                    <button id="addCurrentButton">Add Current</button>
-                </div>
-            </div>
-        </div>
-    `);
 };
 const run = (state) => {
     updateCurrentPage(state);
