@@ -59,6 +59,14 @@ class Utils {
         return parseInt(s.replace('.', '').replace(',', ''))
     }
 
+    randInt = (x: number, y: number) => {
+        return Math.floor(Math.random() * (y - x + 1) + x)
+    }
+
+    sleep = (ms: number) => {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     static addToDate = (date: Date, hour: number, minute: number, second: number) => {
         return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000)
     }
@@ -94,6 +102,7 @@ interface Village {
     id: string
     name: string
     position: Position
+    index: number
     currentBuildTasks: CurrentBuildTask[]
     pendingBuildTasks: PendingBuildTask[]
     resources: Resource
@@ -182,7 +191,7 @@ const updateVillageList = (state: State) => {
     const villageListEle = $('.villageList .listEntry')
     let currentVillageId
 
-    villageListEle.each((_, ele) => {
+    villageListEle.each((index, ele) => {
         const id = ele.attributes.getNamedItem('data-did')?.value
         if (!id) {
             return
@@ -213,6 +222,7 @@ const updateVillageList = (state: State) => {
             ...villages[id],
             id,
             name,
+            index,
             position: { x, y },
         }
     })
@@ -222,7 +232,7 @@ const updateVillageList = (state: State) => {
         state.currentVillageId = currentVillageId
 }
 
-const updateVillageStatus = (state: State) => {
+const updateCurrentVillageStatus = (state: State) => {
     const villages = state.villages
     const currentVillageId = state.currentVillageId
 
@@ -233,34 +243,75 @@ const updateVillageStatus = (state: State) => {
 
     villages[currentVillageId].resources = { lumber, clay, iron, crop }
 
-    const currentBuildTasks: CurrentBuildTask[] = []
-    $('.buildingList > ul > li').each((_, ele) => {
-        const nameAndLevelEle = $(ele).find('.name').contents()
-        const name = $(nameAndLevelEle[0]).text().trim()
-        const level = $(nameAndLevelEle[1]).text().trim()
-        const timer = $(ele).find('.timer').text()
+    if (state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.FIELDS]) {
+        const currentBuildTasks: CurrentBuildTask[] = []
+        $('.buildingList > ul > li').each((_, ele) => {
+            const nameAndLevelEle = $(ele).find('.name').contents()
+            const name = $(nameAndLevelEle[0]).text().trim()
+            const level = $(nameAndLevelEle[1]).text().trim()
+            const timer = $(ele).find('.timer').text()
 
-        const timerParts = timer.split(":")
-        const finishTime = Utils.addToDate(
-            new Date(),
-            Utils.parseIntIgnoreSep(timerParts[0]),
-            Utils.parseIntIgnoreSep(timerParts[1]),
-            Utils.parseIntIgnoreSep(timerParts[2])
-        )
+            const timerParts = timer.split(":")
+            const finishTime = Utils.addToDate(
+                new Date(),
+                Utils.parseIntIgnoreSep(timerParts[0]),
+                Utils.parseIntIgnoreSep(timerParts[1]),
+                Utils.parseIntIgnoreSep(timerParts[2])
+            )
 
-        currentBuildTasks.push({
-            name,
-            level,
-            finishTime
+            currentBuildTasks.push({
+                name,
+                level,
+                finishTime
+            })
         })
-    })
 
-    villages[currentVillageId].currentBuildTasks = currentBuildTasks
+        villages[currentVillageId].currentBuildTasks = currentBuildTasks
+    }
+
     state.villages = villages
 }
 
 const render: RenderFunction = (state: State) => {
     const villages = state.villages
+
+    $('#addCurrentButton').on('click', () => {
+        console.log('ADD')
+        const villages = state.villages
+        const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
+        
+        const params = new URLSearchParams(window.location.search);
+        const aid = params.get('id')
+        const gid = params.get('gid')
+        
+        if (!aid || !gid) {
+            return
+        }
+        
+        const resourceRequirementEle = $('#contract .value')
+        if (!resourceRequirementEle.length) {
+            return
+        }
+        
+        const lumber = Utils.parseIntIgnoreSep(resourceRequirementEle[0].innerText)
+        const clay = Utils.parseIntIgnoreSep(resourceRequirementEle[1].innerText)
+        const iron = Utils.parseIntIgnoreSep(resourceRequirementEle[2].innerText)
+        const crop = Utils.parseIntIgnoreSep(resourceRequirementEle[3].innerText)
+        
+        pendingBuildTasks.push({
+            aid: Utils.parseIntIgnoreSep(aid),
+            gid:  Utils.parseIntIgnoreSep(gid),
+            resources : {
+                lumber,
+                clay,
+                iron,
+                crop
+            }
+        })
+        
+        state.villages = villages
+    })
+
     $('#console').html(`
         <h4>Console</h4>
         <div class="flex-row">
@@ -279,7 +330,8 @@ const render: RenderFunction = (state: State) => {
             </div>
             <div class="flex">
                 <div class="flex-row">
-                <h5>Pending Build Tasks</h5>
+                    <h5>Pending Build Tasks</h5>
+                    <button id="addCurrentButton">Add Current</button>
                 </div>
             </div>
         </div>
@@ -289,10 +341,11 @@ const render: RenderFunction = (state: State) => {
 const run = (state: State) => {
     updateCurrentPage(state)
     updateVillageList(state)
-    updateVillageStatus(state)
+    updateCurrentVillageStatus(state)
     // alertAttack()
     // tryBuild()
     // alertEmptyBuildQueue()
+    // tryNextVillage()
 }
 
 const initialize = () => {
