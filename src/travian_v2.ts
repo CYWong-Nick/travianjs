@@ -13,6 +13,53 @@ interface State {
 
 type RenderFunction = (state: State) => void
 
+const GID_NAME_MAP: Record<string, string> = {
+    "1": "Woodcutter",
+    "2": "Clay Pit",
+    "3": "Iron Mine",
+    "4": "Cropland",
+    "5": "Sawmill",
+    "6": "Brickyard",
+    "7": "Iron Foundry",
+    "8": "Grain Mill",
+    "9": "Bakery",
+    "10": "Warehouse",
+    "11": "Granary",
+    "13": "Smithy",
+    "14": "Tournament Square",
+    "15": "Main Building",
+    "16": "Rally Point",
+    "17": "Marketplace",
+    "18": "Embassy",
+    "19": "Barracks",
+    "21": "Workshop",
+    "23": "Cranny",
+    "24": "Town Hall",
+    "25": "Residence",
+    "26": "Palace",
+    "27": "Treasury",
+    "28": "Trade Office",
+    "29": "Great Barracks",
+    "31": "City Wall",
+    "32": "Earth Wall",
+    "33": "Palisade",
+    "34": "Stonemason's Lodge",
+    "35": "Brewery",
+    "36": "Trapper",
+    "37": "Hero's Mansion",
+    "38": "Great Warehouse",
+    "39": "Great Granary",
+    "41": "Horse Drinking Trough",
+    "42": "Stone Wall",
+    "43": "Makeshift Wall",
+    "44": "Command Center",
+    "45": "Waterworks",
+    "20": "Stable",
+    "22": "Academy",
+    "30": "Great Stable",
+    "40": "Wonder of the World"
+  }
+
 class StateHandler implements ProxyHandler<State> {
     static INITIAL_STATE: State = {
         currentPage: CurrentPageEnum.LOGIN,
@@ -274,6 +321,7 @@ const updateCurrentVillageStatus = (state: State) => {
 
 const render: RenderFunction = (state: State) => {
     const villages = state.villages
+    const currentVillage = state.villages[state.currentVillageId]
 
     $('#console').html(`
         <h4>Console</h4>
@@ -286,7 +334,7 @@ const render: RenderFunction = (state: State) => {
                         <h5>${village.name} (${id})</h5>
                         <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
                         ${village.currentBuildTasks.map(task => `
-                        <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
+                            <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
                         `).join('')}
                     </div>
                 `).join('')}
@@ -294,14 +342,20 @@ const render: RenderFunction = (state: State) => {
             <div class="flex">
                 <div class="flex-row">
                     <h5>Pending Build Tasks</h5>
-                    <button id="addCurrentButton">Add Current</button>
+                    <button id="addCurrentToPending">Add Current</button>
                 </div>
+                ${currentVillage.pendingBuildTasks.map((task, i) => `
+                    <div>
+                        <span>Position: ${task.aid}</span>
+                        <span>${GID_NAME_MAP[task.gid]}</span>
+                        <button class="removeFromPending" idx="${i}">x</button>
+                    </div>
+                `).join('')}
             </div>
         </div>
     `)
 
-    $('#addCurrentButton').on('click', () => {
-        console.log('ADD')
+    $('#addCurrentToPending').on('click', () => {
         const villages = state.villages
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
 
@@ -334,6 +388,17 @@ const render: RenderFunction = (state: State) => {
             }
         })
 
+        state.villages = villages
+    })
+
+    $('.removeFromPending').on('click', (ele) => {
+        const idx = ele.target.attributes.getNamedItem('idx')?.value
+        if (!idx)
+            return
+
+        const villages = state.villages
+        const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
+        pendingBuildTasks.splice( Utils.parseIntIgnoreSep(idx), 1)
         state.villages = villages
     })
 }
