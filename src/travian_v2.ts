@@ -58,7 +58,7 @@ const GID_NAME_MAP: Record<string, string> = {
     "22": "Academy",
     "30": "Great Stable",
     "40": "Wonder of the World"
-  }
+}
 
 class StateHandler implements ProxyHandler<State> {
     static INITIAL_STATE: State = {
@@ -236,7 +236,8 @@ const updateVillageList = (state: State) => {
     const villages = state.villages
 
     const villageListEle = $('.villageList .listEntry')
-    let currentVillageId
+    const currentVillageId = villageListEle.filter((_, ele) => ele.className.includes('active')).attr('data-did')
+    const villiageIds: string[] = []
 
     villageListEle.each((index, ele) => {
         const id = ele.attributes.getNamedItem('data-did')?.value
@@ -244,8 +245,8 @@ const updateVillageList = (state: State) => {
             return
         }
 
-        if (ele.className.includes('active'))
-            currentVillageId = id
+        villiageIds.push(id)
+
         const name = $(ele).find('.name')[0].innerText
         const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes
         const x = Utils.parseIntIgnoreSep(coordinateAttributes.getNamedItem('data-x')?.value || '')
@@ -274,7 +275,7 @@ const updateVillageList = (state: State) => {
         }
     })
 
-    state.villages = villages
+    state.villages = Object.fromEntries(Object.entries(villages).filter(([id, _]) => villiageIds.includes(id)))
     if (currentVillageId)
         state.currentVillageId = currentVillageId
 }
@@ -398,7 +399,7 @@ const render: RenderFunction = (state: State) => {
 
         const villages = state.villages
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
-        pendingBuildTasks.splice( Utils.parseIntIgnoreSep(idx), 1)
+        pendingBuildTasks.splice(Utils.parseIntIgnoreSep(idx), 1)
         state.villages = villages
     })
 }

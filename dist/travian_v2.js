@@ -170,15 +170,15 @@ const updateCurrentPage = (state) => {
 const updateVillageList = (state) => {
     const villages = state.villages;
     const villageListEle = $('.villageList .listEntry');
-    let currentVillageId;
+    const currentVillageId = villageListEle.filter((_, ele) => ele.className.includes('active')).attr('data-did');
+    const villiageIds = [];
     villageListEle.each((index, ele) => {
         var _a, _b, _c;
         const id = (_a = ele.attributes.getNamedItem('data-did')) === null || _a === void 0 ? void 0 : _a.value;
         if (!id) {
             return;
         }
-        if (ele.className.includes('active'))
-            currentVillageId = id;
+        villiageIds.push(id);
         const name = $(ele).find('.name')[0].innerText;
         const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes;
         const x = Utils.parseIntIgnoreSep(((_b = coordinateAttributes.getNamedItem('data-x')) === null || _b === void 0 ? void 0 : _b.value) || '');
@@ -199,7 +199,7 @@ const updateVillageList = (state) => {
             name,
             index, position: { x, y } });
     });
-    state.villages = villages;
+    state.villages = Object.fromEntries(Object.entries(villages).filter(([id, _]) => villiageIds.includes(id)));
     if (currentVillageId)
         state.currentVillageId = currentVillageId;
 };
