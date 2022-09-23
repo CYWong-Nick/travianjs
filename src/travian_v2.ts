@@ -153,8 +153,8 @@ class Utils {
 
 class Navigation {
     static goToVillage = async (state: State, id: string): Promise<boolean> => {
-        state.currentAction = CurrentActionEnum.VILLAGE_RESET
         await Utils.delayClick()
+        state.currentAction = CurrentActionEnum.VILLAGE_RESET
         state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`)
         $(`.listEntry[data-did="${id}"] > a`)[0].click()
         return true
@@ -451,7 +451,7 @@ const build = async (state: State) => {
 
 const nextVillage = async (state: State) => {
     if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 20)
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0)
         const villageIds = Object.keys(state.villages)
         const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length
         await Navigation.goToVillage(state, villageIds[nextIdx])
