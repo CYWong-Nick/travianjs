@@ -531,7 +531,8 @@ const render = (state: State) => {
         <div class="flex-row">
             <div class="flex">
                 <h5>Summary</h5>
-                <div>Current: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
+                <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
+                <div>Current Action: ${state.currentAction}</div>
                 ${Object.entries(villages).map(([id, village]) => `
                     <div>
                         <h5>${village.name} (${id})</h5>
