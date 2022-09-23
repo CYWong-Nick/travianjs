@@ -4,7 +4,8 @@ enum CurrentPageEnum {
     LOGIN = "LOGIN",
     FIELDS = "FIELDS",
     TOWN = "TOWN",
-    BUILDING = "BUILDING"
+    BUILDING = "BUILDING",
+    UNKNOWN="UNKNOWN"
 }
 
 enum CurrentActionEnum {
@@ -239,6 +240,10 @@ const updateCurrentPage = (state: State) => {
             state.currentPage = CurrentPageEnum.LOGIN
             break
         }
+        default: {
+            state.currentPage = CurrentPageEnum.UNKNOWN
+            break
+        }
     }
 }
 
@@ -358,14 +363,15 @@ const build = async (state: State) => {
                     DEBUG && console.log("Go to building")
                     if (task.aid === 40) {// Special case for wall 
                         $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
-                     } else{
+                    } else {
                         $(`a[href="/build.php?id=${task.aid}&gid=${task.gid}"]`)[0].click()
-                     }
+                    }
                 } else {
                     DEBUG && console.log("Go to town")
                     $('.village.buildingView')[0].click()
                 }
             }
+            return
         }
     }
 
@@ -381,6 +387,7 @@ const build = async (state: State) => {
                 state.villages = villages
                 console.log("BUILD!")
                 // bulidButton.trigger('click')
+                return
             }
         }
     }

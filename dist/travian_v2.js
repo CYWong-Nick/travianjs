@@ -15,6 +15,7 @@ var CurrentPageEnum;
     CurrentPageEnum["FIELDS"] = "FIELDS";
     CurrentPageEnum["TOWN"] = "TOWN";
     CurrentPageEnum["BUILDING"] = "BUILDING";
+    CurrentPageEnum["UNKNOWN"] = "UNKNOWN";
 })(CurrentPageEnum || (CurrentPageEnum = {}));
 var CurrentActionEnum;
 (function (CurrentActionEnum) {
@@ -182,6 +183,10 @@ const updateCurrentPage = (state) => {
             state.currentPage = CurrentPageEnum.LOGIN;
             break;
         }
+        default: {
+            state.currentPage = CurrentPageEnum.UNKNOWN;
+            break;
+        }
     }
 };
 const updateVillageList = (state) => {
@@ -286,6 +291,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
                     $('.village.buildingView')[0].click();
                 }
             }
+            return;
         }
     }
     if (village.pendingBuildTasks.length > 0) {
@@ -300,6 +306,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 state.villages = villages;
                 console.log("BUILD!");
                 // bulidButton.trigger('click')
+                return;
             }
         }
     }
