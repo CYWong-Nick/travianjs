@@ -1,3 +1,5 @@
+const DEBUG = true
+
 enum CurrentPageEnum {
     LOGIN = "LOGIN",
     FIELDS = "FIELDS",
@@ -343,19 +345,24 @@ const build = async (state: State) => {
         ) {
             state.currentAction = CurrentActionEnum.BUILD
             await Utils.sleep(Utils.randInt(1000, 5000))
-            console.log(task.aid)
             if (task.aid <= 18) {
-                if (state.currentPage === CurrentPageEnum.FIELDS)
+                if (state.currentPage === CurrentPageEnum.FIELDS) {
+                    DEBUG && console.log("Go to building")
                     $(`a[href="/build.php?id=${task.aid}"]`)[0].click()
-                else
+                } else {
+                    DEBUG && console.log("Go to fields")
                     $('.village.resourceView')[0].click()
+                }
             } else {
                 if (state.currentPage === CurrentPageEnum.TOWN) {
-                    if (task.aid === 40) // Special case for wall
+                    DEBUG && console.log("Go to building")
+                    if (task.aid === 40) {// Special case for wall 
                         $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
-                    else
+                     } else{
                         $(`a[href="/build.php?id=${task.aid}&gid=${task.gid}"]`)[0].click()
+                     }
                 } else {
+                    DEBUG && console.log("Go to town")
                     $('.village.buildingView')[0].click()
                 }
             }
@@ -368,7 +375,7 @@ const build = async (state: State) => {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
             const bulidButton = $('.section1 > button.green')
             if (bulidButton.length) {
-                await Utils.sleep(randInt(1000, 5000))
+                await Utils.sleep(Utils.randInt(1000, 5000))
                 state.currentAction = CurrentActionEnum.IDLE
                 village.pendingBuildTasks.splice(0, 1)
                 state.villages = villages
@@ -389,7 +396,7 @@ const build = async (state: State) => {
         .find(_ => true)
 
     if (nextVillageIdToBuild) {
-        console.log("Go to village", nextVillageIdToBuild)
+        DEBUG && console.log("Go to village", nextVillageIdToBuild)
         $(`a[href="?newdid=${nextVillageIdToBuild}&"]`)[0].click()
     }
 }

@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+const DEBUG = true;
 var CurrentPageEnum;
 (function (CurrentPageEnum) {
     CurrentPageEnum["LOGIN"] = "LOGIN";
@@ -260,21 +261,28 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             && task.resources.crop <= village.resources.crop) {
             state.currentAction = CurrentActionEnum.BUILD;
             yield Utils.sleep(Utils.randInt(1000, 5000));
-            console.log(task.aid);
             if (task.aid <= 18) {
-                if (state.currentPage === CurrentPageEnum.FIELDS)
+                if (state.currentPage === CurrentPageEnum.FIELDS) {
+                    DEBUG && console.log("Go to building");
                     $(`a[href="/build.php?id=${task.aid}"]`)[0].click();
-                else
+                }
+                else {
+                    DEBUG && console.log("Go to fields");
                     $('.village.resourceView')[0].click();
+                }
             }
             else {
                 if (state.currentPage === CurrentPageEnum.TOWN) {
-                    if (task.aid === 40) // Special case for wall
+                    DEBUG && console.log("Go to building");
+                    if (task.aid === 40) { // Special case for wall 
                         $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click');
-                    else
+                    }
+                    else {
                         $(`a[href="/build.php?id=${task.aid}&gid=${task.gid}"]`)[0].click();
+                    }
                 }
                 else {
+                    DEBUG && console.log("Go to town");
                     $('.village.buildingView')[0].click();
                 }
             }
@@ -286,7 +294,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
             const bulidButton = $('.section1 > button.green');
             if (bulidButton.length) {
-                yield Utils.sleep(randInt(1000, 5000));
+                yield Utils.sleep(Utils.randInt(1000, 5000));
                 state.currentAction = CurrentActionEnum.IDLE;
                 village.pendingBuildTasks.splice(0, 1);
                 state.villages = villages;
@@ -302,7 +310,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         .map(([id, _]) => id)
         .find(_ => true);
     if (nextVillageIdToBuild) {
-        console.log("Go to village", nextVillageIdToBuild);
+        DEBUG && console.log("Go to village", nextVillageIdToBuild);
         $(`a[href="?newdid=${nextVillageIdToBuild}&"]`)[0].click();
     }
 });
