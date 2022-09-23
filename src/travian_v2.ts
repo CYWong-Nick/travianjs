@@ -145,7 +145,7 @@ class Utils {
 
     static formatDate = (dateInput: Date) => {
         const date = new Date(dateInput)
-        return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 0)}:${Utils.leftPadZero(date.getMinutes(), 0)}:${Utils.leftPadZero(date.getSeconds(), 0)}`
+        return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 2)}:${Utils.leftPadZero(date.getMinutes(), 2)}:${Utils.leftPadZero(date.getSeconds(), 2)}`
     }
 }
 
