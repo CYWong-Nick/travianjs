@@ -1,5 +1,3 @@
-const DEBUG = true
-
 enum CurrentPageEnum {
     LOGIN = "LOGIN",
     FIELDS = "FIELDS",
@@ -109,7 +107,8 @@ class StateHandler implements ProxyHandler<State> {
 
     set = (obj: State, prop: keyof State, value: any) => {
         localStorage.setItem(prop, JSON.stringify(value))
-        this.state[prop] = value as never
+        //@ts-ignore
+        this.state[prop] = value
         this.callback && this.callback()
         return true
     }
@@ -132,6 +131,10 @@ class Utils {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    static delayClick = async () => {
+        await Utils.sleep(Utils.randInt(1000, 5000))
+    }
+
     static addToDate = (date: Date, hour: number, minute: number, second: number) => {
         return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000)
     }
@@ -143,6 +146,49 @@ class Utils {
     static formatDate = (dateInput: Date) => {
         const date = new Date(dateInput)
         return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 0)}:${Utils.leftPadZero(date.getMinutes(), 0)}:${Utils.leftPadZero(date.getSeconds(), 0)}`
+    }
+}
+
+class Navigation {
+    static goToVillage = async (state: State, id: string): Promise<boolean> => {
+        await Utils.delayClick()
+        state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`)
+        $(`a[href="?newdid=${id}&"]`)[0].click()
+        return true
+    }
+
+    static goToBuilding = async (state: State, aid: number, gid: number): Promise<boolean> => {
+        if (aid <= 18 && state.currentPage === CurrentPageEnum.FIELDS) {
+            await Utils.delayClick()
+            state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
+            $(`a[href="/build.php?id=${aid}"]`)[0].click()
+            return true
+        } else if (aid > 18 && state.currentPage === CurrentPageEnum.TOWN) {
+            await Utils.delayClick()
+            state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
+            if (aid === 40) { // Special case for wall
+                $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
+            } else {
+                $(`a[href="/build.php?id=${aid}&gid=${gid}"]`)[0].click()
+            }
+            return true
+        } else {
+            return false
+        }
+    }
+
+    static goToFields = async (state: State): Promise<boolean> => {
+        await Utils.delayClick()
+        state.feature.debug && console.log('Go to fields')
+        $('.village.resourceView')[0].click()
+        return true
+    }
+
+    static goToTown = async (state: State): Promise<boolean> => {
+        await Utils.delayClick()
+        state.feature.debug && console.log('Go to town')
+        $('.village.buildingView')[0].click()
+        return true
     }
 }
 
@@ -360,27 +406,12 @@ const build = async (state: State) => {
             && task.resources.crop <= village.resources.crop
         ) {
             state.currentAction = CurrentActionEnum.BUILD
-            await Utils.sleep(Utils.randInt(1000, 5000))
-            if (task.aid <= 18) {
-                if (state.currentPage === CurrentPageEnum.FIELDS) {
-                    DEBUG && console.log("Go to building - ", GID_NAME_MAP[task.aid])
-                    $(`a[href="/build.php?id=${task.aid}"]`)[0].click()
-                } else {
-                    DEBUG && console.log("Go to fields")
-                    $('.village.resourceView')[0].click()
-                }
-            } else {
-                if (state.currentPage === CurrentPageEnum.TOWN) {
-                    DEBUG && console.log("Go to building - ", GID_NAME_MAP[task.gid])
-                    if (task.aid === 40) {// Special case for wall
-                        $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
-                    } else {
-                        $(`a[href="/build.php?id=${task.aid}&gid=${task.gid}"]`)[0].click()
-                    }
-                } else {
-                    DEBUG && console.log("Go to town")
-                    $('.village.buildingView')[0].click()
-                }
+            const success = await Navigation.goToBuilding(state, task.aid, task.gid)
+            if (!success) {
+                if (state.currentPage === CurrentPageEnum.FIELDS)
+                    await Navigation.goToTown(state)
+                else
+                    await Navigation.goToFields(state)
             }
             return
         }
@@ -414,18 +445,16 @@ const build = async (state: State) => {
         .find(_ => true)
 
     if (nextVillageIdToBuild) {
-        DEBUG && console.log("Go to village", nextVillageIdToBuild)
-        $(`a[href="?newdid=${nextVillageIdToBuild}&"]`)[0].click()
+        await Navigation.goToVillage(state, nextVillageIdToBuild)
     }
 }
 
-const nextVillage = (state: State) => {
+const nextVillage = async (state: State) => {
     if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0)
         const villageIds = Object.keys(state.villages)
         const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length
-        DEBUG && console.log("Go to village", villageIds[nextIdx])
-        $(`a[href="?newdid=${villageIds[nextIdx]}&"]`)[0].click()
+        await Navigation.goToVillage(state, villageIds[nextIdx])
     }
 }
 
@@ -529,15 +558,15 @@ const render = (state: State) => {
     })
 }
 
-const run = (state: State) => {
+const run = async (state: State) => {
     updateCurrentPage(state)
     updateVillageList(state)
     updateCurrentVillageStatus(state)
     if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
-        build(state)
+        await build(state)
     // alertAttack()
     // alertEmptyBuildQueue()
-    // nextVillage()
+    await nextVillage(state)
 }
 
 const initialize = () => {

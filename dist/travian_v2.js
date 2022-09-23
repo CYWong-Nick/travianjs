@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const DEBUG = true;
+var _a, _b;
 var CurrentPageEnum;
 (function (CurrentPageEnum) {
     CurrentPageEnum["LOGIN"] = "LOGIN";
@@ -82,6 +82,7 @@ class StateHandler {
         };
         this.set = (obj, prop, value) => {
             localStorage.setItem(prop, JSON.stringify(value));
+            //@ts-ignore
             this.state[prop] = value;
             this.callback && this.callback();
             return true;
@@ -105,6 +106,7 @@ StateHandler.INITIAL_STATE = {
 };
 class Utils {
 }
+_a = Utils;
 Utils.parseIntIgnoreSep = (s) => {
     return parseInt(s.replace('.', '').replace(',', ''));
 };
@@ -114,6 +116,9 @@ Utils.randInt = (x, y) => {
 Utils.sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
+Utils.delayClick = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield Utils.sleep(Utils.randInt(1000, 5000));
+});
 Utils.addToDate = (date, hour, minute, second) => {
     return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000);
 };
@@ -124,6 +129,49 @@ Utils.formatDate = (dateInput) => {
     const date = new Date(dateInput);
     return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 0)}:${Utils.leftPadZero(date.getMinutes(), 0)}:${Utils.leftPadZero(date.getSeconds(), 0)}`;
 };
+class Navigation {
+}
+_b = Navigation;
+Navigation.goToVillage = (state, id) => __awaiter(void 0, void 0, void 0, function* () {
+    yield Utils.delayClick();
+    state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`);
+    $(`a[href="?newdid=${id}&"]`)[0].click();
+    return true;
+});
+Navigation.goToBuilding = (state, aid, gid) => __awaiter(void 0, void 0, void 0, function* () {
+    if (aid <= 18 && state.currentPage === CurrentPageEnum.FIELDS) {
+        yield Utils.delayClick();
+        state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
+        $(`a[href="/build.php?id=${aid}"]`)[0].click();
+        return true;
+    }
+    else if (aid > 18 && state.currentPage === CurrentPageEnum.TOWN) {
+        yield Utils.delayClick();
+        state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
+        if (aid === 40) { // Special case for wall
+            $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click');
+        }
+        else {
+            $(`a[href="/build.php?id=${aid}&gid=${gid}"]`)[0].click();
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+});
+Navigation.goToFields = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    yield Utils.delayClick();
+    state.feature.debug && console.log('Go to fields');
+    $('.village.resourceView')[0].click();
+    return true;
+});
+Navigation.goToTown = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    yield Utils.delayClick();
+    state.feature.debug && console.log('Go to town');
+    $('.village.buildingView')[0].click();
+    return true;
+});
 var TroopMovementType;
 (function (TroopMovementType) {
     TroopMovementType["REINFORCE"] = "REINFORCE";
@@ -199,16 +247,16 @@ const updateVillageList = (state) => {
     const currentVillageId = villageListEle.filter((_, ele) => ele.className.includes('active')).attr('data-did');
     const villiageIds = [];
     villageListEle.each((index, ele) => {
-        var _a, _b, _c;
-        const id = (_a = ele.attributes.getNamedItem('data-did')) === null || _a === void 0 ? void 0 : _a.value;
+        var _c, _d, _e;
+        const id = (_c = ele.attributes.getNamedItem('data-did')) === null || _c === void 0 ? void 0 : _c.value;
         if (!id) {
             return;
         }
         villiageIds.push(id);
         const name = $(ele).find('.name')[0].innerText;
         const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes;
-        const x = Utils.parseIntIgnoreSep(((_b = coordinateAttributes.getNamedItem('data-x')) === null || _b === void 0 ? void 0 : _b.value) || '');
-        const y = Utils.parseIntIgnoreSep(((_c = coordinateAttributes.getNamedItem('data-y')) === null || _c === void 0 ? void 0 : _c.value) || '');
+        const x = Utils.parseIntIgnoreSep(((_d = coordinateAttributes.getNamedItem('data-x')) === null || _d === void 0 ? void 0 : _d.value) || '');
+        const y = Utils.parseIntIgnoreSep(((_e = coordinateAttributes.getNamedItem('data-y')) === null || _e === void 0 ? void 0 : _e.value) || '');
         const villageDefaults = {
             currentBuildTasks: [],
             pendingBuildTasks: [],
@@ -269,31 +317,12 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             && task.resources.iron <= village.resources.iron
             && task.resources.crop <= village.resources.crop) {
             state.currentAction = CurrentActionEnum.BUILD;
-            yield Utils.sleep(Utils.randInt(1000, 5000));
-            if (task.aid <= 18) {
-                if (state.currentPage === CurrentPageEnum.FIELDS) {
-                    DEBUG && console.log("Go to building - ", GID_NAME_MAP[task.aid]);
-                    $(`a[href="/build.php?id=${task.aid}"]`)[0].click();
-                }
-                else {
-                    DEBUG && console.log("Go to fields");
-                    $('.village.resourceView')[0].click();
-                }
-            }
-            else {
-                if (state.currentPage === CurrentPageEnum.TOWN) {
-                    DEBUG && console.log("Go to building - ", GID_NAME_MAP[task.gid]);
-                    if (task.aid === 40) { // Special case for wall
-                        $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click');
-                    }
-                    else {
-                        $(`a[href="/build.php?id=${task.aid}&gid=${task.gid}"]`)[0].click();
-                    }
-                }
-                else {
-                    DEBUG && console.log("Go to town");
-                    $('.village.buildingView')[0].click();
-                }
+            const success = yield Navigation.goToBuilding(state, task.aid, task.gid);
+            if (!success) {
+                if (state.currentPage === CurrentPageEnum.FIELDS)
+                    yield Navigation.goToTown(state);
+                else
+                    yield Navigation.goToFields(state);
             }
             return;
         }
@@ -321,19 +350,17 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         .map(([id, _]) => id)
         .find(_ => true);
     if (nextVillageIdToBuild) {
-        DEBUG && console.log("Go to village", nextVillageIdToBuild);
-        $(`a[href="?newdid=${nextVillageIdToBuild}&"]`)[0].click();
+        yield Navigation.goToVillage(state, nextVillageIdToBuild);
     }
 });
-const nextVillage = (state) => {
+const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0);
         const villageIds = Object.keys(state.villages);
         const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length;
-        DEBUG && console.log("Go to village", villageIds[nextIdx]);
-        $(`a[href="?newdid=${villageIds[nextIdx]}&"]`)[0].click();
+        yield Navigation.goToVillage(state, villageIds[nextIdx]);
     }
-};
+});
 const render = (state) => {
     const villages = state.villages;
     const currentVillage = state.villages[state.currentVillageId];
@@ -402,8 +429,8 @@ const render = (state) => {
         state.villages = villages;
     });
     $('.removeFromPending').on('click', (ele) => {
-        var _a;
-        const idx = (_a = ele.target.attributes.getNamedItem('idx')) === null || _a === void 0 ? void 0 : _a.value;
+        var _c;
+        const idx = (_c = ele.target.attributes.getNamedItem('idx')) === null || _c === void 0 ? void 0 : _c.value;
         if (!idx)
             return;
         const villages = state.villages;
@@ -422,16 +449,16 @@ const render = (state) => {
         state.feature = feature;
     });
 };
-const run = (state) => {
+const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     updateCurrentPage(state);
     updateVillageList(state);
     updateCurrentVillageStatus(state);
     if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
-        build(state);
+        yield build(state);
     // alertAttack()
     // alertEmptyBuildQueue()
-    // nextVillage()
-};
+    yield nextVillage(state);
+});
 const initialize = () => {
     const handler = new StateHandler();
     const state = new Proxy(StateHandler.INITIAL_STATE, handler);
