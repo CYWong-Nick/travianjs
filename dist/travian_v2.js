@@ -97,7 +97,10 @@ StateHandler.INITIAL_STATE = {
     currentAction: CurrentActionEnum.IDLE,
     currentPage: CurrentPageEnum.LOGIN,
     currentVillageId: '',
-    villages: {}
+    villages: {},
+    feature: {
+        autoBuild: false
+    }
 };
 class Utils {
 }
@@ -268,7 +271,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             yield Utils.sleep(Utils.randInt(1000, 5000));
             if (task.aid <= 18) {
                 if (state.currentPage === CurrentPageEnum.FIELDS) {
-                    DEBUG && console.log("Go to building");
+                    DEBUG && console.log("Go to building - ", GID_NAME_MAP[task.aid]);
                     $(`a[href="/build.php?id=${task.aid}"]`)[0].click();
                 }
                 else {
@@ -278,8 +281,8 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             }
             else {
                 if (state.currentPage === CurrentPageEnum.TOWN) {
-                    DEBUG && console.log("Go to building");
-                    if (task.aid === 40) { // Special case for wall 
+                    DEBUG && console.log("Go to building - ", GID_NAME_MAP[task.gid]);
+                    if (task.aid === 40) { // Special case for wall
                         $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click');
                     }
                     else {
@@ -343,7 +346,8 @@ const render = (state) => {
             <div class="flex">
                 <div class="flex-row">
                     <h5>Pending Build Tasks</h5>
-                    <button id="addCurrentToPending">Add Current</button>
+                    <button id="addCurrentToPending" class="ml-5">Add Current</button>
+                    <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
                 </div>
                 ${currentVillage.pendingBuildTasks.map((task, i) => `
                     <div>
@@ -393,6 +397,11 @@ const render = (state) => {
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks;
         pendingBuildTasks.splice(Utils.parseIntIgnoreSep(idx), 1);
         state.villages = villages;
+    });
+    $('#toggleAutoBuild').on('click', () => {
+        const feature = state.feature;
+        feature.autoBuild = !feature.autoBuild;
+        state.feature = feature;
     });
 };
 const run = (state) => {

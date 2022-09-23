@@ -5,18 +5,23 @@ enum CurrentPageEnum {
     FIELDS = "FIELDS",
     TOWN = "TOWN",
     BUILDING = "BUILDING",
-    UNKNOWN="UNKNOWN"
+    UNKNOWN = "UNKNOWN"
 }
 
 enum CurrentActionEnum {
     IDLE = "IDLE",
     BUILD = "BUILD"
 }
+
+interface Feature {
+    autoBuild: boolean
+}
 interface State {
     currentAction: CurrentActionEnum
     currentPage: CurrentPageEnum
     currentVillageId: string
     villages: Record<string, Village>
+    feature: Feature
 }
 
 const GID_NAME_MAP: Record<string, string> = {
@@ -71,7 +76,10 @@ class StateHandler implements ProxyHandler<State> {
         currentAction: CurrentActionEnum.IDLE,
         currentPage: CurrentPageEnum.LOGIN,
         currentVillageId: '',
-        villages: {}
+        villages: {},
+        feature: {
+            autoBuild: false
+        }
     }
 
     private state: State
@@ -352,7 +360,7 @@ const build = async (state: State) => {
             await Utils.sleep(Utils.randInt(1000, 5000))
             if (task.aid <= 18) {
                 if (state.currentPage === CurrentPageEnum.FIELDS) {
-                    DEBUG && console.log("Go to building")
+                    DEBUG && console.log("Go to building - ", GID_NAME_MAP[task.aid])
                     $(`a[href="/build.php?id=${task.aid}"]`)[0].click()
                 } else {
                     DEBUG && console.log("Go to fields")
@@ -360,8 +368,8 @@ const build = async (state: State) => {
                 }
             } else {
                 if (state.currentPage === CurrentPageEnum.TOWN) {
-                    DEBUG && console.log("Go to building")
-                    if (task.aid === 40) {// Special case for wall 
+                    DEBUG && console.log("Go to building - ", GID_NAME_MAP[task.gid])
+                    if (task.aid === 40) {// Special case for wall
                         $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
                     } else {
                         $(`a[href="/build.php?id=${task.aid}&gid=${task.gid}"]`)[0].click()
@@ -431,7 +439,8 @@ const render = (state: State) => {
             <div class="flex">
                 <div class="flex-row">
                     <h5>Pending Build Tasks</h5>
-                    <button id="addCurrentToPending">Add Current</button>
+                    <button id="addCurrentToPending" class="ml-5">Add Current</button>
+                    <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
                 </div>
                 ${currentVillage.pendingBuildTasks.map((task, i) => `
                     <div>
@@ -489,6 +498,12 @@ const render = (state: State) => {
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
         pendingBuildTasks.splice(Utils.parseIntIgnoreSep(idx), 1)
         state.villages = villages
+    })
+
+    $('#toggleAutoBuild').on('click', () => {
+        const feature = state.feature
+        feature.autoBuild = !feature.autoBuild
+        state.feature = feature
     })
 }
 
