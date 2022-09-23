@@ -21,6 +21,7 @@ var CurrentActionEnum;
 (function (CurrentActionEnum) {
     CurrentActionEnum["IDLE"] = "IDLE";
     CurrentActionEnum["BUILD"] = "BUILD";
+    CurrentActionEnum["VILLAGE_RESET"] = "VILLAGE_RESET";
 })(CurrentActionEnum || (CurrentActionEnum = {}));
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -134,9 +135,10 @@ class Navigation {
 }
 _b = Navigation;
 Navigation.goToVillage = (state, id) => __awaiter(void 0, void 0, void 0, function* () {
+    state.currentAction = CurrentActionEnum.VILLAGE_RESET;
     yield Utils.delayClick();
     state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`);
-    $(`a[href="?newdid=${id}&"]`)[0].click();
+    $(`.listEntry[data-did="${id}"] > a`)[0].click();
     return true;
 });
 Navigation.goToBuilding = (state, aid, gid) => __awaiter(void 0, void 0, void 0, function* () {
@@ -341,7 +343,6 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
     }
-    state.currentAction = CurrentActionEnum.IDLE;
     // Check if need to build in another village
     const nextVillageIdToBuild = Object.entries(state.villages)
         .filter(([_, village]) => village.pendingBuildTasks.length > 0 && village.currentBuildTasks.filter(t => new Date(t.finishTime) < new Date()).length < 2)
@@ -349,6 +350,9 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         .find(_ => true);
     if (nextVillageIdToBuild) {
         yield Navigation.goToVillage(state, nextVillageIdToBuild);
+    }
+    else {
+        state.currentAction = CurrentActionEnum.IDLE;
     }
 });
 const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
@@ -453,6 +457,8 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     updateCurrentVillageStatus(state);
     if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
         yield build(state);
+    if (CurrentActionEnum.VILLAGE_RESET === state.currentAction)
+        yield Navigation.goToFields(state);
     // alertAttack()
     // alertEmptyBuildQueue()
     yield nextVillage(state);

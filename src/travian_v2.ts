@@ -8,7 +8,8 @@ enum CurrentPageEnum {
 
 enum CurrentActionEnum {
     IDLE = "IDLE",
-    BUILD = "BUILD"
+    BUILD = "BUILD",
+    VILLAGE_RESET = "VILLAGE_RESET"
 }
 
 interface Feature {
@@ -152,9 +153,10 @@ class Utils {
 
 class Navigation {
     static goToVillage = async (state: State, id: string): Promise<boolean> => {
+        state.currentAction = CurrentActionEnum.VILLAGE_RESET
         await Utils.delayClick()
         state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`)
-        $(`a[href="?newdid=${id}&"]`)[0].click()
+        $(`.listEntry[data-did="${id}"] > a`)[0].click()
         return true
     }
 
@@ -432,8 +434,6 @@ const build = async (state: State) => {
         }
     }
 
-    state.currentAction = CurrentActionEnum.IDLE
-
     // Check if need to build in another village
     const nextVillageIdToBuild = Object.entries(state.villages)
         .filter(([_, village]) =>
@@ -444,6 +444,8 @@ const build = async (state: State) => {
 
     if (nextVillageIdToBuild) {
         await Navigation.goToVillage(state, nextVillageIdToBuild)
+    } else {
+        state.currentAction = CurrentActionEnum.IDLE
     }
 }
 
@@ -562,6 +564,8 @@ const run = async (state: State) => {
     updateCurrentVillageStatus(state)
     if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
         await build(state)
+    if (CurrentActionEnum.VILLAGE_RESET === state.currentAction)
+        await Navigation.goToFields(state)
     // alertAttack()
     // alertEmptyBuildQueue()
     await nextVillage(state)
