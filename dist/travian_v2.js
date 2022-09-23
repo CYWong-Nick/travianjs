@@ -357,7 +357,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0);
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 20);
         const villageIds = Object.keys(state.villages);
         const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length;
         yield Navigation.goToVillage(state, villageIds[nextIdx]);
