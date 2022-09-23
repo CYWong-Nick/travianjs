@@ -327,14 +327,11 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             }
             return;
         }
-    }
-    if (village.pendingBuildTasks.length > 0) {
-        const task = village.pendingBuildTasks[0];
         let params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
             const bulidButton = $('.section1 > button.green');
             if (bulidButton.length) {
-                yield Utils.sleep(Utils.randInt(1000, 5000));
+                yield Utils.delayClick();
                 state.currentAction = CurrentActionEnum.IDLE;
                 village.pendingBuildTasks.splice(0, 1);
                 state.villages = villages;
@@ -368,6 +365,7 @@ const render = (state) => {
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
+            <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
         <div class="flex-row">
@@ -388,7 +386,6 @@ const render = (state) => {
                 <div class="flex-row">
                     <h5>Pending Build Tasks</h5>
                     <button id="addCurrentToPending" class="ml-5">Add Current</button>
-                    <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
                 </div>
                 ${currentVillage.pendingBuildTasks.map((task, i) => `
                     <div>
@@ -468,6 +465,6 @@ const initialize = () => {
     createContainer();
     render(state);
     run(state);
-    setInterval(() => run(state), 5000);
+    setInterval(() => run(state), 10000);
 };
 initialize();
