@@ -99,7 +99,8 @@ StateHandler.INITIAL_STATE = {
     currentVillageId: '',
     villages: {},
     feature: {
-        autoBuild: false
+        autoBuild: false,
+        debug: false
     }
 };
 class Utils {
@@ -324,11 +325,23 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         $(`a[href="?newdid=${nextVillageIdToBuild}&"]`)[0].click();
     }
 });
+const nextVillage = (state) => {
+    if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0);
+        const villageIds = Object.keys(state.villages);
+        const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length;
+        DEBUG && console.log("Go to village", villageIds[nextIdx]);
+        $(`a[href="?newdid=${villageIds[nextIdx]}&"]`)[0].click();
+    }
+};
 const render = (state) => {
     const villages = state.villages;
     const currentVillage = state.villages[state.currentVillageId];
     $('#console').html(`
-        <h4>Console</h4>
+        <div class="flex-row">
+            <h4>Console</h4>
+            <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
+        </div>
         <div class="flex-row">
             <div class="flex">
                 <h5>Summary</h5>
@@ -398,6 +411,11 @@ const render = (state) => {
         pendingBuildTasks.splice(Utils.parseIntIgnoreSep(idx), 1);
         state.villages = villages;
     });
+    $('#toggleDebug').on('click', () => {
+        const feature = state.feature;
+        feature.debug = !feature.debug;
+        state.feature = feature;
+    });
     $('#toggleAutoBuild').on('click', () => {
         const feature = state.feature;
         feature.autoBuild = !feature.autoBuild;
@@ -408,11 +426,11 @@ const run = (state) => {
     updateCurrentPage(state);
     updateVillageList(state);
     updateCurrentVillageStatus(state);
-    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction))
+    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
         build(state);
     // alertAttack()
     // alertEmptyBuildQueue()
-    // tryNextVillage()
+    // nextVillage()
 };
 const initialize = () => {
     const handler = new StateHandler();

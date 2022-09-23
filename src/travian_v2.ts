@@ -15,6 +15,7 @@ enum CurrentActionEnum {
 
 interface Feature {
     autoBuild: boolean
+    debug: boolean
 }
 interface State {
     currentAction: CurrentActionEnum
@@ -22,6 +23,7 @@ interface State {
     currentVillageId: string
     villages: Record<string, Village>
     feature: Feature
+    nextVillageRotationTime?: Date
 }
 
 const GID_NAME_MAP: Record<string, string> = {
@@ -78,7 +80,8 @@ class StateHandler implements ProxyHandler<State> {
         currentVillageId: '',
         villages: {},
         feature: {
-            autoBuild: false
+            autoBuild: false,
+            debug: false
         }
     }
 
@@ -416,12 +419,25 @@ const build = async (state: State) => {
     }
 }
 
+const nextVillage = (state: State) => {
+    if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0)
+        const villageIds = Object.keys(state.villages)
+        const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length
+        DEBUG && console.log("Go to village", villageIds[nextIdx])
+        $(`a[href="?newdid=${villageIds[nextIdx]}&"]`)[0].click()
+    }
+}
+
 const render = (state: State) => {
     const villages = state.villages
     const currentVillage = state.villages[state.currentVillageId]
 
     $('#console').html(`
-        <h4>Console</h4>
+        <div class="flex-row">
+            <h4>Console</h4>
+            <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
+        </div>
         <div class="flex-row">
             <div class="flex">
                 <h5>Summary</h5>
@@ -500,6 +516,12 @@ const render = (state: State) => {
         state.villages = villages
     })
 
+    $('#toggleDebug').on('click', () => {
+        const feature = state.feature
+        feature.debug = !feature.debug
+        state.feature = feature
+    })
+
     $('#toggleAutoBuild').on('click', () => {
         const feature = state.feature
         feature.autoBuild = !feature.autoBuild
@@ -511,11 +533,11 @@ const run = (state: State) => {
     updateCurrentPage(state)
     updateVillageList(state)
     updateCurrentVillageStatus(state)
-    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction))
+    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
         build(state)
     // alertAttack()
     // alertEmptyBuildQueue()
-    // tryNextVillage()
+    // nextVillage()
 }
 
 const initialize = () => {
