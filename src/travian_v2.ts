@@ -122,9 +122,13 @@ class Utils {
         return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000)
     }
 
+    static leftPadZero = (value: string | number, length: number) => {
+        return String(value).padStart(length, '0')
+    }
+
     static formatDate = (dateInput: Date) => {
         const date = new Date(dateInput)
-        return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+        return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 0)}:${Utils.leftPadZero(date.getMinutes(), 0)}:${Utils.leftPadZero(date.getSeconds(), 0)}`
     }
 }
 
@@ -339,6 +343,7 @@ const build = async (state: State) => {
         ) {
             state.currentAction = CurrentActionEnum.BUILD
             await Utils.sleep(Utils.randInt(1000, 5000))
+            console.log(task.aid)
             if (task.aid <= 18) {
                 if (state.currentPage === CurrentPageEnum.FIELDS)
                     $(`a[href="/build.php?id=${task.aid}"]`)[0].click()
@@ -363,7 +368,7 @@ const build = async (state: State) => {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
             const bulidButton = $('.section1 > button.green')
             if (bulidButton.length) {
-                await sleep(randInt(1000, 5000))
+                await Utils.sleep(randInt(1000, 5000))
                 state.currentAction = CurrentActionEnum.IDLE
                 village.pendingBuildTasks.splice(0, 1)
                 state.villages = villages

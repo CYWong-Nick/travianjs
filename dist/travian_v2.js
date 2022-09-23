@@ -111,9 +111,12 @@ Utils.sleep = (ms) => {
 Utils.addToDate = (date, hour, minute, second) => {
     return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000);
 };
+Utils.leftPadZero = (value, length) => {
+    return String(value).padStart(length, '0');
+};
 Utils.formatDate = (dateInput) => {
     const date = new Date(dateInput);
-    return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 0)}:${Utils.leftPadZero(date.getMinutes(), 0)}:${Utils.leftPadZero(date.getSeconds(), 0)}`;
 };
 var TroopMovementType;
 (function (TroopMovementType) {
@@ -257,6 +260,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             && task.resources.crop <= village.resources.crop) {
             state.currentAction = CurrentActionEnum.BUILD;
             yield Utils.sleep(Utils.randInt(1000, 5000));
+            console.log(task.aid);
             if (task.aid <= 18) {
                 if (state.currentPage === CurrentPageEnum.FIELDS)
                     $(`a[href="/build.php?id=${task.aid}"]`)[0].click();
@@ -282,7 +286,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
             const bulidButton = $('.section1 > button.green');
             if (bulidButton.length) {
-                yield sleep(randInt(1000, 5000));
+                yield Utils.sleep(randInt(1000, 5000));
                 state.currentAction = CurrentActionEnum.IDLE;
                 village.pendingBuildTasks.splice(0, 1);
                 state.villages = villages;
