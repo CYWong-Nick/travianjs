@@ -209,11 +209,14 @@ interface Position {
 
 enum TroopMovementType {
     REINFORCE = "REINFORCE",
-    ATTACK = "ATTACK"
+    ATTACK = "ATTACK",
+    ADVENTURE = "ADVENTURE"
 }
 
 interface TroopMovement {
     type: TroopMovementType
+    count: number
+    time: Date
 }
 
 interface Village {
@@ -226,6 +229,7 @@ interface Village {
     resources: Resource
     incomingTroops: TroopMovement[]
     outgoingTroops: TroopMovement[]
+    lastUpdatedTime: Date
 }
 
 interface CurrentBuildTask {
@@ -390,6 +394,56 @@ const updateCurrentVillageStatus = (state: State) => {
         })
 
         villages[currentVillageId].currentBuildTasks = currentBuildTasks
+
+        const incomingTroops: TroopMovement[] = []
+        const outgoingTroops: TroopMovement[] = []
+
+        $('#movements tr').each((_, ele) => {
+            const typeEle = $(ele).find('.typ img')
+            if (!typeEle.length)
+                return
+
+            const type = typeEle[0].attributes.getNamedItem('class')?.value
+            const count = Utils.parseIntIgnoreSep($(ele).find('.mov').text())
+            const timer = $(ele).find('.timer').text()
+
+            const timerParts = timer.split(":")
+            const time = Utils.addToDate(
+                new Date(),
+                Utils.parseIntIgnoreSep(timerParts[0]),
+                Utils.parseIntIgnoreSep(timerParts[1]),
+                Utils.parseIntIgnoreSep(timerParts[2])
+            )
+
+            switch (type) {
+                case 'def1':
+                    incomingTroops.push({
+                        type: TroopMovementType.REINFORCE,
+                        count,
+                        time
+                    })
+                    break
+                case 'hero_on_adventure':
+                    outgoingTroops.push({
+                        type: TroopMovementType.ADVENTURE,
+                        count,
+                        time
+                    })
+                    break
+                case 'att2':
+                    outgoingTroops.push({
+                        type: TroopMovementType.ATTACK,
+                        count,
+                        time
+                    })
+                    break
+            }
+
+            villages[currentVillageId].incomingTroops = incomingTroops
+            villages[currentVillageId].outgoingTroops = outgoingTroops
+        })
+
+        villages[currentVillageId].lastUpdatedTime = new Date()
     }
 
     state.villages = villages
@@ -427,8 +481,7 @@ const build = async (state: State) => {
                 state.currentAction = CurrentActionEnum.IDLE
                 village.pendingBuildTasks.splice(0, 1)
                 state.villages = villages
-                console.log("BUILD!")
-                // bulidButton.trigger('click')
+                bulidButton.trigger('click')
                 return
             }
         }
@@ -450,11 +503,18 @@ const build = async (state: State) => {
 }
 
 const nextVillage = async (state: State) => {
-    if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 20)
-        const villageIds = Object.keys(state.villages)
-        const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length
-        await Navigation.goToVillage(state, villageIds[nextIdx])
+    if (new Date(state.nextVillageRotationTime) < new Date()) {
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 20)
+
+        let earliestVillageId: string = ''
+        Object.values(state.villages)
+            .forEach(village => {
+                if (!village.lastUpdatedTime || !earliestVillageId || village.lastUpdatedTime < state.villages[earliestVillageId].lastUpdatedTime) {
+                    earliestVillageId = village.id
+                }
+            })
+
+        await Navigation.goToVillage(state, earliestVillageId)
     }
 }
 
@@ -564,13 +624,16 @@ const run = async (state: State) => {
     updateCurrentVillageStatus(state)
     if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
         await build(state)
+
     if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
         state.currentAction = CurrentActionEnum.IDLE
-        await Navigation.goToFields(state)
+        if (state.currentPage !== CurrentPageEnum.FIELDS)
+            await Navigation.goToFields(state)
     }
     // alertAttack()
     // alertEmptyBuildQueue()
-    await nextVillage(state)
+    if (state.currentAction === CurrentActionEnum.IDLE)
+        await nextVillage(state)
 }
 
 const initialize = () => {

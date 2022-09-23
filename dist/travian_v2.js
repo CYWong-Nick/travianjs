@@ -179,6 +179,7 @@ var TroopMovementType;
 (function (TroopMovementType) {
     TroopMovementType["REINFORCE"] = "REINFORCE";
     TroopMovementType["ATTACK"] = "ATTACK";
+    TroopMovementType["ADVENTURE"] = "ADVENTURE";
 })(TroopMovementType || (TroopMovementType = {}));
 const createStyle = () => {
     const style = document.createElement('style');
@@ -304,6 +305,45 @@ const updateCurrentVillageStatus = (state) => {
             });
         });
         villages[currentVillageId].currentBuildTasks = currentBuildTasks;
+        const incomingTroops = [];
+        const outgoingTroops = [];
+        $('#movements tr').each((_, ele) => {
+            var _c;
+            const typeEle = $(ele).find('.typ img');
+            if (!typeEle.length)
+                return;
+            const type = (_c = typeEle[0].attributes.getNamedItem('class')) === null || _c === void 0 ? void 0 : _c.value;
+            const count = Utils.parseIntIgnoreSep($(ele).find('.mov').text());
+            const timer = $(ele).find('.timer').text();
+            const timerParts = timer.split(":");
+            const time = Utils.addToDate(new Date(), Utils.parseIntIgnoreSep(timerParts[0]), Utils.parseIntIgnoreSep(timerParts[1]), Utils.parseIntIgnoreSep(timerParts[2]));
+            switch (type) {
+                case 'def1':
+                    incomingTroops.push({
+                        type: TroopMovementType.REINFORCE,
+                        count,
+                        time
+                    });
+                    break;
+                case 'hero_on_adventure':
+                    outgoingTroops.push({
+                        type: TroopMovementType.ADVENTURE,
+                        count,
+                        time
+                    });
+                    break;
+                case 'att2':
+                    outgoingTroops.push({
+                        type: TroopMovementType.ATTACK,
+                        count,
+                        time
+                    });
+                    break;
+            }
+            villages[currentVillageId].incomingTroops = incomingTroops;
+            villages[currentVillageId].outgoingTroops = outgoingTroops;
+        });
+        villages[currentVillageId].lastUpdatedTime = new Date();
     }
     state.villages = villages;
 };
@@ -337,8 +377,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 state.currentAction = CurrentActionEnum.IDLE;
                 village.pendingBuildTasks.splice(0, 1);
                 state.villages = villages;
-                console.log("BUILD!");
-                // bulidButton.trigger('click')
+                bulidButton.trigger('click');
                 return;
             }
         }
@@ -356,11 +395,16 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 20);
-        const villageIds = Object.keys(state.villages);
-        const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length;
-        yield Navigation.goToVillage(state, villageIds[nextIdx]);
+    if (new Date(state.nextVillageRotationTime) < new Date()) {
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 20);
+        let earliestVillageId = '';
+        Object.values(state.villages)
+            .forEach(village => {
+            if (!village.lastUpdatedTime || !earliestVillageId || village.lastUpdatedTime < state.villages[earliestVillageId].lastUpdatedTime) {
+                earliestVillageId = village.id;
+            }
+        });
+        yield Navigation.goToVillage(state, earliestVillageId);
     }
 });
 const render = (state) => {
@@ -459,11 +503,13 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
         yield build(state);
     if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
         state.currentAction = CurrentActionEnum.IDLE;
-        yield Navigation.goToFields(state);
+        if (state.currentPage !== CurrentPageEnum.FIELDS)
+            yield Navigation.goToFields(state);
     }
     // alertAttack()
     // alertEmptyBuildQueue()
-    yield nextVillage(state);
+    if (state.currentAction === CurrentActionEnum.IDLE)
+        yield nextVillage(state);
 });
 const initialize = () => {
     const handler = new StateHandler();
