@@ -396,7 +396,9 @@ const updateCurrentVillageStatus = (state: State) => {
         })
 
         villages[currentVillageId].currentBuildTasks = currentBuildTasks
+    }
 
+    if (state.currentPage === CurrentPageEnum.FIELDS) {
         const incomingTroops: TroopMovement[] = []
         const outgoingTroops: TroopMovement[] = []
 
@@ -434,6 +436,14 @@ const updateCurrentVillageStatus = (state: State) => {
                     break
                 case 'att2':
                     outgoingTroops.push({
+                        type: TroopMovementType.ATTACK,
+                        count,
+                        time
+                    })
+                    break
+                case 'att1':
+                case 'att3':
+                    incomingTroops.push({
                         type: TroopMovementType.ATTACK,
                         count,
                         time
@@ -634,7 +644,7 @@ const run = async (state: State) => {
     updateCurrentVillageStatus(state)
     // alertAttack()
     // alertEmptyBuildQueue()
- 
+
     if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
         await build(state)
     }

@@ -306,6 +306,8 @@ const updateCurrentVillageStatus = (state) => {
             });
         });
         villages[currentVillageId].currentBuildTasks = currentBuildTasks;
+    }
+    if (state.currentPage === CurrentPageEnum.FIELDS) {
         const incomingTroops = [];
         const outgoingTroops = [];
         $('#movements tr').each((_, ele) => {
@@ -335,6 +337,14 @@ const updateCurrentVillageStatus = (state) => {
                     break;
                 case 'att2':
                     outgoingTroops.push({
+                        type: TroopMovementType.ATTACK,
+                        count,
+                        time
+                    });
+                    break;
+                case 'att1':
+                case 'att3':
+                    incomingTroops.push({
                         type: TroopMovementType.ATTACK,
                         count,
                         time
