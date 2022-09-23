@@ -13,6 +13,7 @@ enum CurrentActionEnum {
 }
 
 interface Feature {
+    autoScan: boolean
     autoBuild: boolean
     debug: boolean
 }
@@ -79,6 +80,7 @@ class StateHandler implements ProxyHandler<State> {
         currentVillageId: '',
         villages: {},
         feature: {
+            autoScan: false,
             autoBuild: false,
             debug: false
         },
@@ -525,6 +527,7 @@ const render = (state: State) => {
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
+            <input id="toggleAutoScan" class="ml-5" type="checkbox" ${state.feature.autoScan ? 'checked' : ''}/> Auto scan
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
@@ -606,9 +609,9 @@ const render = (state: State) => {
         state.villages = villages
     })
 
-    $('#toggleDebug').on('click', () => {
+    $('#toggleAutoScan').on('click', () => {
         const feature = state.feature
-        feature.debug = !feature.debug
+        feature.autoScan = !feature.autoScan
         state.feature = feature
     })
 
@@ -617,24 +620,34 @@ const render = (state: State) => {
         feature.autoBuild = !feature.autoBuild
         state.feature = feature
     })
+
+    $('#toggleDebug').on('click', () => {
+        const feature = state.feature
+        feature.debug = !feature.debug
+        state.feature = feature
+    })
 }
 
 const run = async (state: State) => {
     updateCurrentPage(state)
     updateVillageList(state)
     updateCurrentVillageStatus(state)
-    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
+    // alertAttack()
+    // alertEmptyBuildQueue()
+ 
+    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
         await build(state)
+    }
 
     if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
         state.currentAction = CurrentActionEnum.IDLE
         if (state.currentPage !== CurrentPageEnum.FIELDS)
             await Navigation.goToFields(state)
     }
-    // alertAttack()
-    // alertEmptyBuildQueue()
-    if (state.currentAction === CurrentActionEnum.IDLE)
+
+    if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
         await nextVillage(state)
+    }
 }
 
 const initialize = () => {
