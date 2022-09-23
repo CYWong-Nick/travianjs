@@ -5,13 +5,16 @@ enum CurrentPageEnum {
     BUILDING = "BUILDING"
 }
 
+enum CurrentActionEnum {
+    IDLE = "IDLE",
+    BUILD = "BUILD"
+}
 interface State {
+    currentAction: CurrentActionEnum
     currentPage: CurrentPageEnum
     currentVillageId: string
     villages: Record<string, Village>
 }
-
-type RenderFunction = (state: State) => void
 
 const GID_NAME_MAP: Record<string, string> = {
     "1": "Woodcutter",
@@ -62,6 +65,7 @@ const GID_NAME_MAP: Record<string, string> = {
 
 class StateHandler implements ProxyHandler<State> {
     static INITIAL_STATE: State = {
+        currentAction: CurrentActionEnum.IDLE,
         currentPage: CurrentPageEnum.LOGIN,
         currentVillageId: '',
         villages: {}
@@ -91,7 +95,7 @@ class StateHandler implements ProxyHandler<State> {
 
     set = (obj: State, prop: keyof State, value: any) => {
         localStorage.setItem(prop, JSON.stringify(value))
-        this.state[prop] = value
+        this.state[prop] = value as never
         this.callback && this.callback()
         return true
     }
@@ -106,11 +110,11 @@ class Utils {
         return parseInt(s.replace('.', '').replace(',', ''))
     }
 
-    randInt = (x: number, y: number) => {
+    static randInt = (x: number, y: number) => {
         return Math.floor(Math.random() * (y - x + 1) + x)
     }
 
-    sleep = (ms: number) => {
+    static sleep = (ms: number) => {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
@@ -291,7 +295,7 @@ const updateCurrentVillageStatus = (state: State) => {
 
     villages[currentVillageId].resources = { lumber, clay, iron, crop }
 
-    if (state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.FIELDS]) {
+    if (state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN]) {
         const currentBuildTasks: CurrentBuildTask[] = []
         $('.buildingList > ul > li').each((_, ele) => {
             const nameAndLevelEle = $(ele).find('.name').contents()
@@ -320,7 +324,71 @@ const updateCurrentVillageStatus = (state: State) => {
     state.villages = villages
 }
 
-const render: RenderFunction = (state: State) => {
+const build = async (state: State) => {
+    // Try building in current village
+    const villages = state.villages
+    const village = villages[state.currentVillageId]
+    if (village.pendingBuildTasks.length > 0) {
+        const task = village.pendingBuildTasks[0]
+        if (village.currentBuildTasks.length < 2
+            && state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN]
+            && task.resources.lumber <= village.resources.lumber
+            && task.resources.clay <= village.resources.clay
+            && task.resources.iron <= village.resources.iron
+            && task.resources.crop <= village.resources.crop
+        ) {
+            state.currentAction = CurrentActionEnum.BUILD
+            await Utils.sleep(Utils.randInt(1000, 5000))
+            if (task.aid <= 18) {
+                if (state.currentPage === CurrentPageEnum.FIELDS)
+                    $(`a[href="/build.php?id=${task.aid}"]`)[0].click()
+                else
+                    $('.village.resourceView')[0].click()
+            } else {
+                if (state.currentPage === CurrentPageEnum.TOWN) {
+                    if (task.aid === 40) // Special case for wall
+                        $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
+                    else
+                        $(`a[href="/build.php?id=${task.aid}&gid=${task.gid}"]`)[0].click()
+                } else {
+                    $('.village.buildingView')[0].click()
+                }
+            }
+        }
+    }
+
+    if (village.pendingBuildTasks.length > 0) {
+        const task = village.pendingBuildTasks[0];
+        let params = new URLSearchParams(window.location.search);
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
+            const bulidButton = $('.section1 > button.green')
+            if (bulidButton.length) {
+                await sleep(randInt(1000, 5000))
+                state.currentAction = CurrentActionEnum.IDLE
+                village.pendingBuildTasks.splice(0, 1)
+                state.villages = villages
+                console.log("BUILD!")
+                // bulidButton.trigger('click')
+            }
+        }
+    }
+
+    state.currentAction = CurrentActionEnum.IDLE
+
+    // Check if need to build in another village
+    const nextVillageIdToBuild = Object.entries(state.villages)
+        .filter(([_, village]) =>
+            village.pendingBuildTasks.length > 0 && village.currentBuildTasks.filter(t => new Date(t.finishTime) < new Date()).length < 2
+        )
+        .map(([id, _]) => id)
+        .find(_ => true)
+
+    if (nextVillageIdToBuild) {
+        $(`a[href="?newdid=${nextVillageIdToBuild}&"]`)[0].click()
+    }
+}
+
+const render = (state: State) => {
     const villages = state.villages
     const currentVillage = state.villages[state.currentVillageId]
 
@@ -408,8 +476,9 @@ const run = (state: State) => {
     updateCurrentPage(state)
     updateVillageList(state)
     updateCurrentVillageStatus(state)
+    if (state.currentAction in [CurrentActionEnum.IDLE, CurrentActionEnum.BUILD])
+        build(state)
     // alertAttack()
-    // tryBuild()
     // alertEmptyBuildQueue()
     // tryNextVillage()
 }

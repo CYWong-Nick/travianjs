@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var CurrentPageEnum;
 (function (CurrentPageEnum) {
     CurrentPageEnum["LOGIN"] = "LOGIN";
@@ -6,6 +15,11 @@ var CurrentPageEnum;
     CurrentPageEnum["TOWN"] = "TOWN";
     CurrentPageEnum["BUILDING"] = "BUILDING";
 })(CurrentPageEnum || (CurrentPageEnum = {}));
+var CurrentActionEnum;
+(function (CurrentActionEnum) {
+    CurrentActionEnum["IDLE"] = "IDLE";
+    CurrentActionEnum["BUILD"] = "BUILD";
+})(CurrentActionEnum || (CurrentActionEnum = {}));
 const GID_NAME_MAP = {
     "1": "Woodcutter",
     "2": "Clay Pit",
@@ -78,22 +92,21 @@ class StateHandler {
     }
 }
 StateHandler.INITIAL_STATE = {
+    currentAction: CurrentActionEnum.IDLE,
     currentPage: CurrentPageEnum.LOGIN,
     currentVillageId: '',
     villages: {}
 };
 class Utils {
-    constructor() {
-        this.randInt = (x, y) => {
-            return Math.floor(Math.random() * (y - x + 1) + x);
-        };
-        this.sleep = (ms) => {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        };
-    }
 }
 Utils.parseIntIgnoreSep = (s) => {
     return parseInt(s.replace('.', '').replace(',', ''));
+};
+Utils.randInt = (x, y) => {
+    return Math.floor(Math.random() * (y - x + 1) + x);
+};
+Utils.sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
 };
 Utils.addToDate = (date, hour, minute, second) => {
     return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000);
@@ -211,7 +224,7 @@ const updateCurrentVillageStatus = (state) => {
     let iron = Utils.parseIntIgnoreSep($('#l3')[0].innerText);
     let crop = Utils.parseIntIgnoreSep($('#l4')[0].innerText);
     villages[currentVillageId].resources = { lumber, clay, iron, crop };
-    if (state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.FIELDS]) {
+    if (state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN]) {
         const currentBuildTasks = [];
         $('.buildingList > ul > li').each((_, ele) => {
             const nameAndLevelEle = $(ele).find('.name').contents();
@@ -230,6 +243,64 @@ const updateCurrentVillageStatus = (state) => {
     }
     state.villages = villages;
 };
+const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    // Try building in current village
+    const villages = state.villages;
+    const village = villages[state.currentVillageId];
+    if (village.pendingBuildTasks.length > 0) {
+        const task = village.pendingBuildTasks[0];
+        if (village.currentBuildTasks.length < 2
+            && state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN]
+            && task.resources.lumber <= village.resources.lumber
+            && task.resources.clay <= village.resources.clay
+            && task.resources.iron <= village.resources.iron
+            && task.resources.crop <= village.resources.crop) {
+            state.currentAction = CurrentActionEnum.BUILD;
+            yield Utils.sleep(Utils.randInt(1000, 5000));
+            if (task.aid <= 18) {
+                if (state.currentPage === CurrentPageEnum.FIELDS)
+                    $(`a[href="/build.php?id=${task.aid}"]`)[0].click();
+                else
+                    $('.village.resourceView')[0].click();
+            }
+            else {
+                if (state.currentPage === CurrentPageEnum.TOWN) {
+                    if (task.aid === 40) // Special case for wall
+                        $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click');
+                    else
+                        $(`a[href="/build.php?id=${task.aid}&gid=${task.gid}"]`)[0].click();
+                }
+                else {
+                    $('.village.buildingView')[0].click();
+                }
+            }
+        }
+    }
+    if (village.pendingBuildTasks.length > 0) {
+        const task = village.pendingBuildTasks[0];
+        let params = new URLSearchParams(window.location.search);
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
+            const bulidButton = $('.section1 > button.green');
+            if (bulidButton.length) {
+                yield sleep(randInt(1000, 5000));
+                state.currentAction = CurrentActionEnum.IDLE;
+                village.pendingBuildTasks.splice(0, 1);
+                state.villages = villages;
+                console.log("BUILD!");
+                // bulidButton.trigger('click')
+            }
+        }
+    }
+    state.currentAction = CurrentActionEnum.IDLE;
+    // Check if need to build in another village
+    const nextVillageIdToBuild = Object.entries(state.villages)
+        .filter(([_, village]) => village.pendingBuildTasks.length > 0 && village.currentBuildTasks.filter(t => new Date(t.finishTime) < new Date()).length < 2)
+        .map(([id, _]) => id)
+        .find(_ => true);
+    if (nextVillageIdToBuild) {
+        $(`a[href="?newdid=${nextVillageIdToBuild}&"]`)[0].click();
+    }
+});
 const render = (state) => {
     const villages = state.villages;
     const currentVillage = state.villages[state.currentVillageId];
@@ -308,8 +379,9 @@ const run = (state) => {
     updateCurrentPage(state);
     updateVillageList(state);
     updateCurrentVillageStatus(state);
+    if (state.currentAction in [CurrentActionEnum.IDLE, CurrentActionEnum.BUILD])
+        build(state);
     // alertAttack()
-    // tryBuild()
     // alertEmptyBuildQueue()
     // tryNextVillage()
 };
