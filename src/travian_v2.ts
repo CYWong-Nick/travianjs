@@ -389,6 +389,7 @@ const build = async (state: State) => {
         .find(_ => true)
 
     if (nextVillageIdToBuild) {
+        console.log("Go to village", nextVillageIdToBuild)
         $(`a[href="?newdid=${nextVillageIdToBuild}&"]`)[0].click()
     }
 }
