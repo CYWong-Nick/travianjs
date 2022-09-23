@@ -21,7 +21,7 @@ interface State {
     currentVillageId: string
     villages: Record<string, Village>
     feature: Feature
-    nextVillageRotationTime?: Date
+    nextVillageRotationTime: Date
 }
 
 const GID_NAME_MAP: Record<string, string> = {
@@ -80,7 +80,8 @@ class StateHandler implements ProxyHandler<State> {
         feature: {
             autoBuild: false,
             debug: false
-        }
+        },
+        nextVillageRotationTime: new Date()
     }
 
     private state: State

@@ -102,7 +102,8 @@ StateHandler.INITIAL_STATE = {
     feature: {
         autoBuild: false,
         debug: false
-    }
+    },
+    nextVillageRotationTime: new Date()
 };
 class Utils {
 }
