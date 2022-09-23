@@ -357,7 +357,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 10);
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 20);
         const villageIds = Object.keys(state.villages);
         const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length;
         yield Navigation.goToVillage(state, villageIds[nextIdx]);
@@ -457,8 +457,10 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     updateCurrentVillageStatus(state);
     if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
         yield build(state);
-    if (CurrentActionEnum.VILLAGE_RESET === state.currentAction)
+    if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
+        state.currentAction = CurrentActionEnum.IDLE;
         yield Navigation.goToFields(state);
+    }
     // alertAttack()
     // alertEmptyBuildQueue()
     yield nextVillage(state);

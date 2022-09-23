@@ -451,7 +451,7 @@ const build = async (state: State) => {
 
 const nextVillage = async (state: State) => {
     if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 10)
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 20)
         const villageIds = Object.keys(state.villages)
         const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length
         await Navigation.goToVillage(state, villageIds[nextIdx])
@@ -564,8 +564,10 @@ const run = async (state: State) => {
     updateCurrentVillageStatus(state)
     if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild)
         await build(state)
-    if (CurrentActionEnum.VILLAGE_RESET === state.currentAction)
+    if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
+        state.currentAction = CurrentActionEnum.IDLE
         await Navigation.goToFields(state)
+    }
     // alertAttack()
     // alertEmptyBuildQueue()
     await nextVillage(state)
