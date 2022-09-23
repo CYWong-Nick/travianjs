@@ -113,7 +113,7 @@ Utils.addToDate = (date, hour, minute, second) => {
 };
 Utils.formatDate = (dateInput) => {
     const date = new Date(dateInput);
-    return `${date.getFullYear()}/${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 };
 var TroopMovementType;
 (function (TroopMovementType) {
@@ -224,7 +224,7 @@ const updateCurrentVillageStatus = (state) => {
     let iron = Utils.parseIntIgnoreSep($('#l3')[0].innerText);
     let crop = Utils.parseIntIgnoreSep($('#l4')[0].innerText);
     villages[currentVillageId].resources = { lumber, clay, iron, crop };
-    if (state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN]) {
+    if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
         const currentBuildTasks = [];
         $('.buildingList > ul > li').each((_, ele) => {
             const nameAndLevelEle = $(ele).find('.name').contents();
@@ -250,7 +250,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (village.pendingBuildTasks.length > 0) {
         const task = village.pendingBuildTasks[0];
         if (village.currentBuildTasks.length < 2
-            && state.currentPage in [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN]
+            && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)
             && task.resources.lumber <= village.resources.lumber
             && task.resources.clay <= village.resources.clay
             && task.resources.iron <= village.resources.iron
@@ -379,7 +379,7 @@ const run = (state) => {
     updateCurrentPage(state);
     updateVillageList(state);
     updateCurrentVillageStatus(state);
-    if (state.currentAction in [CurrentActionEnum.IDLE, CurrentActionEnum.BUILD])
+    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction))
         build(state);
     // alertAttack()
     // alertEmptyBuildQueue()
@@ -393,6 +393,6 @@ const initialize = () => {
     createContainer();
     render(state);
     run(state);
-    setInterval(() => run(state), 30000);
+    setInterval(() => run(state), 5000);
 };
 initialize();
