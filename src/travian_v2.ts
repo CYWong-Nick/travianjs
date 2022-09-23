@@ -451,7 +451,7 @@ const build = async (state: State) => {
 
 const nextVillage = async (state: State) => {
     if (!state.nextVillageRotationTime || new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0)
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, 0, 10)
         const villageIds = Object.keys(state.villages)
         const nextIdx = (villageIds.findIndex(v => v === state.currentVillageId) + 1) % villageIds.length
         await Navigation.goToVillage(state, villageIds[nextIdx])
