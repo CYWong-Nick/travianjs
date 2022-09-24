@@ -171,27 +171,24 @@ class Utils {
 }
 
 class Navigation {
-    static goToVillage = async (state: State, id: string, action?: CurrentActionEnum): Promise<boolean> => {
+    static goToVillage = async (state: State, id: string, action: CurrentActionEnum): Promise<boolean> => {
         await Utils.delayClick()
-        if (action)
-            state.currentAction = action
+        state.currentAction = action
         state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`)
         $(`.listEntry[data-did="${id}"] > a`)[0].click()
         return true
     }
 
-    static goToBuilding = async (state: State, aid: number, gid: number, action?: CurrentActionEnum): Promise<boolean> => {
+    static goToBuilding = async (state: State, aid: number, gid: number, action: CurrentActionEnum): Promise<boolean> => {
         if (aid <= 18 && state.currentPage === CurrentPageEnum.FIELDS) {
             await Utils.delayClick()
-            if (action)
-                state.currentAction = action
+            state.currentAction = action
             state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
             $(`a[href="/build.php?id=${aid}"]`)[0].click()
             return true
         } else if (aid > 18 && state.currentPage === CurrentPageEnum.TOWN) {
             await Utils.delayClick()
-            if (action)
-                state.currentAction = action
+            state.currentAction = action
             state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
             if (aid === 40) { // Special case for wall
                 $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
@@ -205,19 +202,17 @@ class Navigation {
         }
     }
 
-    static goToFields = async (state: State, action?: CurrentActionEnum): Promise<boolean> => {
+    static goToFields = async (state: State, action: CurrentActionEnum): Promise<boolean> => {
         await Utils.delayClick()
-        if (action)
-            state.currentAction = action
+        state.currentAction = action
         state.feature.debug && console.log('Go to fields')
         $('.village.resourceView')[0].click()
         return true
     }
 
-    static goToTown = async (state: State, action?: CurrentActionEnum): Promise<boolean> => {
+    static goToTown = async (state: State, action: CurrentActionEnum): Promise<boolean> => {
         await Utils.delayClick()
-        if (action)
-            state.currentAction = action
+        state.currentAction = action
         state.feature.debug && console.log('Go to town')
         $('.village.buildingView')[0].click()
         return true
@@ -511,7 +506,7 @@ const alertAttack = (state: State) => {
 
 const alertEmptyBuildQueue = (state: State) => {
     const villages = state.villages
-    const village = villages[state.currentVillageId] 
+    const village = villages[state.currentVillageId]
     if (!village.currentBuildTasks.length) {
         if (!state.telegramChatId || !state.telegramToken) {
             state.feature.debug && console.log("Telegram chat id or token not set")
@@ -526,7 +521,7 @@ const alertEmptyBuildQueue = (state: State) => {
             state.feature.debug && console.log(`Not alerting empty build queue due to backoff at ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}`)
         }
     }
-        
+
 }
 
 const build = async (state: State) => {
@@ -596,13 +591,13 @@ const nextVillage = async (state: State) => {
             })
 
         state.feature.debug && console.log(`Rotating to ${state.villages[earliestVillageId].name}`)
-        await Navigation.goToVillage(state, earliestVillageId)
+        await Navigation.goToVillage(state, earliestVillageId, CurrentActionEnum.VILLAGE_RESET)
     } else {
         state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`)
     }
 }
 
-const handleFeatureToggle= (selector: string, state: State,  key: keyof Feature) => {
+const handleFeatureToggle = (selector: string, state: State, key: keyof Feature) => {
     $(selector).on('click', () => {
         const feature = state.feature
         feature[key] = !feature[key]

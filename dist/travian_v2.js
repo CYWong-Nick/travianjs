@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 20:42:40";
+const BUILD_TIME = "2022/09/24 20:46:20";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -149,8 +149,7 @@ class Navigation {
 _b = Navigation;
 Navigation.goToVillage = (state, id, action) => __awaiter(void 0, void 0, void 0, function* () {
     yield Utils.delayClick();
-    if (action)
-        state.currentAction = action;
+    state.currentAction = action;
     state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`);
     $(`.listEntry[data-did="${id}"] > a`)[0].click();
     return true;
@@ -158,16 +157,14 @@ Navigation.goToVillage = (state, id, action) => __awaiter(void 0, void 0, void 0
 Navigation.goToBuilding = (state, aid, gid, action) => __awaiter(void 0, void 0, void 0, function* () {
     if (aid <= 18 && state.currentPage === CurrentPageEnum.FIELDS) {
         yield Utils.delayClick();
-        if (action)
-            state.currentAction = action;
+        state.currentAction = action;
         state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
         $(`a[href="/build.php?id=${aid}"]`)[0].click();
         return true;
     }
     else if (aid > 18 && state.currentPage === CurrentPageEnum.TOWN) {
         yield Utils.delayClick();
-        if (action)
-            state.currentAction = action;
+        state.currentAction = action;
         state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
         if (aid === 40) { // Special case for wall
             $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click');
@@ -184,16 +181,14 @@ Navigation.goToBuilding = (state, aid, gid, action) => __awaiter(void 0, void 0,
 });
 Navigation.goToFields = (state, action) => __awaiter(void 0, void 0, void 0, function* () {
     yield Utils.delayClick();
-    if (action)
-        state.currentAction = action;
+    state.currentAction = action;
     state.feature.debug && console.log('Go to fields');
     $('.village.resourceView')[0].click();
     return true;
 });
 Navigation.goToTown = (state, action) => __awaiter(void 0, void 0, void 0, function* () {
     yield Utils.delayClick();
-    if (action)
-        state.currentAction = action;
+    state.currentAction = action;
     state.feature.debug && console.log('Go to town');
     $('.village.buildingView')[0].click();
     return true;
@@ -479,7 +474,7 @@ const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
             }
         });
         state.feature.debug && console.log(`Rotating to ${state.villages[earliestVillageId].name}`);
-        yield Navigation.goToVillage(state, earliestVillageId);
+        yield Navigation.goToVillage(state, earliestVillageId, CurrentActionEnum.VILLAGE_RESET);
     }
     else {
         state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`);
