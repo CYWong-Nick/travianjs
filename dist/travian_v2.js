@@ -9,20 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-var CurrentPageEnum;
-(function (CurrentPageEnum) {
-    CurrentPageEnum["LOGIN"] = "LOGIN";
-    CurrentPageEnum["FIELDS"] = "FIELDS";
-    CurrentPageEnum["TOWN"] = "TOWN";
-    CurrentPageEnum["BUILDING"] = "BUILDING";
-    CurrentPageEnum["UNKNOWN"] = "UNKNOWN";
-})(CurrentPageEnum || (CurrentPageEnum = {}));
-var CurrentActionEnum;
-(function (CurrentActionEnum) {
-    CurrentActionEnum["IDLE"] = "IDLE";
-    CurrentActionEnum["BUILD"] = "BUILD";
-    CurrentActionEnum["VILLAGE_RESET"] = "VILLAGE_RESET";
-})(CurrentActionEnum || (CurrentActionEnum = {}));
+const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
     "2": "Clay Pit",
@@ -69,6 +56,20 @@ const GID_NAME_MAP = {
     "30": "Great Stable",
     "40": "Wonder of the World"
 };
+var CurrentPageEnum;
+(function (CurrentPageEnum) {
+    CurrentPageEnum["LOGIN"] = "LOGIN";
+    CurrentPageEnum["FIELDS"] = "FIELDS";
+    CurrentPageEnum["TOWN"] = "TOWN";
+    CurrentPageEnum["BUILDING"] = "BUILDING";
+    CurrentPageEnum["UNKNOWN"] = "UNKNOWN";
+})(CurrentPageEnum || (CurrentPageEnum = {}));
+var CurrentActionEnum;
+(function (CurrentActionEnum) {
+    CurrentActionEnum["IDLE"] = "IDLE";
+    CurrentActionEnum["BUILD"] = "BUILD";
+    CurrentActionEnum["VILLAGE_RESET"] = "VILLAGE_RESET";
+})(CurrentActionEnum || (CurrentActionEnum = {}));
 class StateHandler {
     constructor() {
         this.parseState = (prop) => {
@@ -169,6 +170,7 @@ Navigation.goToBuilding = (state, aid, gid, action) => __awaiter(void 0, void 0,
         return true;
     }
     else {
+        state.feature.debug && console.log(`Cannot go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
         return false;
     }
 });
@@ -409,13 +411,16 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         .map(([id, _]) => id)
         .find(_ => true);
     if (nextVillageIdToBuild) {
-        yield Navigation.goToVillage(state, nextVillageIdToBuild);
+        yield Navigation.goToVillage(state, nextVillageIdToBuild, CurrentActionEnum.VILLAGE_RESET);
     }
     else {
+        state.feature.debug && console.log("Nothing to build in other villages");
         state.currentAction = CurrentActionEnum.IDLE;
     }
 });
 const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    const nextRotationTIme = new Date(state.nextVillageRotationTime);
+    const currentTime = new Date();
     if (new Date(state.nextVillageRotationTime) < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 20);
         let earliestVillageId = '';
@@ -425,7 +430,11 @@ const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 earliestVillageId = village.id;
             }
         });
+        state.feature.debug && console.log(`Rotating to ${state.villages[earliestVillageId].name}`);
         yield Navigation.goToVillage(state, earliestVillageId);
+    }
+    else {
+        state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`);
     }
 });
 const render = (state) => {
@@ -524,22 +533,29 @@ const render = (state) => {
     });
 };
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
-    updateCurrentPage(state);
-    updateVillageList(state);
-    updateCurrentVillageStatus(state);
-    // alertAttack()
-    // alertEmptyBuildQueue()
-    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
-        yield build(state);
-    }
-    if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
-        if (state.currentPage === CurrentPageEnum.FIELDS)
-            state.currentAction = CurrentActionEnum.IDLE;
-        else
-            yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
-    }
-    if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
-        yield nextVillage(state);
+    while (true) {
+        updateCurrentPage(state);
+        updateVillageList(state);
+        updateCurrentVillageStatus(state);
+        // alertAttack()
+        // alertEmptyBuildQueue()
+        if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
+            state.feature.debug && console.log("Attempting build");
+            yield build(state);
+        }
+        if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
+            if (state.currentPage === CurrentPageEnum.FIELDS)
+                state.currentAction = CurrentActionEnum.IDLE;
+            else
+                yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
+        }
+        // Auto farm
+        if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
+            state.feature.debug && console.log("Try next village");
+            yield nextVillage(state);
+        }
+        state.feature.debug && console.log(`Awaiting ${RUN_INTERVAL}ms`);
+        yield Utils.sleep(RUN_INTERVAL);
     }
 });
 const initialize = () => {
@@ -550,6 +566,5 @@ const initialize = () => {
     createContainer();
     render(state);
     run(state);
-    setInterval(() => run(state), 10000);
 };
 initialize();

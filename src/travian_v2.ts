@@ -1,31 +1,4 @@
-enum CurrentPageEnum {
-    LOGIN = "LOGIN",
-    FIELDS = "FIELDS",
-    TOWN = "TOWN",
-    BUILDING = "BUILDING",
-    UNKNOWN = "UNKNOWN"
-}
-
-enum CurrentActionEnum {
-    IDLE = "IDLE",
-    BUILD = "BUILD",
-    VILLAGE_RESET = "VILLAGE_RESET"
-}
-
-interface Feature {
-    autoScan: boolean
-    autoBuild: boolean
-    debug: boolean
-}
-interface State {
-    currentAction: CurrentActionEnum
-    currentPage: CurrentPageEnum
-    currentVillageId: string
-    villages: Record<string, Village>
-    feature: Feature
-    nextVillageRotationTime: Date
-}
-
+const RUN_INTERVAL = 10000
 const GID_NAME_MAP: Record<string, string> = {
     "1": "Woodcutter",
     "2": "Clay Pit",
@@ -71,6 +44,34 @@ const GID_NAME_MAP: Record<string, string> = {
     "22": "Academy",
     "30": "Great Stable",
     "40": "Wonder of the World"
+}
+
+enum CurrentPageEnum {
+    LOGIN = "LOGIN",
+    FIELDS = "FIELDS",
+    TOWN = "TOWN",
+    BUILDING = "BUILDING",
+    UNKNOWN = "UNKNOWN"
+}
+
+enum CurrentActionEnum {
+    IDLE = "IDLE",
+    BUILD = "BUILD",
+    VILLAGE_RESET = "VILLAGE_RESET"
+}
+
+interface Feature {
+    autoScan: boolean
+    autoBuild: boolean
+    debug: boolean
+}
+interface State {
+    currentAction: CurrentActionEnum
+    currentPage: CurrentPageEnum
+    currentVillageId: string
+    villages: Record<string, Village>
+    feature: Feature
+    nextVillageRotationTime: Date
 }
 
 class StateHandler implements ProxyHandler<State> {
@@ -187,6 +188,7 @@ class Navigation {
             }
             return true
         } else {
+            state.feature.debug && console.log(`Cannot go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
             return false
         }
     }
@@ -519,13 +521,16 @@ const build = async (state: State) => {
         .find(_ => true)
 
     if (nextVillageIdToBuild) {
-        await Navigation.goToVillage(state, nextVillageIdToBuild)
+        await Navigation.goToVillage(state, nextVillageIdToBuild, CurrentActionEnum.VILLAGE_RESET)
     } else {
+        state.feature.debug && console.log("Nothing to build in other villages")
         state.currentAction = CurrentActionEnum.IDLE
     }
 }
 
 const nextVillage = async (state: State) => {
+    const nextRotationTIme = new Date(state.nextVillageRotationTime)
+    const currentTime = new Date()
     if (new Date(state.nextVillageRotationTime) < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 20)
 
@@ -537,7 +542,10 @@ const nextVillage = async (state: State) => {
                 }
             })
 
+        state.feature.debug && console.log(`Rotating to ${state.villages[earliestVillageId].name}`)
         await Navigation.goToVillage(state, earliestVillageId)
+    } else {
+        state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`)
     }
 }
 
@@ -650,25 +658,34 @@ const render = (state: State) => {
 }
 
 const run = async (state: State) => {
-    updateCurrentPage(state)
-    updateVillageList(state)
-    updateCurrentVillageStatus(state)
-    // alertAttack()
-    // alertEmptyBuildQueue()
+    while (true) {
+        updateCurrentPage(state)
+        updateVillageList(state)
+        updateCurrentVillageStatus(state)
+        // alertAttack()
+        // alertEmptyBuildQueue()
 
-    if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
-        await build(state)
-    }
+        if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
+            state.feature.debug && console.log("Attempting build")
+            await build(state)
+        }
 
-    if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
-        if (state.currentPage === CurrentPageEnum.FIELDS)
-            state.currentAction = CurrentActionEnum.IDLE
-        else
-            await Navigation.goToFields(state, CurrentActionEnum.IDLE)
-    }
+        if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
+            if (state.currentPage === CurrentPageEnum.FIELDS)
+                state.currentAction = CurrentActionEnum.IDLE
+            else
+                await Navigation.goToFields(state, CurrentActionEnum.IDLE)
+        }
 
-    if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
-        await nextVillage(state)
+        // Auto farm
+
+        if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
+            state.feature.debug && console.log("Try next village")
+            await nextVillage(state)
+        }
+
+        state.feature.debug && console.log(`Awaiting ${RUN_INTERVAL}ms`)
+        await Utils.sleep(RUN_INTERVAL)
     }
 }
 
@@ -681,7 +698,6 @@ const initialize = () => {
     createContainer()
     render(state)
     run(state)
-    setInterval(() => run(state), 10000)
 }
 
 initialize()
