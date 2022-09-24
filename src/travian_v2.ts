@@ -587,7 +587,7 @@ const render = (state: State) => {
         </div>
         <div class="flex-row">
             <div class="flex">
-                <h5>Summary</h5>
+                <h5>Summary (Build: ${BUILD_TIME})</h5>
                 <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
                 <div>Current Action: ${state.currentAction}</div>
                 <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>

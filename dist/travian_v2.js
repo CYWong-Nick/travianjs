@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 15:15:01";
+const BUILD_TIME = "2022/09/24 15:15:40";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -471,7 +471,7 @@ const render = (state) => {
         </div>
         <div class="flex-row">
             <div class="flex">
-                <h5>Summary</h5>
+                <h5>Summary (Build: ${BUILD_TIME})</h5>
                 <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
                 <div>Current Action: ${state.currentAction}</div>
                 <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
