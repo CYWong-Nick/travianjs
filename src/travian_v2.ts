@@ -66,6 +66,7 @@ interface Feature {
     autoBuild: boolean
     alertAttack: boolean
     alertEmptyBuildQueue: boolean
+    alertResourceCapacityFull: boolean
     debug: boolean
 }
 interface State {
@@ -90,6 +91,7 @@ class StateHandler implements ProxyHandler<State> {
             autoBuild: false,
             alertAttack: false,
             alertEmptyBuildQueue: false,
+            alertResourceCapacityFull: false,
             debug: false
         },
         nextVillageRotationTime: new Date(),
@@ -157,7 +159,7 @@ class Utils {
         return String(value).padStart(length, '0')
     }
 
-    static formatDate = (dateInput: Date) => {
+    static formatDate = (dateInput?: Date) => {
         if (!dateInput) {
             return 'N/A'
         }
@@ -251,11 +253,13 @@ interface Village {
     currentBuildTasks: CurrentBuildTask[]
     pendingBuildTasks: PendingBuildTask[]
     resources: Resource
+    capacity: Resource
     incomingTroops: TroopMovement[]
     outgoingTroops: TroopMovement[]
-    lastUpdatedTime: Date
-    attackAlertBackoff: Date
-    emptyBuildQueueAlertBackoff: Date
+    lastUpdatedTime?: Date
+    attackAlertBackoff?: Date
+    emptyBuildQueueAlertBackoff?: Date
+    resourceCapacityFullAlertBackoff?: Date
 }
 
 interface CurrentBuildTask {
@@ -358,7 +362,11 @@ const updateVillageList = (state: State) => {
         const x = Utils.parseIntIgnoreSep(coordinateAttributes.getNamedItem('data-x')?.value || '')
         const y = Utils.parseIntIgnoreSep(coordinateAttributes.getNamedItem('data-y')?.value || '')
 
-        const villageDefaults = {
+        const villageDefaults: Village = {
+            id: '',
+            name: '',
+            position: { x: 0, y: 0 },
+            index: -1,
             currentBuildTasks: [],
             pendingBuildTasks: [],
             incomingTroops: [],
@@ -369,6 +377,12 @@ const updateVillageList = (state: State) => {
                 iron: 0,
                 crop: 0
             },
+            capacity: {
+                lumber: 0,
+                clay: 0,
+                iron: 0,
+                crop: 0
+            }
         }
 
         villages[id] = {
@@ -396,6 +410,15 @@ const updateCurrentVillageStatus = (state: State) => {
     let crop = Utils.parseIntIgnoreSep($('#l4')[0].innerText)
 
     villages[currentVillageId].resources = { lumber, clay, iron, crop }
+
+    const warehouseCapacity = Utils.parseIntIgnoreSep($('.warehouse .capacity > div').text())
+    const granaryCapacity = Utils.parseIntIgnoreSep($('.granary .capacity > div').text())
+    villages[currentVillageId].capacity = {
+        lumber: warehouseCapacity,
+        clay: warehouseCapacity,
+        iron: warehouseCapacity,
+        crop: granaryCapacity
+    }
 
     if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
         const currentBuildTasks: CurrentBuildTask[] = []
@@ -521,8 +544,45 @@ const alertEmptyBuildQueue = (state: State) => {
             state.feature.debug && console.log(`Not alerting empty build queue due to backoff at ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}`)
         }
     }
-
 }
+
+const alertResourceCapacityFull = (state: State) => {
+    const villages = state.villages
+    const village = villages[state.currentVillageId]
+
+    let fullResourceType = ''
+    if (village.resources.lumber === village.capacity.lumber) {
+        fullResourceType = 'lumber'
+    }
+
+    if (village.resources.clay === village.capacity.clay) {
+        fullResourceType = 'clay'
+    }
+
+    if (village.resources.iron === village.capacity.iron) {
+        fullResourceType = 'iron'
+    }
+
+    if (village.resources.crop === village.capacity.crop) {
+        fullResourceType = 'crop'
+    }
+
+    if (fullResourceType) {
+        if (!state.telegramChatId || !state.telegramToken) {
+            state.feature.debug && console.log("Telegram chat id or token not set")
+            return
+        }
+        if (!village.resourceCapacityFullAlertBackoff || new Date(village.resourceCapacityFullAlertBackoff) < new Date()) {
+            state.feature.debug && console.log(`Send alert for capacity full for ${fullResourceType} at village ${village.name}`)
+            village.resourceCapacityFullAlertBackoff = Utils.addToDate(new Date(), 0, 5, 0)
+            state.villages = villages
+            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} ${fullResourceType} is at capacity`)
+        } else {
+            state.feature.debug && console.log(`Not alerting capacity full due to backoff at ${Utils.formatDate(village.resourceCapacityFullAlertBackoff)}`)
+        }
+    }
+}
+
 
 const build = async (state: State) => {
     // Try building in current village
@@ -582,10 +642,11 @@ const nextVillage = async (state: State) => {
     if (new Date(state.nextVillageRotationTime) < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0)
 
-        let earliestVillageId: string = ''
+        let earliestVillageId: string = state.villages[0].id
         Object.values(state.villages)
             .forEach(village => {
-                if (!village.lastUpdatedTime || !earliestVillageId || village.lastUpdatedTime < state.villages[earliestVillageId].lastUpdatedTime) {
+                const earliestUpdatedTime = state.villages[earliestVillageId]?.lastUpdatedTime
+                if (!village.lastUpdatedTime || (earliestUpdatedTime && village.lastUpdatedTime < earliestUpdatedTime)) {
                     earliestVillageId = village.id
                 }
             })
@@ -615,6 +676,7 @@ const render = (state: State) => {
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
+            <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
         <div>
@@ -711,6 +773,7 @@ const render = (state: State) => {
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue')
+    handleFeatureToggle('#toggleAlertResourceCapacityFull', state, 'alertResourceCapacityFull')
     handleFeatureToggle('#toggleDebug', state, 'debug')
 }
 
@@ -729,7 +792,10 @@ const run = async (state: State) => {
             alertEmptyBuildQueue(state)
         }
 
-        // Alert resources full
+        if (state.feature.alertResourceCapacityFull) {
+            state.feature.debug && console.log("Checking resource capacity full")
+            alertResourceCapacityFull(state)
+        }
 
         if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
             state.feature.debug && console.log("Attempting build")
