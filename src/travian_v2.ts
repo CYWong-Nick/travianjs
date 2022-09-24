@@ -120,7 +120,6 @@ class StateHandler implements ProxyHandler<State> {
     }
 
     set = (obj: State, prop: keyof State, value: any) => {
-        console.log("Set", prop, value)
         localStorage.setItem(prop, JSON.stringify(value))
         //@ts-ignore
         this.state[prop] = value

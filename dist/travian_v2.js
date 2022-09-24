@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 20:12:55";
+const BUILD_TIME = "2022/09/24 20:42:40";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -84,7 +84,6 @@ class StateHandler {
             return this.state[prop];
         };
         this.set = (obj, prop, value) => {
-            console.log("Set", prop, value);
             localStorage.setItem(prop, JSON.stringify(value));
             //@ts-ignore
             this.state[prop] = value;
