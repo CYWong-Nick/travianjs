@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 20:08:27";
+const BUILD_TIME = "2022/09/24 20:12:55";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -84,6 +84,7 @@ class StateHandler {
             return this.state[prop];
         };
         this.set = (obj, prop, value) => {
+            console.log("Set", prop, value);
             localStorage.setItem(prop, JSON.stringify(value));
             //@ts-ignore
             this.state[prop] = value;
@@ -315,7 +316,6 @@ const updateCurrentVillageStatus = (state) => {
     villages[currentVillageId].resources = { lumber, clay, iron, crop };
     if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
         const currentBuildTasks = [];
-        console.log($('.buildingList > ul > li'));
         $('.buildingList > ul > li').each((_, ele) => {
             const nameAndLevelEle = $(ele).find('.name').contents();
             const name = $(nameAndLevelEle[0]).text().trim();
@@ -329,7 +329,6 @@ const updateCurrentVillageStatus = (state) => {
                 finishTime
             });
         });
-        console.log(currentBuildTasks);
         villages[currentVillageId].currentBuildTasks = currentBuildTasks;
     }
     if (state.currentPage === CurrentPageEnum.FIELDS) {

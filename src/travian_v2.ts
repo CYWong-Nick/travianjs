@@ -120,6 +120,7 @@ class StateHandler implements ProxyHandler<State> {
     }
 
     set = (obj: State, prop: keyof State, value: any) => {
+        console.log("Set", prop, value)
         localStorage.setItem(prop, JSON.stringify(value))
         //@ts-ignore
         this.state[prop] = value
@@ -404,7 +405,6 @@ const updateCurrentVillageStatus = (state: State) => {
 
     if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
         const currentBuildTasks: CurrentBuildTask[] = []
-        console.log($('.buildingList > ul > li'))
         $('.buildingList > ul > li').each((_, ele) => {
             const nameAndLevelEle = $(ele).find('.name').contents()
             const name = $(nameAndLevelEle[0]).text().trim()
@@ -425,7 +425,6 @@ const updateCurrentVillageStatus = (state: State) => {
                 finishTime
             })
         })
-        console.log(currentBuildTasks)
         villages[currentVillageId].currentBuildTasks = currentBuildTasks
     }
 
