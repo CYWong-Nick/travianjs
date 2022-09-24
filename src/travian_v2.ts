@@ -601,9 +601,16 @@ const nextVillage = async (state: State) => {
     }
 }
 
+const handleFeatureToggle= (selector: string, state: State,  key: keyof Feature) => {
+    $(selector).on('click', () => {
+        const feature = state.feature
+        feature[key] = !feature[key]
+        state.feature = feature
+    })
+}
+
 const render = (state: State) => {
     const villages = state.villages
-    const currentVillage = state.villages[state.currentVillageId]
 
     $('#console').html(`
         <div class="flex-row">
@@ -657,7 +664,6 @@ const render = (state: State) => {
         </div>
     `)
 
-
     state.currentPage === CurrentPageEnum.BUILDING && $('#addCurrentToPending').on('click', () => {
         const villages = state.villages
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
@@ -705,35 +711,11 @@ const render = (state: State) => {
         state.villages = villages
     })
 
-    $('#toggleAutoScan').on('click', () => {
-        const feature = state.feature
-        feature.autoScan = !feature.autoScan
-        state.feature = feature
-    })
-
-    $('#toggleAutoBuild').on('click', () => {
-        const feature = state.feature
-        feature.autoBuild = !feature.autoBuild
-        state.feature = feature
-    })
-
-    $('#toggleAlertAttack').on('click', () => {
-        const feature = state.feature
-        feature.alertAttack = !feature.alertAttack
-        state.feature = feature
-    })
-
-    $('#toggleAlertEmptyBuildQueue').on('click', () => {
-        const feature = state.feature
-        feature.alertEmptyBuildQueue = !feature.alertEmptyBuildQueue
-        state.feature = feature
-    })
-
-    $('#toggleDebug').on('click', () => {
-        const feature = state.feature
-        feature.debug = !feature.debug
-        state.feature = feature
-    })
+    handleFeatureToggle('#toggleAutoScan', state, 'autoScan')
+    handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')
+    handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
+    handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue')
+    handleFeatureToggle('#toggleDebug', state, 'debug')
 }
 
 const run = async (state: State) => {

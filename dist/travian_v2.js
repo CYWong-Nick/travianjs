@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 16:43:28";
+const BUILD_TIME = "2022/09/24 16:47:27";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -482,9 +482,15 @@ const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
         state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`);
     }
 });
+const handleFeatureToggle = (selector, state, key) => {
+    $(selector).on('click', () => {
+        const feature = state.feature;
+        feature[key] = !feature[key];
+        state.feature = feature;
+    });
+};
 const render = (state) => {
     const villages = state.villages;
-    const currentVillage = state.villages[state.currentVillageId];
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
@@ -575,31 +581,11 @@ const render = (state) => {
         pendingBuildTasks.splice(Utils.parseIntIgnoreSep(idx), 1);
         state.villages = villages;
     });
-    $('#toggleAutoScan').on('click', () => {
-        const feature = state.feature;
-        feature.autoScan = !feature.autoScan;
-        state.feature = feature;
-    });
-    $('#toggleAutoBuild').on('click', () => {
-        const feature = state.feature;
-        feature.autoBuild = !feature.autoBuild;
-        state.feature = feature;
-    });
-    $('#toggleAlertAttack').on('click', () => {
-        const feature = state.feature;
-        feature.alertAttack = !feature.alertAttack;
-        state.feature = feature;
-    });
-    $('#toggleAlertEmptyBuildQueue').on('click', () => {
-        const feature = state.feature;
-        feature.alertEmptyBuildQueue = !feature.alertEmptyBuildQueue;
-        state.feature = feature;
-    });
-    $('#toggleDebug').on('click', () => {
-        const feature = state.feature;
-        feature.debug = !feature.debug;
-        state.feature = feature;
-    });
+    handleFeatureToggle('#toggleAutoScan', state, 'autoScan');
+    handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild');
+    handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack');
+    handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue');
+    handleFeatureToggle('#toggleDebug', state, 'debug');
 };
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     while (true) {
