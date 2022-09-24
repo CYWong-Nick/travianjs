@@ -132,25 +132,33 @@ Utils.formatDate = (dateInput) => {
     const date = new Date(dateInput);
     return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 2)}:${Utils.leftPadZero(date.getMinutes(), 2)}:${Utils.leftPadZero(date.getSeconds(), 2)}`;
 };
+Utils.isSufficientResources = (required, own) => {
+    return required.lumber <= own.lumber && required.clay <= own.clay && required.iron <= own.iron && required.crop <= own.crop;
+};
 class Navigation {
 }
 _b = Navigation;
-Navigation.goToVillage = (state, id) => __awaiter(void 0, void 0, void 0, function* () {
+Navigation.goToVillage = (state, id, action) => __awaiter(void 0, void 0, void 0, function* () {
     yield Utils.delayClick();
-    state.currentAction = CurrentActionEnum.VILLAGE_RESET;
+    if (action)
+        state.currentAction = action;
     state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`);
     $(`.listEntry[data-did="${id}"] > a`)[0].click();
     return true;
 });
-Navigation.goToBuilding = (state, aid, gid) => __awaiter(void 0, void 0, void 0, function* () {
+Navigation.goToBuilding = (state, aid, gid, action) => __awaiter(void 0, void 0, void 0, function* () {
     if (aid <= 18 && state.currentPage === CurrentPageEnum.FIELDS) {
         yield Utils.delayClick();
+        if (action)
+            state.currentAction = action;
         state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
         $(`a[href="/build.php?id=${aid}"]`)[0].click();
         return true;
     }
     else if (aid > 18 && state.currentPage === CurrentPageEnum.TOWN) {
         yield Utils.delayClick();
+        if (action)
+            state.currentAction = action;
         state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
         if (aid === 40) { // Special case for wall
             $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click');
@@ -164,14 +172,18 @@ Navigation.goToBuilding = (state, aid, gid) => __awaiter(void 0, void 0, void 0,
         return false;
     }
 });
-Navigation.goToFields = (state) => __awaiter(void 0, void 0, void 0, function* () {
+Navigation.goToFields = (state, action) => __awaiter(void 0, void 0, void 0, function* () {
     yield Utils.delayClick();
+    if (action)
+        state.currentAction = action;
     state.feature.debug && console.log('Go to fields');
     $('.village.resourceView')[0].click();
     return true;
 });
-Navigation.goToTown = (state) => __awaiter(void 0, void 0, void 0, function* () {
+Navigation.goToTown = (state, action) => __awaiter(void 0, void 0, void 0, function* () {
     yield Utils.delayClick();
+    if (action)
+        state.currentAction = action;
     state.feature.debug && console.log('Go to town');
     $('.village.buildingView')[0].click();
     return true;
@@ -366,17 +378,13 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         const task = village.pendingBuildTasks[0];
         if (village.currentBuildTasks.length < 2
             && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)
-            && task.resources.lumber <= village.resources.lumber
-            && task.resources.clay <= village.resources.clay
-            && task.resources.iron <= village.resources.iron
-            && task.resources.crop <= village.resources.crop) {
-            state.currentAction = CurrentActionEnum.BUILD;
-            const success = yield Navigation.goToBuilding(state, task.aid, task.gid);
+            && Utils.isSufficientResources(task.resources, village.resources)) {
+            const success = yield Navigation.goToBuilding(state, task.aid, task.gid, CurrentActionEnum.BUILD);
             if (!success) {
                 if (state.currentPage === CurrentPageEnum.FIELDS)
-                    yield Navigation.goToTown(state);
+                    yield Navigation.goToTown(state, CurrentActionEnum.BUILD);
                 else
-                    yield Navigation.goToFields(state);
+                    yield Navigation.goToFields(state, CurrentActionEnum.BUILD);
             }
             return;
         }
@@ -395,7 +403,9 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
     }
     // Check if need to build in another village
     const nextVillageIdToBuild = Object.entries(state.villages)
-        .filter(([_, village]) => village.pendingBuildTasks.length > 0 && village.currentBuildTasks.filter(t => new Date(t.finishTime) < new Date()).length < 2)
+        .filter(([_, village]) => village.pendingBuildTasks.length > 0
+        && village.currentBuildTasks.filter(task => new Date(task.finishTime) < new Date()).length < 2
+        && Utils.isSufficientResources(village.pendingBuildTasks[0].resources, village.resources))
         .map(([id, _]) => id)
         .find(_ => true);
     if (nextVillageIdToBuild) {
@@ -523,9 +533,10 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
         yield build(state);
     }
     if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
-        state.currentAction = CurrentActionEnum.IDLE;
-        if (state.currentPage !== CurrentPageEnum.FIELDS)
-            yield Navigation.goToFields(state);
+        if (state.currentPage === CurrentPageEnum.FIELDS)
+            state.currentAction = CurrentActionEnum.IDLE;
+        else
+            yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
     }
     if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
         yield nextVillage(state);

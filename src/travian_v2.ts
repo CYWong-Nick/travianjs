@@ -151,25 +151,34 @@ class Utils {
         const date = new Date(dateInput)
         return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 2)}:${Utils.leftPadZero(date.getMinutes(), 2)}:${Utils.leftPadZero(date.getSeconds(), 2)}`
     }
+
+    static isSufficientResources = (required: Resource, own: Resource) => {
+        return required.lumber <= own.lumber && required.clay <= own.clay && required.iron <= own.iron && required.crop <= own.crop
+    }
 }
 
 class Navigation {
-    static goToVillage = async (state: State, id: string): Promise<boolean> => {
+    static goToVillage = async (state: State, id: string, action?: CurrentActionEnum): Promise<boolean> => {
         await Utils.delayClick()
-        state.currentAction = CurrentActionEnum.VILLAGE_RESET
+        if (action)
+            state.currentAction = action
         state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`)
         $(`.listEntry[data-did="${id}"] > a`)[0].click()
         return true
     }
 
-    static goToBuilding = async (state: State, aid: number, gid: number): Promise<boolean> => {
+    static goToBuilding = async (state: State, aid: number, gid: number, action?: CurrentActionEnum): Promise<boolean> => {
         if (aid <= 18 && state.currentPage === CurrentPageEnum.FIELDS) {
             await Utils.delayClick()
+            if (action)
+                state.currentAction = action
             state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
             $(`a[href="/build.php?id=${aid}"]`)[0].click()
             return true
         } else if (aid > 18 && state.currentPage === CurrentPageEnum.TOWN) {
             await Utils.delayClick()
+            if (action)
+                state.currentAction = action
             state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
             if (aid === 40) { // Special case for wall
                 $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
@@ -182,15 +191,19 @@ class Navigation {
         }
     }
 
-    static goToFields = async (state: State): Promise<boolean> => {
+    static goToFields = async (state: State, action?: CurrentActionEnum): Promise<boolean> => {
         await Utils.delayClick()
+        if (action)
+            state.currentAction = action
         state.feature.debug && console.log('Go to fields')
         $('.village.resourceView')[0].click()
         return true
     }
 
-    static goToTown = async (state: State): Promise<boolean> => {
+    static goToTown = async (state: State, action?: CurrentActionEnum): Promise<boolean> => {
         await Utils.delayClick()
+        if (action)
+            state.currentAction = action
         state.feature.debug && console.log('Go to town')
         $('.village.buildingView')[0].click()
         return true
@@ -469,18 +482,14 @@ const build = async (state: State) => {
         const task = village.pendingBuildTasks[0]
         if (village.currentBuildTasks.length < 2
             && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)
-            && task.resources.lumber <= village.resources.lumber
-            && task.resources.clay <= village.resources.clay
-            && task.resources.iron <= village.resources.iron
-            && task.resources.crop <= village.resources.crop
+            && Utils.isSufficientResources(task.resources, village.resources)
         ) {
-            state.currentAction = CurrentActionEnum.BUILD
-            const success = await Navigation.goToBuilding(state, task.aid, task.gid)
+            const success = await Navigation.goToBuilding(state, task.aid, task.gid, CurrentActionEnum.BUILD)
             if (!success) {
                 if (state.currentPage === CurrentPageEnum.FIELDS)
-                    await Navigation.goToTown(state)
+                    await Navigation.goToTown(state, CurrentActionEnum.BUILD)
                 else
-                    await Navigation.goToFields(state)
+                    await Navigation.goToFields(state, CurrentActionEnum.BUILD)
             }
             return
         }
@@ -502,7 +511,9 @@ const build = async (state: State) => {
     // Check if need to build in another village
     const nextVillageIdToBuild = Object.entries(state.villages)
         .filter(([_, village]) =>
-            village.pendingBuildTasks.length > 0 && village.currentBuildTasks.filter(t => new Date(t.finishTime) < new Date()).length < 2
+            village.pendingBuildTasks.length > 0
+            && village.currentBuildTasks.filter(task => new Date(task.finishTime) < new Date()).length < 2
+            && Utils.isSufficientResources(village.pendingBuildTasks[0].resources, village.resources)
         )
         .map(([id, _]) => id)
         .find(_ => true)
@@ -650,9 +661,10 @@ const run = async (state: State) => {
     }
 
     if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
-        state.currentAction = CurrentActionEnum.IDLE
-        if (state.currentPage !== CurrentPageEnum.FIELDS)
-            await Navigation.goToFields(state)
+        if (state.currentPage === CurrentPageEnum.FIELDS)
+            state.currentAction = CurrentActionEnum.IDLE
+        else
+            await Navigation.goToFields(state, CurrentActionEnum.IDLE)
     }
 
     if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
