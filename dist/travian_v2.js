@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 16:51:30";
+const BUILD_TIME = "2022/09/24 16:55:27";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -135,6 +135,9 @@ Utils.leftPadZero = (value, length) => {
     return String(value).padStart(length, '0');
 };
 Utils.formatDate = (dateInput) => {
+    if (!dateInput) {
+        return 'N/A';
+    }
     const date = new Date(dateInput);
     return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 2)}:${Utils.leftPadZero(date.getMinutes(), 2)}:${Utils.leftPadZero(date.getSeconds(), 2)}`;
 };

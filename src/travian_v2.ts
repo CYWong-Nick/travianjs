@@ -158,6 +158,9 @@ class Utils {
     }
 
     static formatDate = (dateInput: Date) => {
+        if (!dateInput) {
+            return 'N/A'
+        }
         const date = new Date(dateInput)
         return `${date.getFullYear()}/${Utils.leftPadZero(date.getMonth() + 1, 2)}/${Utils.leftPadZero(date.getDate(), 2)} ${Utils.leftPadZero(date.getHours(), 2)}:${Utils.leftPadZero(date.getMinutes(), 2)}:${Utils.leftPadZero(date.getSeconds(), 2)}`
     }
