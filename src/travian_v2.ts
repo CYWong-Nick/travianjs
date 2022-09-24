@@ -1,3 +1,4 @@
+const BUILD_TIME = "@@BUILD_TIME@@"
 const RUN_INTERVAL = 10000
 const GID_NAME_MAP: Record<string, string> = {
     "1": "Woodcutter",
