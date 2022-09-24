@@ -477,11 +477,10 @@ const updateCurrentVillageStatus = (state: State) => {
                     })
                     break
             }
-
-            villages[currentVillageId].incomingTroops = incomingTroops
-            villages[currentVillageId].outgoingTroops = outgoingTroops
         })
 
+        villages[currentVillageId].incomingTroops = incomingTroops
+        villages[currentVillageId].outgoingTroops = outgoingTroops
         villages[currentVillageId].lastUpdatedTime = new Date()
     }
 

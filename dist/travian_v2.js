@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 16:47:27";
+const BUILD_TIME = "2022/09/24 16:51:30";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -371,9 +371,9 @@ const updateCurrentVillageStatus = (state) => {
                     });
                     break;
             }
-            villages[currentVillageId].incomingTroops = incomingTroops;
-            villages[currentVillageId].outgoingTroops = outgoingTroops;
         });
+        villages[currentVillageId].incomingTroops = incomingTroops;
+        villages[currentVillageId].outgoingTroops = outgoingTroops;
         villages[currentVillageId].lastUpdatedTime = new Date();
     }
     state.villages = villages;
