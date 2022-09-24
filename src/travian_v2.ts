@@ -539,7 +539,7 @@ const build = async (state: State) => {
     const nextVillageIdToBuild = Object.entries(state.villages)
         .filter(([_, village]) =>
             village.pendingBuildTasks.length > 0
-            && village.currentBuildTasks.filter(task => new Date(task.finishTime) < new Date()).length < 2
+            && village.currentBuildTasks.filter(task => new Date(task.finishTime) > new Date()).length < 2
             && Utils.isSufficientResources(village.pendingBuildTasks[0].resources, village.resources)
         )
         .map(([id, _]) => id)

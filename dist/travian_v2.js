@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 15:15:40";
+const BUILD_TIME = "2022/09/24 15:41:00";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -428,7 +428,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
     // Check if need to build in another village
     const nextVillageIdToBuild = Object.entries(state.villages)
         .filter(([_, village]) => village.pendingBuildTasks.length > 0
-        && village.currentBuildTasks.filter(task => new Date(task.finishTime) < new Date()).length < 2
+        && village.currentBuildTasks.filter(task => new Date(task.finishTime) > new Date()).length < 2
         && Utils.isSufficientResources(village.pendingBuildTasks[0].resources, village.resources))
         .map(([id, _]) => id)
         .find(_ => true);
