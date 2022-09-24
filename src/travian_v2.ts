@@ -72,6 +72,8 @@ interface State {
     villages: Record<string, Village>
     feature: Feature
     nextVillageRotationTime: Date
+    telegramChatId: string
+    telegramToken: string
 }
 
 class StateHandler implements ProxyHandler<State> {
@@ -85,7 +87,9 @@ class StateHandler implements ProxyHandler<State> {
             autoBuild: false,
             debug: false
         },
-        nextVillageRotationTime: new Date()
+        nextVillageRotationTime: new Date(),
+        telegramChatId: '',
+        telegramToken: ''
     }
 
     private state: State
@@ -247,6 +251,7 @@ interface Village {
     incomingTroops: TroopMovement[]
     outgoingTroops: TroopMovement[]
     lastUpdatedTime: Date
+    alertBackoff: Date
 }
 
 interface CurrentBuildTask {
@@ -476,6 +481,25 @@ const updateCurrentVillageStatus = (state: State) => {
     state.villages = villages
 }
 
+const alertAttack = (state: State) => {
+    const villages = state.villages
+    const village = villages[state.currentVillageId]
+    if (village.incomingTroops.find(e => e.type === TroopMovementType.ATTACK)) {
+        if (!state.telegramChatId || !state.telegramToken) {
+            state.feature.debug && console.log("Telegram chat id or token not set")
+            return
+        }
+        if (!village.alertBackoff || new Date(village.alertBackoff) < new Date()) {
+            state.feature.debug && console.log(`Send alert for attack at village ${village.name}`)
+            village.alertBackoff = Utils.addToDate(new Date(), 0, 5, 0)
+            state.villages = villages
+            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} under attack`)
+        } else {
+            state.feature.debug && console.log(`Not alert due to backoff at ${Utils.formatDate(village.alertBackoff)}`)
+        }
+    }
+}
+
 const build = async (state: State) => {
     // Try building in current village
     const villages = state.villages
@@ -565,6 +589,7 @@ const render = (state: State) => {
                 <h5>Summary</h5>
                 <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
                 <div>Current Action: ${state.currentAction}</div>
+                <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
                 ${Object.entries(villages).map(([id, village]) => `
                     <div>
                         <h5>${village.name} (${id})</h5>
@@ -662,7 +687,7 @@ const run = async (state: State) => {
         updateCurrentPage(state)
         updateVillageList(state)
         updateCurrentVillageStatus(state)
-        // alertAttack()
+        alertAttack(state)
         // alertEmptyBuildQueue()
 
         if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
