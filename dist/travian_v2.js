@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 15:41:00";
+const BUILD_TIME = "2022/09/24 16:43:28";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -105,6 +105,8 @@ StateHandler.INITIAL_STATE = {
     feature: {
         autoScan: false,
         autoBuild: false,
+        alertAttack: false,
+        alertEmptyBuildQueue: false,
         debug: false
     },
     nextVillageRotationTime: new Date(),
@@ -212,10 +214,11 @@ const createStyle = () => {
         #console .flex-row {
             display: flex;
             flex-direction: row;
+            flex-wrap: wrap;
         }
         
-        #console .flex {
-            flex: 1 1 auto;
+        #console .village-container {
+            flex: 0 1 33%;
         }
         
         #console .ml-5 {
@@ -378,19 +381,39 @@ const updateCurrentVillageStatus = (state) => {
 const alertAttack = (state) => {
     const villages = state.villages;
     const village = villages[state.currentVillageId];
-    if (village.incomingTroops.find(e => e.type === TroopMovementType.ATTACK)) {
+    const attack = village.incomingTroops.find(e => e.type === TroopMovementType.ATTACK);
+    if (attack) {
         if (!state.telegramChatId || !state.telegramToken) {
             state.feature.debug && console.log("Telegram chat id or token not set");
             return;
         }
-        if (!village.alertBackoff || new Date(village.alertBackoff) < new Date()) {
+        if (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date()) {
             state.feature.debug && console.log(`Send alert for attack at village ${village.name}`);
-            village.alertBackoff = Utils.addToDate(new Date(), 0, 5, 0);
+            village.attackAlertBackoff = Utils.addToDate(new Date(), 0, 5, 0);
             state.villages = villages;
-            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} under attack`);
+            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} under attack at ${Utils.formatDate(attack.time)}`);
         }
         else {
-            state.feature.debug && console.log(`Not alert due to backoff at ${Utils.formatDate(village.alertBackoff)}`);
+            state.feature.debug && console.log(`Not alerting attack due to backoff at ${Utils.formatDate(village.attackAlertBackoff)}`);
+        }
+    }
+};
+const alertEmptyBuildQueue = (state) => {
+    const villages = state.villages;
+    const village = villages[state.currentVillageId];
+    if (!village.currentBuildTasks.length) {
+        if (!state.telegramChatId || !state.telegramToken) {
+            state.feature.debug && console.log("Telegram chat id or token not set");
+            return;
+        }
+        if (!village.emptyBuildQueueAlertBackoff || new Date(village.emptyBuildQueueAlertBackoff) < new Date()) {
+            state.feature.debug && console.log(`Send alert for attack at village ${village.name}`);
+            village.emptyBuildQueueAlertBackoff = Utils.addToDate(new Date(), 0, 5, 0);
+            state.villages = villages;
+            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} build queue is empty`);
+        }
+        else {
+            state.feature.debug && console.log(`Not alerting empty build queue due to backoff at ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}`);
         }
     }
 };
@@ -467,40 +490,53 @@ const render = (state) => {
             <h4>Console</h4>
             <input id="toggleAutoScan" class="ml-5" type="checkbox" ${state.feature.autoScan ? 'checked' : ''}/> Auto scan
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
+            <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
+            <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
+        <div>
+            <h5>Summary (Build: ${BUILD_TIME})</h5>
+            <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
+            <div>Current Action: ${state.currentAction}</div>
+            <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
+        </div>
         <div class="flex-row">
-            <div class="flex">
-                <h5>Summary (Build: ${BUILD_TIME})</h5>
-                <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
-                <div>Current Action: ${state.currentAction}</div>
-                <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
-                ${Object.entries(villages).map(([id, village]) => `
-                    <div>
-                        <h5>${village.name} (${id})</h5>
-                        <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
-                        ${village.currentBuildTasks.map(task => `
-                            <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
-                        `).join('')}
+            ${Object.entries(villages).map(([id, village]) => `
+                <div class="village-container">
+                    <h4>${village.name} (id: ${id}) (${village.position.x}, ${village.position.y})</h4>
+                    <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
+                    <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
+                    <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
+                    <h5>Resources</h5>
+                    <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
+                    <h5>Current build tasks</h5>
+                    ${village.currentBuildTasks.map(task => `
+                        <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
+                    `).join('')}
+                    <div class="flex-row">
+                        <h5>Pending build tasks</h5> 
+                        ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id ? `<button id="addCurrentToPending" class="ml-5">Add Current</button>` : ''}
                     </div>
-                `).join('')}
-            </div>
-            <div class="flex">
-                <div class="flex-row">
-                    <h5>Pending Build Tasks</h5>
-                    <button id="addCurrentToPending" class="ml-5">Add Current</button>
+                    ${village.pendingBuildTasks.map((task, i) => `
+                        <div>
+                            <span>Position: ${task.aid}</span>
+                            <span>${GID_NAME_MAP[task.gid]}</span>
+                            <button class="removeFromPending" idx="${i}">x</button>
+                        </div>
+                    `).join('')}
+                    <h5>Incoming Troop Movements</h5>
+                    ${village.incomingTroops.map(troop => `
+                        <div>${troop.type} ${troop.count} ${Utils.formatDate(troop.time)}</div>
+                    `).join('')}
+                    <h5>Outgoing Troop Movements</h5>
+                    ${village.outgoingTroops.map(troop => `
+                        <div>${troop.type} ${troop.count} ${Utils.formatDate(troop.time)}</div>
+                    `).join('')}
                 </div>
-                ${currentVillage.pendingBuildTasks.map((task, i) => `
-                    <div>
-                        <span>Position: ${task.aid}</span>
-                        <span>${GID_NAME_MAP[task.gid]}</span>
-                        <button class="removeFromPending" idx="${i}">x</button>
-                    </div>
-                `).join('')}
-            </div>
+            `).join('')}
         </div>
     `);
-    $('#addCurrentToPending').on('click', () => {
+    state.currentPage === CurrentPageEnum.BUILDING && $('#addCurrentToPending').on('click', () => {
         const villages = state.villages;
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks;
         const params = new URLSearchParams(window.location.search);
@@ -549,6 +585,16 @@ const render = (state) => {
         feature.autoBuild = !feature.autoBuild;
         state.feature = feature;
     });
+    $('#toggleAlertAttack').on('click', () => {
+        const feature = state.feature;
+        feature.alertAttack = !feature.alertAttack;
+        state.feature = feature;
+    });
+    $('#toggleAlertEmptyBuildQueue').on('click', () => {
+        const feature = state.feature;
+        feature.alertEmptyBuildQueue = !feature.alertEmptyBuildQueue;
+        state.feature = feature;
+    });
     $('#toggleDebug').on('click', () => {
         const feature = state.feature;
         feature.debug = !feature.debug;
@@ -560,8 +606,14 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
         updateCurrentPage(state);
         updateVillageList(state);
         updateCurrentVillageStatus(state);
-        alertAttack(state);
-        // alertEmptyBuildQueue()
+        if (state.feature.alertAttack) {
+            state.feature.debug && console.log("Checking for attacks");
+            alertAttack(state);
+        }
+        if (state.feature.alertEmptyBuildQueue) {
+            state.feature.debug && console.log("Checking empty build queue");
+            alertEmptyBuildQueue(state);
+        }
         if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
             state.feature.debug && console.log("Attempting build");
             yield build(state);
