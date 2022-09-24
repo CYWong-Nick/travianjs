@@ -404,6 +404,7 @@ const updateCurrentVillageStatus = (state: State) => {
 
     if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
         const currentBuildTasks: CurrentBuildTask[] = []
+        console.log($('.buildingList > ul > li'))
         $('.buildingList > ul > li').each((_, ele) => {
             const nameAndLevelEle = $(ele).find('.name').contents()
             const name = $(nameAndLevelEle[0]).text().trim()
@@ -424,7 +425,7 @@ const updateCurrentVillageStatus = (state: State) => {
                 finishTime
             })
         })
-
+        console.log(currentBuildTasks)
         villages[currentVillageId].currentBuildTasks = currentBuildTasks
     }
 
@@ -586,7 +587,7 @@ const nextVillage = async (state: State) => {
     const nextRotationTIme = new Date(state.nextVillageRotationTime)
     const currentTime = new Date()
     if (new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 20)
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0)
 
         let earliestVillageId: string = ''
         Object.values(state.villages)
@@ -734,6 +735,8 @@ const run = async (state: State) => {
             state.feature.debug && console.log("Checking empty build queue")
             alertEmptyBuildQueue(state)
         }
+
+        // Alert resources full
 
         if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
             state.feature.debug && console.log("Attempting build")

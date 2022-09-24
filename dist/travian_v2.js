@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/24 16:55:27";
+const BUILD_TIME = "2022/09/24 20:08:27";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -315,6 +315,7 @@ const updateCurrentVillageStatus = (state) => {
     villages[currentVillageId].resources = { lumber, clay, iron, crop };
     if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
         const currentBuildTasks = [];
+        console.log($('.buildingList > ul > li'));
         $('.buildingList > ul > li').each((_, ele) => {
             const nameAndLevelEle = $(ele).find('.name').contents();
             const name = $(nameAndLevelEle[0]).text().trim();
@@ -328,6 +329,7 @@ const updateCurrentVillageStatus = (state) => {
                 finishTime
             });
         });
+        console.log(currentBuildTasks);
         villages[currentVillageId].currentBuildTasks = currentBuildTasks;
     }
     if (state.currentPage === CurrentPageEnum.FIELDS) {
@@ -470,7 +472,7 @@ const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
     const nextRotationTIme = new Date(state.nextVillageRotationTime);
     const currentTime = new Date();
     if (new Date(state.nextVillageRotationTime) < new Date()) {
-        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 20);
+        state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0);
         let earliestVillageId = '';
         Object.values(state.villages)
             .forEach(village => {
@@ -603,6 +605,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
             state.feature.debug && console.log("Checking empty build queue");
             alertEmptyBuildQueue(state);
         }
+        // Alert resources full
         if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
             state.feature.debug && console.log("Attempting build");
             yield build(state);
