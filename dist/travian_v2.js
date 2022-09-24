@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 00:04:28";
+const BUILD_TIME = "2022/09/25 01:09:08";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -69,7 +69,8 @@ var CurrentActionEnum;
 (function (CurrentActionEnum) {
     CurrentActionEnum["IDLE"] = "IDLE";
     CurrentActionEnum["BUILD"] = "BUILD";
-    CurrentActionEnum["VILLAGE_RESET"] = "VILLAGE_RESET";
+    CurrentActionEnum["NAVIGATE_TO_FIELDS"] = "NAVIGATE_TO_FIELDS";
+    CurrentActionEnum["FARM"] = "FARM";
 })(CurrentActionEnum || (CurrentActionEnum = {}));
 class StateHandler {
     constructor() {
@@ -117,8 +118,8 @@ StateHandler.INITIAL_STATE = {
 class Utils {
 }
 _a = Utils;
-Utils.parseIntIgnoreSep = (s) => {
-    return parseInt(s.replace('.', '').replace(',', ''));
+Utils.parseIntIgnoreNonNumeric = (text) => {
+    return parseInt(text.replace(/[^0-9]/g, ''));
 };
 Utils.randInt = (x, y) => {
     return Math.floor(Math.random() * (y - x + 1) + x);
@@ -279,8 +280,8 @@ const updateVillageList = (state) => {
         villiageIds.push(id);
         const name = $(ele).find('.name')[0].innerText;
         const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes;
-        const x = Utils.parseIntIgnoreSep(((_d = coordinateAttributes.getNamedItem('data-x')) === null || _d === void 0 ? void 0 : _d.value) || '');
-        const y = Utils.parseIntIgnoreSep(((_e = coordinateAttributes.getNamedItem('data-y')) === null || _e === void 0 ? void 0 : _e.value) || '');
+        const x = Utils.parseIntIgnoreNonNumeric(((_d = coordinateAttributes.getNamedItem('data-x')) === null || _d === void 0 ? void 0 : _d.value) || '');
+        const y = Utils.parseIntIgnoreNonNumeric(((_e = coordinateAttributes.getNamedItem('data-y')) === null || _e === void 0 ? void 0 : _e.value) || '');
         const villageDefaults = {
             id: '',
             name: '',
@@ -314,13 +315,13 @@ const updateVillageList = (state) => {
 const updateCurrentVillageStatus = (state) => {
     const villages = state.villages;
     const currentVillageId = state.currentVillageId;
-    let lumber = Utils.parseIntIgnoreSep($('#l1')[0].innerText);
-    let clay = Utils.parseIntIgnoreSep($('#l2')[0].innerText);
-    let iron = Utils.parseIntIgnoreSep($('#l3')[0].innerText);
-    let crop = Utils.parseIntIgnoreSep($('#l4')[0].innerText);
+    let lumber = Utils.parseIntIgnoreNonNumeric($('#l1')[0].innerText);
+    let clay = Utils.parseIntIgnoreNonNumeric($('#l2')[0].innerText);
+    let iron = Utils.parseIntIgnoreNonNumeric($('#l3')[0].innerText);
+    let crop = Utils.parseIntIgnoreNonNumeric($('#l4')[0].innerText);
     villages[currentVillageId].resources = { lumber, clay, iron, crop };
-    const warehouseCapacity = Utils.parseIntIgnoreSep($('.warehouse .capacity > div').text());
-    const granaryCapacity = Utils.parseIntIgnoreSep($('.granary .capacity > div').text());
+    const warehouseCapacity = Utils.parseIntIgnoreNonNumeric($('.warehouse .capacity > div').text());
+    const granaryCapacity = Utils.parseIntIgnoreNonNumeric($('.granary .capacity > div').text());
     villages[currentVillageId].capacity = {
         lumber: warehouseCapacity,
         clay: warehouseCapacity,
@@ -335,7 +336,7 @@ const updateCurrentVillageStatus = (state) => {
             const level = $(nameAndLevelEle[1]).text().trim();
             const timer = $(ele).find('.timer').text();
             const timerParts = timer.split(":");
-            const finishTime = Utils.addToDate(new Date(), Utils.parseIntIgnoreSep(timerParts[0]), Utils.parseIntIgnoreSep(timerParts[1]), Utils.parseIntIgnoreSep(timerParts[2]));
+            const finishTime = Utils.addToDate(new Date(), Utils.parseIntIgnoreNonNumeric(timerParts[0]), Utils.parseIntIgnoreNonNumeric(timerParts[1]), Utils.parseIntIgnoreNonNumeric(timerParts[2]));
             currentBuildTasks.push({
                 name,
                 level,
@@ -353,10 +354,10 @@ const updateCurrentVillageStatus = (state) => {
             if (!typeEle.length)
                 return;
             const type = (_c = typeEle[0].attributes.getNamedItem('class')) === null || _c === void 0 ? void 0 : _c.value;
-            const count = Utils.parseIntIgnoreSep($(ele).find('.mov').text());
+            const count = Utils.parseIntIgnoreNonNumeric($(ele).find('.mov').text());
             const timer = $(ele).find('.timer').text();
             const timerParts = timer.split(":");
-            const time = Utils.addToDate(new Date(), Utils.parseIntIgnoreSep(timerParts[0]), Utils.parseIntIgnoreSep(timerParts[1]), Utils.parseIntIgnoreSep(timerParts[2]));
+            const time = Utils.addToDate(new Date(), Utils.parseIntIgnoreNonNumeric(timerParts[0]), Utils.parseIntIgnoreNonNumeric(timerParts[1]), Utils.parseIntIgnoreNonNumeric(timerParts[2]));
             switch (type) {
                 case 'def1':
                     incomingTroops.push({
@@ -505,7 +506,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         .map(([id, _]) => id)
         .find(_ => true);
     if (nextVillageIdToBuild) {
-        yield Navigation.goToVillage(state, nextVillageIdToBuild, CurrentActionEnum.VILLAGE_RESET);
+        yield Navigation.goToVillage(state, nextVillageIdToBuild, CurrentActionEnum.NAVIGATE_TO_FIELDS);
     }
     else {
         state.feature.debug && console.log("Nothing to build in other villages");
@@ -527,7 +528,7 @@ const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
             }
         });
         state.feature.debug && console.log(`Rotating to ${state.villages[earliestVillageId].name}`);
-        yield Navigation.goToVillage(state, earliestVillageId, CurrentActionEnum.VILLAGE_RESET);
+        yield Navigation.goToVillage(state, earliestVillageId, CurrentActionEnum.NAVIGATE_TO_FIELDS);
     }
     else {
         state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`);
@@ -607,13 +608,13 @@ const render = (state) => {
         if (!resourceRequirementEle.length) {
             return;
         }
-        const lumber = Utils.parseIntIgnoreSep(resourceRequirementEle[0].innerText);
-        const clay = Utils.parseIntIgnoreSep(resourceRequirementEle[1].innerText);
-        const iron = Utils.parseIntIgnoreSep(resourceRequirementEle[2].innerText);
-        const crop = Utils.parseIntIgnoreSep(resourceRequirementEle[3].innerText);
+        const lumber = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[0].innerText);
+        const clay = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[1].innerText);
+        const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText);
+        const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText);
         pendingBuildTasks.push({
-            aid: Utils.parseIntIgnoreSep(aid),
-            gid: Utils.parseIntIgnoreSep(gid),
+            aid: Utils.parseIntIgnoreNonNumeric(aid),
+            gid: Utils.parseIntIgnoreNonNumeric(gid),
             resources: {
                 lumber,
                 clay,
@@ -630,7 +631,7 @@ const render = (state) => {
             return;
         const villages = state.villages;
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks;
-        pendingBuildTasks.splice(Utils.parseIntIgnoreSep(idx), 1);
+        pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1);
         state.villages = villages;
     });
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan');
@@ -661,7 +662,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
             state.feature.debug && console.log("Attempting build");
             yield build(state);
         }
-        if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
+        if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
             if (state.currentPage === CurrentPageEnum.FIELDS)
                 state.currentAction = CurrentActionEnum.IDLE;
             else

@@ -58,7 +58,8 @@ enum CurrentPageEnum {
 enum CurrentActionEnum {
     IDLE = "IDLE",
     BUILD = "BUILD",
-    VILLAGE_RESET = "VILLAGE_RESET"
+    NAVIGATE_TO_FIELDS = "NAVIGATE_TO_FIELDS",
+    FARM = "FARM"
 }
 
 interface Feature {
@@ -135,8 +136,8 @@ class StateHandler implements ProxyHandler<State> {
 }
 
 class Utils {
-    static parseIntIgnoreSep = (s: string) => {
-        return parseInt(s.replace('.', '').replace(',', ''))
+    static parseIntIgnoreNonNumeric = (text: string) => {
+        return parseInt(text.replace(/[^0-9]/g, ''))
     }
 
     static randInt = (x: number, y: number) => {
@@ -359,8 +360,8 @@ const updateVillageList = (state: State) => {
 
         const name = $(ele).find('.name')[0].innerText
         const coordinateAttributes = $(ele).find('.coordinatesGrid')[0].attributes
-        const x = Utils.parseIntIgnoreSep(coordinateAttributes.getNamedItem('data-x')?.value || '')
-        const y = Utils.parseIntIgnoreSep(coordinateAttributes.getNamedItem('data-y')?.value || '')
+        const x = Utils.parseIntIgnoreNonNumeric(coordinateAttributes.getNamedItem('data-x')?.value || '')
+        const y = Utils.parseIntIgnoreNonNumeric(coordinateAttributes.getNamedItem('data-y')?.value || '')
 
         const villageDefaults: Village = {
             id: '',
@@ -404,15 +405,15 @@ const updateCurrentVillageStatus = (state: State) => {
     const villages = state.villages
     const currentVillageId = state.currentVillageId
 
-    let lumber = Utils.parseIntIgnoreSep($('#l1')[0].innerText)
-    let clay = Utils.parseIntIgnoreSep($('#l2')[0].innerText)
-    let iron = Utils.parseIntIgnoreSep($('#l3')[0].innerText)
-    let crop = Utils.parseIntIgnoreSep($('#l4')[0].innerText)
+    let lumber = Utils.parseIntIgnoreNonNumeric($('#l1')[0].innerText)
+    let clay = Utils.parseIntIgnoreNonNumeric($('#l2')[0].innerText)
+    let iron = Utils.parseIntIgnoreNonNumeric($('#l3')[0].innerText)
+    let crop = Utils.parseIntIgnoreNonNumeric($('#l4')[0].innerText)
 
     villages[currentVillageId].resources = { lumber, clay, iron, crop }
 
-    const warehouseCapacity = Utils.parseIntIgnoreSep($('.warehouse .capacity > div').text())
-    const granaryCapacity = Utils.parseIntIgnoreSep($('.granary .capacity > div').text())
+    const warehouseCapacity = Utils.parseIntIgnoreNonNumeric($('.warehouse .capacity > div').text())
+    const granaryCapacity = Utils.parseIntIgnoreNonNumeric($('.granary .capacity > div').text())
     villages[currentVillageId].capacity = {
         lumber: warehouseCapacity,
         clay: warehouseCapacity,
@@ -431,9 +432,9 @@ const updateCurrentVillageStatus = (state: State) => {
             const timerParts = timer.split(":")
             const finishTime = Utils.addToDate(
                 new Date(),
-                Utils.parseIntIgnoreSep(timerParts[0]),
-                Utils.parseIntIgnoreSep(timerParts[1]),
-                Utils.parseIntIgnoreSep(timerParts[2])
+                Utils.parseIntIgnoreNonNumeric(timerParts[0]),
+                Utils.parseIntIgnoreNonNumeric(timerParts[1]),
+                Utils.parseIntIgnoreNonNumeric(timerParts[2])
             )
 
             currentBuildTasks.push({
@@ -455,15 +456,15 @@ const updateCurrentVillageStatus = (state: State) => {
                 return
 
             const type = typeEle[0].attributes.getNamedItem('class')?.value
-            const count = Utils.parseIntIgnoreSep($(ele).find('.mov').text())
+            const count = Utils.parseIntIgnoreNonNumeric($(ele).find('.mov').text())
             const timer = $(ele).find('.timer').text()
 
             const timerParts = timer.split(":")
             const time = Utils.addToDate(
                 new Date(),
-                Utils.parseIntIgnoreSep(timerParts[0]),
-                Utils.parseIntIgnoreSep(timerParts[1]),
-                Utils.parseIntIgnoreSep(timerParts[2])
+                Utils.parseIntIgnoreNonNumeric(timerParts[0]),
+                Utils.parseIntIgnoreNonNumeric(timerParts[1]),
+                Utils.parseIntIgnoreNonNumeric(timerParts[2])
             )
 
             switch (type) {
@@ -583,7 +584,6 @@ const alertResourceCapacityFull = (state: State) => {
     }
 }
 
-
 const build = async (state: State) => {
     // Try building in current village
     const villages = state.villages
@@ -629,7 +629,7 @@ const build = async (state: State) => {
         .find(_ => true)
 
     if (nextVillageIdToBuild) {
-        await Navigation.goToVillage(state, nextVillageIdToBuild, CurrentActionEnum.VILLAGE_RESET)
+        await Navigation.goToVillage(state, nextVillageIdToBuild, CurrentActionEnum.NAVIGATE_TO_FIELDS)
     } else {
         state.feature.debug && console.log("Nothing to build in other villages")
         state.currentAction = CurrentActionEnum.IDLE
@@ -652,7 +652,7 @@ const nextVillage = async (state: State) => {
             })
 
         state.feature.debug && console.log(`Rotating to ${state.villages[earliestVillageId].name}`)
-        await Navigation.goToVillage(state, earliestVillageId, CurrentActionEnum.VILLAGE_RESET)
+        await Navigation.goToVillage(state, earliestVillageId, CurrentActionEnum.NAVIGATE_TO_FIELDS)
     } else {
         state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`)
     }
@@ -739,14 +739,14 @@ const render = (state: State) => {
             return
         }
 
-        const lumber = Utils.parseIntIgnoreSep(resourceRequirementEle[0].innerText)
-        const clay = Utils.parseIntIgnoreSep(resourceRequirementEle[1].innerText)
-        const iron = Utils.parseIntIgnoreSep(resourceRequirementEle[2].innerText)
-        const crop = Utils.parseIntIgnoreSep(resourceRequirementEle[3].innerText)
+        const lumber = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[0].innerText)
+        const clay = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[1].innerText)
+        const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText)
+        const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText)
 
         pendingBuildTasks.push({
-            aid: Utils.parseIntIgnoreSep(aid),
-            gid: Utils.parseIntIgnoreSep(gid),
+            aid: Utils.parseIntIgnoreNonNumeric(aid),
+            gid: Utils.parseIntIgnoreNonNumeric(gid),
             resources: {
                 lumber,
                 clay,
@@ -765,7 +765,7 @@ const render = (state: State) => {
 
         const villages = state.villages
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
-        pendingBuildTasks.splice(Utils.parseIntIgnoreSep(idx), 1)
+        pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1)
         state.villages = villages
     })
 
@@ -802,7 +802,7 @@ const run = async (state: State) => {
             await build(state)
         }
 
-        if (CurrentActionEnum.VILLAGE_RESET === state.currentAction) {
+        if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
             if (state.currentPage === CurrentPageEnum.FIELDS)
                 state.currentAction = CurrentActionEnum.IDLE
             else
