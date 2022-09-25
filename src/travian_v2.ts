@@ -662,11 +662,7 @@ const build = async (state: State) => {
 }
 
 const farm = async (state: State) => {
-    if (new Date(state.nextFarmTime) < new Date()) { 
-        
-
-       
-
+    if (new Date(state.nextFarmTime) < new Date()) {
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16') {
             const startButtonEle = $('.startButton[value=Start]')
@@ -679,10 +675,10 @@ const farm = async (state: State) => {
             return
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
             await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
-            return 
-        }    else {
-        await Navigation.goToTown(state, CurrentActionEnum.FARM)
-        return
+            return
+        } else {
+            await Navigation.goToTown(state, CurrentActionEnum.FARM)
+            return
         }
     }
 }
