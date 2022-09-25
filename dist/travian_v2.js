@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 01:09:08";
+const BUILD_TIME = "2022/09/25 10:59:00";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -60,6 +60,7 @@ const GID_NAME_MAP = {
 var CurrentPageEnum;
 (function (CurrentPageEnum) {
     CurrentPageEnum["LOGIN"] = "LOGIN";
+    CurrentPageEnum["LOGOUT"] = "LOGOUT";
     CurrentPageEnum["FIELDS"] = "FIELDS";
     CurrentPageEnum["TOWN"] = "TOWN";
     CurrentPageEnum["BUILDING"] = "BUILDING";
@@ -260,6 +261,10 @@ const updateCurrentPage = (state) => {
             state.currentPage = CurrentPageEnum.LOGIN;
             break;
         }
+        case '/logout': {
+            state.currentPage = CurrentPageEnum.LOGOUT;
+            break;
+        }
         default: {
             state.currentPage = CurrentPageEnum.UNKNOWN;
             break;
@@ -269,6 +274,10 @@ const updateCurrentPage = (state) => {
 const updateVillageList = (state) => {
     const villages = state.villages;
     const villageListEle = $('.villageList .listEntry');
+    if (!villageListEle.length) {
+        state.feature.debug && console.log("Village list not found");
+        return;
+    }
     const currentVillageId = villageListEle.filter((_, ele) => ele.className.includes('active')).attr('data-did');
     const villiageIds = [];
     villageListEle.each((index, ele) => {
@@ -644,34 +653,39 @@ const render = (state) => {
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     while (true) {
         updateCurrentPage(state);
-        updateVillageList(state);
-        updateCurrentVillageStatus(state);
-        if (state.feature.alertAttack) {
-            state.feature.debug && console.log("Checking for attacks");
-            alertAttack(state);
+        if ([CurrentPageEnum.LOGIN, CurrentPageEnum.LOGOUT].includes(state.currentPage)) {
+            // Auto login
         }
-        if (state.feature.alertEmptyBuildQueue) {
-            state.feature.debug && console.log("Checking empty build queue");
-            alertEmptyBuildQueue(state);
-        }
-        if (state.feature.alertResourceCapacityFull) {
-            state.feature.debug && console.log("Checking resource capacity full");
-            alertResourceCapacityFull(state);
-        }
-        if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
-            state.feature.debug && console.log("Attempting build");
-            yield build(state);
-        }
-        if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
-            if (state.currentPage === CurrentPageEnum.FIELDS)
-                state.currentAction = CurrentActionEnum.IDLE;
-            else
-                yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
-        }
-        // Auto farm
-        if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
-            state.feature.debug && console.log("Try next village");
-            yield nextVillage(state);
+        else {
+            updateVillageList(state);
+            updateCurrentVillageStatus(state);
+            if (state.feature.alertAttack) {
+                state.feature.debug && console.log("Checking for attacks");
+                alertAttack(state);
+            }
+            if (state.feature.alertEmptyBuildQueue) {
+                state.feature.debug && console.log("Checking empty build queue");
+                alertEmptyBuildQueue(state);
+            }
+            if (state.feature.alertResourceCapacityFull) {
+                state.feature.debug && console.log("Checking resource capacity full");
+                alertResourceCapacityFull(state);
+            }
+            if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
+                state.feature.debug && console.log("Attempting build");
+                yield build(state);
+            }
+            if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
+                if (state.currentPage === CurrentPageEnum.FIELDS)
+                    state.currentAction = CurrentActionEnum.IDLE;
+                else
+                    yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            }
+            // Auto farm
+            if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
+                state.feature.debug && console.log("Try next village");
+                yield nextVillage(state);
+            }
         }
         state.feature.debug && console.log(`Awaiting ${RUN_INTERVAL}ms`);
         yield Utils.sleep(RUN_INTERVAL);

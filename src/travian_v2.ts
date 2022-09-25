@@ -49,6 +49,7 @@ const GID_NAME_MAP: Record<string, string> = {
 
 enum CurrentPageEnum {
     LOGIN = "LOGIN",
+    LOGOUT = "LOGOUT",
     FIELDS = "FIELDS",
     TOWN = "TOWN",
     BUILDING = "BUILDING",
@@ -336,6 +337,10 @@ const updateCurrentPage = (state: State) => {
             state.currentPage = CurrentPageEnum.LOGIN
             break
         }
+        case '/logout': {
+            state.currentPage = CurrentPageEnum.LOGOUT
+            break
+        }
         default: {
             state.currentPage = CurrentPageEnum.UNKNOWN
             break
@@ -347,6 +352,10 @@ const updateVillageList = (state: State) => {
     const villages = state.villages
 
     const villageListEle = $('.villageList .listEntry')
+    if (!villageListEle.length) {
+        state.feature.debug && console.log("Village list not found")
+        return
+    }
     const currentVillageId = villageListEle.filter((_, ele) => ele.className.includes('active')).attr('data-did')
     const villiageIds: string[] = []
 
@@ -780,40 +789,45 @@ const render = (state: State) => {
 const run = async (state: State) => {
     while (true) {
         updateCurrentPage(state)
-        updateVillageList(state)
-        updateCurrentVillageStatus(state)
-        if (state.feature.alertAttack) {
-            state.feature.debug && console.log("Checking for attacks")
-            alertAttack(state)
-        }
 
-        if (state.feature.alertEmptyBuildQueue) {
-            state.feature.debug && console.log("Checking empty build queue")
-            alertEmptyBuildQueue(state)
-        }
+        if ([CurrentPageEnum.LOGIN, CurrentPageEnum.LOGOUT].includes(state.currentPage)) {
+            // Auto login
+        } else {
+            updateVillageList(state)
+            updateCurrentVillageStatus(state)
+            if (state.feature.alertAttack) {
+                state.feature.debug && console.log("Checking for attacks")
+                alertAttack(state)
+            }
 
-        if (state.feature.alertResourceCapacityFull) {
-            state.feature.debug && console.log("Checking resource capacity full")
-            alertResourceCapacityFull(state)
-        }
+            if (state.feature.alertEmptyBuildQueue) {
+                state.feature.debug && console.log("Checking empty build queue")
+                alertEmptyBuildQueue(state)
+            }
 
-        if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
-            state.feature.debug && console.log("Attempting build")
-            await build(state)
-        }
+            if (state.feature.alertResourceCapacityFull) {
+                state.feature.debug && console.log("Checking resource capacity full")
+                alertResourceCapacityFull(state)
+            }
 
-        if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
-            if (state.currentPage === CurrentPageEnum.FIELDS)
-                state.currentAction = CurrentActionEnum.IDLE
-            else
-                await Navigation.goToFields(state, CurrentActionEnum.IDLE)
-        }
+            if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
+                state.feature.debug && console.log("Attempting build")
+                await build(state)
+            }
 
-        // Auto farm
+            if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
+                if (state.currentPage === CurrentPageEnum.FIELDS)
+                    state.currentAction = CurrentActionEnum.IDLE
+                else
+                    await Navigation.goToFields(state, CurrentActionEnum.IDLE)
+            }
 
-        if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
-            state.feature.debug && console.log("Try next village")
-            await nextVillage(state)
+            // Auto farm
+
+            if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
+                state.feature.debug && console.log("Try next village")
+                await nextVillage(state)
+            }
         }
 
         state.feature.debug && console.log(`Awaiting ${RUN_INTERVAL}ms`)
