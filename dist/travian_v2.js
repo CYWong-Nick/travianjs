@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 18:29:48";
+const BUILD_TIME = "2022/09/26 01:06:28";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -602,7 +602,7 @@ const render = (state) => {
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
         <div>
-            <h5>Summary (Build: ${BUILD_TIME})</h5>
+            <h4>Summary (Build: ${BUILD_TIME})</h4>
             <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
             <div>Current Action: ${state.currentAction}</div>
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>

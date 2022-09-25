@@ -733,7 +733,7 @@ const render = (state: State) => {
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
         <div>
-            <h5>Summary (Build: ${BUILD_TIME})</h5>
+            <h4>Summary (Build: ${BUILD_TIME})</h4>
             <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
             <div>Current Action: ${state.currentAction}</div>
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
