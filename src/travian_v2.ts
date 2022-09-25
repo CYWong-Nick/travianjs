@@ -662,7 +662,7 @@ const nextVillage = async (state: State) => {
     if (new Date(state.nextVillageRotationTime) < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0)
 
-        let earliestVillageId: string = state.villages[0].id
+        let earliestVillageId: string = Object.keys(state.villages)[0]
         Object.values(state.villages)
             .forEach(village => {
                 const earliestUpdatedTime = state.villages[earliestVillageId]?.lastUpdatedTime

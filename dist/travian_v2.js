@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 14:43:44";
+const BUILD_TIME = "2022/09/25 16:36:59";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -533,7 +533,7 @@ const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
     const currentTime = new Date();
     if (new Date(state.nextVillageRotationTime) < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0);
-        let earliestVillageId = state.villages[0].id;
+        let earliestVillageId = Object.keys(state.villages)[0];
         Object.values(state.villages)
             .forEach(village => {
             var _c;
