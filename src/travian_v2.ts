@@ -102,8 +102,8 @@ class StateHandler implements ProxyHandler<State> {
         nextVillageRotationTime: new Date(),
         telegramChatId: '',
         telegramToken: '',
-        username:'',
-        password:''
+        username: '',
+        password: ''
     }
 
     private state: State
@@ -351,7 +351,7 @@ const updateCurrentPage = (state: State) => {
 
 const login = (state: State) => {
     if (!state.username || !state.password) {
-        state.feature.debug&&console.log("User name or password not set")
+        state.feature.debug && console.log("User name or password not set")
     }
 
     $('input[name=name]').val(state.username)
@@ -803,7 +803,8 @@ const run = async (state: State) => {
         updateCurrentPage(state)
 
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage)) {
-            // Auto login
+            if (state.feature.autoLogin)
+                login(state)
         }
 
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING].includes(state.currentPage)) {

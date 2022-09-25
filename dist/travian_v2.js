@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 14:42:20";
+const BUILD_TIME = "2022/09/25 14:43:44";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -662,7 +662,8 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     while (true) {
         updateCurrentPage(state);
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage)) {
-            // Auto login
+            if (state.feature.autoLogin)
+                login(state);
         }
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING].includes(state.currentPage)) {
             updateVillageList(state);
