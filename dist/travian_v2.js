@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 10:59:00";
+const BUILD_TIME = "2022/09/25 14:39:59";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -60,7 +60,6 @@ const GID_NAME_MAP = {
 var CurrentPageEnum;
 (function (CurrentPageEnum) {
     CurrentPageEnum["LOGIN"] = "LOGIN";
-    CurrentPageEnum["LOGOUT"] = "LOGOUT";
     CurrentPageEnum["FIELDS"] = "FIELDS";
     CurrentPageEnum["TOWN"] = "TOWN";
     CurrentPageEnum["BUILDING"] = "BUILDING";
@@ -105,6 +104,7 @@ StateHandler.INITIAL_STATE = {
     currentVillageId: '',
     villages: {},
     feature: {
+        autoLogin: false,
         autoScan: false,
         autoBuild: false,
         alertAttack: false,
@@ -114,7 +114,9 @@ StateHandler.INITIAL_STATE = {
     },
     nextVillageRotationTime: new Date(),
     telegramChatId: '',
-    telegramToken: ''
+    telegramToken: '',
+    username: '',
+    password: ''
 };
 class Utils {
 }
@@ -261,15 +263,19 @@ const updateCurrentPage = (state) => {
             state.currentPage = CurrentPageEnum.LOGIN;
             break;
         }
-        case '/logout': {
-            state.currentPage = CurrentPageEnum.LOGOUT;
-            break;
-        }
         default: {
             state.currentPage = CurrentPageEnum.UNKNOWN;
             break;
         }
     }
+};
+const login = (state) => {
+    if (!state.username || !state.password) {
+        state.feature.debug && console.log("User name or password not set");
+    }
+    $('input[name=name]').val(state.username);
+    $('input[name=password]').val(state.password);
+    $('button[type=submit]').trigger('click');
 };
 const updateVillageList = (state) => {
     const villages = state.villages;
@@ -653,10 +659,10 @@ const render = (state) => {
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     while (true) {
         updateCurrentPage(state);
-        if ([CurrentPageEnum.LOGIN, CurrentPageEnum.LOGOUT].includes(state.currentPage)) {
+        if ([CurrentPageEnum.LOGIN].includes(state.currentPage)) {
             // Auto login
         }
-        else {
+        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING].includes(state.currentPage)) {
             updateVillageList(state);
             updateCurrentVillageStatus(state);
             if (state.feature.alertAttack) {

@@ -49,7 +49,6 @@ const GID_NAME_MAP: Record<string, string> = {
 
 enum CurrentPageEnum {
     LOGIN = "LOGIN",
-    LOGOUT = "LOGOUT",
     FIELDS = "FIELDS",
     TOWN = "TOWN",
     BUILDING = "BUILDING",
@@ -64,6 +63,7 @@ enum CurrentActionEnum {
 }
 
 interface Feature {
+    autoLogin: boolean
     autoScan: boolean
     autoBuild: boolean
     alertAttack: boolean
@@ -80,6 +80,8 @@ interface State {
     nextVillageRotationTime: Date
     telegramChatId: string
     telegramToken: string
+    username: string
+    password: string
 }
 
 class StateHandler implements ProxyHandler<State> {
@@ -89,6 +91,7 @@ class StateHandler implements ProxyHandler<State> {
         currentVillageId: '',
         villages: {},
         feature: {
+            autoLogin: false,
             autoScan: false,
             autoBuild: false,
             alertAttack: false,
@@ -98,7 +101,9 @@ class StateHandler implements ProxyHandler<State> {
         },
         nextVillageRotationTime: new Date(),
         telegramChatId: '',
-        telegramToken: ''
+        telegramToken: '',
+        username:'',
+        password:''
     }
 
     private state: State
@@ -337,15 +342,21 @@ const updateCurrentPage = (state: State) => {
             state.currentPage = CurrentPageEnum.LOGIN
             break
         }
-        case '/logout': {
-            state.currentPage = CurrentPageEnum.LOGOUT
-            break
-        }
         default: {
             state.currentPage = CurrentPageEnum.UNKNOWN
             break
         }
     }
+}
+
+const login = (state: State) => {
+    if (!state.username || !state.password) {
+        state.feature.debug&&console.log("User name or password not set")
+    }
+
+    $('input[name=name]').val(state.username)
+    $('input[name=password]').val(state.password)
+    $('button[type=submit]').trigger('click')
 }
 
 const updateVillageList = (state: State) => {
@@ -790,9 +801,11 @@ const run = async (state: State) => {
     while (true) {
         updateCurrentPage(state)
 
-        if ([CurrentPageEnum.LOGIN, CurrentPageEnum.LOGOUT].includes(state.currentPage)) {
+        if ([CurrentPageEnum.LOGIN].includes(state.currentPage)) {
             // Auto login
-        } else {
+        }
+
+        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING].includes(state.currentPage)) {
             updateVillageList(state)
             updateCurrentVillageStatus(state)
             if (state.feature.alertAttack) {
