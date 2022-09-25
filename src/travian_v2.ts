@@ -664,7 +664,7 @@ const build = async (state: State) => {
 const farm = async (state: State) => {
     if (new Date(state.nextFarmTime) < new Date()) {
         const params = new URLSearchParams(window.location.search);
-        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16') {
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
             const startButtonEle = $('.startButton[value=Start]')
             for (let i = 0; i < startButtonEle.length; i++) {
                 await Utils.delayClick()
@@ -672,6 +672,10 @@ const farm = async (state: State) => {
             }
             state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0)
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            return
+        } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
+            await Utils.delayClick()
+            $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click()
             return
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
             await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)

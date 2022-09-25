@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 17:57:35";
+const BUILD_TIME = "2022/09/25 18:29:48";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -534,7 +534,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
 const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (new Date(state.nextFarmTime) < new Date()) {
         const params = new URLSearchParams(window.location.search);
-        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16') {
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
             const startButtonEle = $('.startButton[value=Start]');
             for (let i = 0; i < startButtonEle.length; i++) {
                 yield Utils.delayClick();
@@ -542,6 +542,11 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
             }
             state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0);
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            return;
+        }
+        else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
+            yield Utils.delayClick();
+            $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click();
             return;
         }
         else if (state.currentPage === CurrentPageEnum.TOWN) {
