@@ -663,15 +663,9 @@ const build = async (state: State) => {
 
 const farm = async (state: State) => {
     if (new Date(state.nextFarmTime) < new Date()) { 
-        if (state.currentPage !== CurrentPageEnum.TOWN) {
-            await Navigation.goToTown(state, CurrentActionEnum.FARM)
-            return
-        }
+        
 
-        if (state.currentPage === CurrentPageEnum.TOWN) {
-            await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
-            return 
-        }
+       
 
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16') {
@@ -683,7 +677,13 @@ const farm = async (state: State) => {
             state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0)
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return
-        };
+        } else if (state.currentPage === CurrentPageEnum.TOWN) {
+            await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
+            return 
+        }    else {
+        await Navigation.goToTown(state, CurrentActionEnum.FARM)
+        return
+        }
     }
 }
 

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 17:03:13";
+const BUILD_TIME = "2022/09/25 17:55:38";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -533,14 +533,6 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (new Date(state.nextFarmTime) < new Date()) {
-        if (state.currentPage !== CurrentPageEnum.TOWN) {
-            yield Navigation.goToTown(state, CurrentActionEnum.FARM);
-            return;
-        }
-        if (state.currentPage === CurrentPageEnum.TOWN) {
-            yield Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM);
-            return;
-        }
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16') {
             const startButtonEle = $('.startButton[value=Start]');
@@ -552,7 +544,14 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
         }
-        ;
+        else if (state.currentPage === CurrentPageEnum.TOWN) {
+            yield Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM);
+            return;
+        }
+        else {
+            yield Navigation.goToTown(state, CurrentActionEnum.FARM);
+            return;
+        }
     }
 });
 const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
