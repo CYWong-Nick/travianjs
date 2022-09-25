@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 14:39:59";
+const BUILD_TIME = "2022/09/25 14:42:20";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -561,6 +561,7 @@ const render = (state) => {
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
+            <input id="toggleAutoLogin" class="ml-5" type="checkbox" ${state.feature.autoLogin ? 'checked' : ''}/> Auto login
             <input id="toggleAutoScan" class="ml-5" type="checkbox" ${state.feature.autoScan ? 'checked' : ''}/> Auto scan
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
@@ -649,6 +650,7 @@ const render = (state) => {
         pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1);
         state.villages = villages;
     });
+    handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin');
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan');
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild');
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack');

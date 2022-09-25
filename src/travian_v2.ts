@@ -692,6 +692,7 @@ const render = (state: State) => {
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
+            <input id="toggleAutoLogin" class="ml-5" type="checkbox" ${state.feature.autoLogin ? 'checked' : ''}/> Auto login
             <input id="toggleAutoScan" class="ml-5" type="checkbox" ${state.feature.autoScan ? 'checked' : ''}/> Auto scan
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
@@ -788,7 +789,7 @@ const render = (state: State) => {
         pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1)
         state.villages = villages
     })
-
+    handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin')
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan')
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
