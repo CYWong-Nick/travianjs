@@ -662,12 +662,16 @@ const build = async (state: State) => {
 }
 
 const farm = async (state: State) => {
-    if (new Date(state.nextFarmTime) < new Date()) {
-        if (state.currentPage !== CurrentPageEnum.TOWN)
-            Navigation.goToTown(state, CurrentActionEnum.FARM)
+    if (new Date(state.nextFarmTime) < new Date()) { 
+        if (state.currentPage !== CurrentPageEnum.TOWN) {
+            await Navigation.goToTown(state, CurrentActionEnum.FARM)
+            return
+        }
 
-        if (state.currentPage === CurrentPageEnum.TOWN)
-            Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
+        if (state.currentPage === CurrentPageEnum.TOWN) {
+            await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
+            return 
+        }
 
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16') {
@@ -677,7 +681,8 @@ const farm = async (state: State) => {
                 startButtonEle[i].click()
             }
             state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0)
-            Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            await Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            return
         };
     }
 }
