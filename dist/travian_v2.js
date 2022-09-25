@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/25 16:36:59";
+const BUILD_TIME = "2022/09/25 16:51:20";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -110,9 +110,11 @@ StateHandler.INITIAL_STATE = {
         alertAttack: false,
         alertEmptyBuildQueue: false,
         alertResourceCapacityFull: false,
+        autoFarm: false,
         debug: false
     },
     nextVillageRotationTime: new Date(),
+    nextFarmTime: new Date(),
     telegramChatId: '',
     telegramToken: '',
     username: '',
@@ -269,14 +271,15 @@ const updateCurrentPage = (state) => {
         }
     }
 };
-const login = (state) => {
+const login = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (!state.username || !state.password) {
         state.feature.debug && console.log("User name or password not set");
     }
     $('input[name=name]').val(state.username);
     $('input[name=password]').val(state.password);
+    yield Utils.delayClick();
     $('button[type=submit]').trigger('click');
-};
+});
 const updateVillageList = (state) => {
     const villages = state.villages;
     const villageListEle = $('.villageList .listEntry');
@@ -500,7 +503,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             }
             return;
         }
-        let params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
             const bulidButton = $('.section1 > button.green');
             if (bulidButton.length) {
@@ -528,10 +531,29 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         state.currentAction = CurrentActionEnum.IDLE;
     }
 });
+const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    if (new Date(state.nextFarmTime) < new Date()) {
+        if (state.currentPage !== CurrentPageEnum.TOWN)
+            Navigation.goToTown(state, CurrentActionEnum.FARM);
+        if (state.currentPage === CurrentPageEnum.TOWN)
+            Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM);
+        const params = new URLSearchParams(window.location.search);
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16') {
+            const startButtonEle = $('.startButton[value=Start]');
+            for (let i = 0; i < startButtonEle.length; i++) {
+                yield Utils.delayClick();
+                startButtonEle[i].click();
+            }
+            state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0);
+            Navigation.goToFields(state, CurrentActionEnum.IDLE);
+        }
+        ;
+    }
+});
 const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
-    const nextRotationTIme = new Date(state.nextVillageRotationTime);
+    const nextRotationTime = new Date(state.nextVillageRotationTime);
     const currentTime = new Date();
-    if (new Date(state.nextVillageRotationTime) < new Date()) {
+    if (nextRotationTime < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0);
         let earliestVillageId = Object.keys(state.villages)[0];
         Object.values(state.villages)
@@ -546,7 +568,7 @@ const nextVillage = (state) => __awaiter(void 0, void 0, void 0, function* () {
         yield Navigation.goToVillage(state, earliestVillageId, CurrentActionEnum.NAVIGATE_TO_FIELDS);
     }
     else {
-        state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`);
+        state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTime)}, current=${Utils.formatDate(currentTime)}`);
     }
 });
 const handleFeatureToggle = (selector, state, key) => {
@@ -564,6 +586,7 @@ const render = (state) => {
             <input id="toggleAutoLogin" class="ml-5" type="checkbox" ${state.feature.autoLogin ? 'checked' : ''}/> Auto login
             <input id="toggleAutoScan" class="ml-5" type="checkbox" ${state.feature.autoScan ? 'checked' : ''}/> Auto scan
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
+            <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
@@ -574,6 +597,7 @@ const render = (state) => {
             <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
             <div>Current Action: ${state.currentAction}</div>
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
+            <div>Next farm: ${Utils.formatDate(state.nextFarmTime)}</div>
         </div>
         <div class="flex-row">
             ${Object.entries(villages).map(([id, village]) => `
@@ -653,6 +677,7 @@ const render = (state) => {
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin');
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan');
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild');
+    handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm');
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack');
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue');
     handleFeatureToggle('#toggleAlertResourceCapacityFull', state, 'alertResourceCapacityFull');
@@ -661,9 +686,9 @@ const render = (state) => {
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     while (true) {
         updateCurrentPage(state);
-        if ([CurrentPageEnum.LOGIN].includes(state.currentPage)) {
-            if (state.feature.autoLogin)
-                login(state);
+        if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
+            state.feature.debug && console.log("Attempt login");
+            yield login(state);
         }
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING].includes(state.currentPage)) {
             updateVillageList(state);
@@ -690,7 +715,10 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 else
                     yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             }
-            // Auto farm
+            if ([CurrentActionEnum.IDLE, CurrentActionEnum.FARM].includes(state.currentAction)) {
+                state.feature.debug && console.log("Attempting farm");
+                yield farm(state);
+            }
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
                 state.feature.debug && console.log("Try next village");
                 yield nextVillage(state);

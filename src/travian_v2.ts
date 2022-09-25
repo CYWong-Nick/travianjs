@@ -69,6 +69,7 @@ interface Feature {
     alertAttack: boolean
     alertEmptyBuildQueue: boolean
     alertResourceCapacityFull: boolean
+    autoFarm: boolean
     debug: boolean
 }
 interface State {
@@ -78,6 +79,7 @@ interface State {
     villages: Record<string, Village>
     feature: Feature
     nextVillageRotationTime: Date
+    nextFarmTime: Date
     telegramChatId: string
     telegramToken: string
     username: string
@@ -97,9 +99,11 @@ class StateHandler implements ProxyHandler<State> {
             alertAttack: false,
             alertEmptyBuildQueue: false,
             alertResourceCapacityFull: false,
+            autoFarm: false,
             debug: false
         },
         nextVillageRotationTime: new Date(),
+        nextFarmTime: new Date(),
         telegramChatId: '',
         telegramToken: '',
         username: '',
@@ -349,13 +353,14 @@ const updateCurrentPage = (state: State) => {
     }
 }
 
-const login = (state: State) => {
+const login = async (state: State) => {
     if (!state.username || !state.password) {
         state.feature.debug && console.log("User name or password not set")
     }
 
     $('input[name=name]').val(state.username)
     $('input[name=password]').val(state.password)
+    await Utils.delayClick()
     $('button[type=submit]').trigger('click')
 }
 
@@ -624,7 +629,7 @@ const build = async (state: State) => {
             return
         }
 
-        let params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
             const bulidButton = $('.section1 > button.green')
             if (bulidButton.length) {
@@ -656,10 +661,31 @@ const build = async (state: State) => {
     }
 }
 
+const farm = async (state: State) => {
+    if (new Date(state.nextFarmTime) < new Date()) {
+        if (state.currentPage !== CurrentPageEnum.TOWN)
+            Navigation.goToTown(state, CurrentActionEnum.FARM)
+
+        if (state.currentPage === CurrentPageEnum.TOWN)
+            Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
+
+        const params = new URLSearchParams(window.location.search);
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16') {
+            const startButtonEle = $('.startButton[value=Start]')
+            for (let i = 0; i < startButtonEle.length; i++) {
+                await Utils.delayClick()
+                startButtonEle[i].click()
+            }
+            state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0)
+            Navigation.goToFields(state, CurrentActionEnum.IDLE);
+        };
+    }
+}
+
 const nextVillage = async (state: State) => {
-    const nextRotationTIme = new Date(state.nextVillageRotationTime)
+    const nextRotationTime = new Date(state.nextVillageRotationTime)
     const currentTime = new Date()
-    if (new Date(state.nextVillageRotationTime) < new Date()) {
+    if (nextRotationTime < new Date()) {
         state.nextVillageRotationTime = Utils.addToDate(new Date(), 0, Utils.randInt(5, 10), 0)
 
         let earliestVillageId: string = Object.keys(state.villages)[0]
@@ -674,7 +700,7 @@ const nextVillage = async (state: State) => {
         state.feature.debug && console.log(`Rotating to ${state.villages[earliestVillageId].name}`)
         await Navigation.goToVillage(state, earliestVillageId, CurrentActionEnum.NAVIGATE_TO_FIELDS)
     } else {
-        state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTIme)}, current=${Utils.formatDate(currentTime)}`)
+        state.feature.debug && console.log(`Not rotating, next rotation=${Utils.formatDate(nextRotationTime)}, current=${Utils.formatDate(currentTime)}`)
     }
 }
 
@@ -695,6 +721,7 @@ const render = (state: State) => {
             <input id="toggleAutoLogin" class="ml-5" type="checkbox" ${state.feature.autoLogin ? 'checked' : ''}/> Auto login
             <input id="toggleAutoScan" class="ml-5" type="checkbox" ${state.feature.autoScan ? 'checked' : ''}/> Auto scan
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
+            <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
@@ -705,6 +732,7 @@ const render = (state: State) => {
             <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
             <div>Current Action: ${state.currentAction}</div>
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
+            <div>Next farm: ${Utils.formatDate(state.nextFarmTime)}</div>
         </div>
         <div class="flex-row">
             ${Object.entries(villages).map(([id, village]) => `
@@ -792,6 +820,7 @@ const render = (state: State) => {
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin')
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan')
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')
+    handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm')
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue')
     handleFeatureToggle('#toggleAlertResourceCapacityFull', state, 'alertResourceCapacityFull')
@@ -802,9 +831,9 @@ const run = async (state: State) => {
     while (true) {
         updateCurrentPage(state)
 
-        if ([CurrentPageEnum.LOGIN].includes(state.currentPage)) {
-            if (state.feature.autoLogin)
-                login(state)
+        if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
+            state.feature.debug && console.log("Attempt login")
+            await login(state)
         }
 
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING].includes(state.currentPage)) {
@@ -837,7 +866,10 @@ const run = async (state: State) => {
                     await Navigation.goToFields(state, CurrentActionEnum.IDLE)
             }
 
-            // Auto farm
+            if ([CurrentActionEnum.IDLE, CurrentActionEnum.FARM].includes(state.currentAction)) {
+                state.feature.debug && console.log("Attempting farm")
+                await farm(state)
+            }
 
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
                 state.feature.debug && console.log("Try next village")
