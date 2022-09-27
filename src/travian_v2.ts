@@ -760,7 +760,7 @@ const render = (state: State) => {
                         <div>
                             <span>Position: ${task.aid}</span>
                             <span>${GID_NAME_MAP[task.gid]}</span>
-                            <button class="removeFromPending" idx="${i}">x</button>
+                            <button class="removeFromPending" village-id="${id}" idx="${i}">x</button>
                         </div>
                     `).join('')}
                     <h5>Incoming Troop Movements</h5>
@@ -814,14 +814,15 @@ const render = (state: State) => {
 
     $('.removeFromPending').on('click', (ele) => {
         const idx = ele.target.attributes.getNamedItem('idx')?.value
-        if (!idx)
+        const villageId = ele.target.attributes.getNamedItem('village-id')?.value
+        if (!idx || !villageId)
             return
 
         const villages = state.villages
-        const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
-        pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1)
+        villages[villageId].pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1)
         state.villages = villages
     })
+
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin')
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan')
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')

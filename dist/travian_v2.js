@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/26 01:06:28";
+const BUILD_TIME = "2022/09/27 15:16:18";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -629,7 +629,7 @@ const render = (state) => {
                         <div>
                             <span>Position: ${task.aid}</span>
                             <span>${GID_NAME_MAP[task.gid]}</span>
-                            <button class="removeFromPending" idx="${i}">x</button>
+                            <button class="removeFromPending" village-id="${id}" idx="${i}">x</button>
                         </div>
                     `).join('')}
                     <h5>Incoming Troop Movements</h5>
@@ -674,13 +674,13 @@ const render = (state) => {
         state.villages = villages;
     });
     $('.removeFromPending').on('click', (ele) => {
-        var _c;
+        var _c, _d;
         const idx = (_c = ele.target.attributes.getNamedItem('idx')) === null || _c === void 0 ? void 0 : _c.value;
-        if (!idx)
+        const villageId = (_d = ele.target.attributes.getNamedItem('village-id')) === null || _d === void 0 ? void 0 : _d.value;
+        if (!idx || !villageId)
             return;
         const villages = state.villages;
-        const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks;
-        pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1);
+        villages[villageId].pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1);
         state.villages = villages;
     });
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin');
