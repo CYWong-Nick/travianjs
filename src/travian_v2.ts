@@ -59,7 +59,8 @@ enum CurrentActionEnum {
     IDLE = "IDLE",
     BUILD = "BUILD",
     NAVIGATE_TO_FIELDS = "NAVIGATE_TO_FIELDS",
-    FARM = "FARM"
+    FARM = "FARM",
+    CUSTOM_FARM = "CUSTOM_FARM"
 }
 
 interface Feature {
@@ -70,8 +71,16 @@ interface Feature {
     alertEmptyBuildQueue: boolean
     alertResourceCapacityFull: boolean
     autoFarm: boolean
+    autoCustomFarm: boolean
     debug: boolean
 }
+
+interface CustomFarm {
+    position: Position,
+    farmIntervalMinutes: { min: number, max: number },
+    troops: Record<string, string>
+}
+
 interface State {
     currentAction: CurrentActionEnum
     currentPage: CurrentPageEnum
@@ -100,6 +109,7 @@ class StateHandler implements ProxyHandler<State> {
             alertEmptyBuildQueue: false,
             alertResourceCapacityFull: false,
             autoFarm: false,
+            autoCustomFarm: false,
             debug: false
         },
         nextVillageRotationTime: new Date(),
@@ -271,6 +281,8 @@ interface Village {
     attackAlertBackoff?: Date
     emptyBuildQueueAlertBackoff?: Date
     resourceCapacityFullAlertBackoff?: Date
+    customFarm?: CustomFarm
+    nextCustomFarmTime?: Date
 }
 
 interface CurrentBuildTask {
@@ -391,7 +403,7 @@ const updateVillageList = (state: State) => {
         const villageDefaults: Village = {
             id: '',
             name: '',
-            position: { x: 0, y: 0 },
+            position: {x: 0, y: 0},
             index: -1,
             currentBuildTasks: [],
             pendingBuildTasks: [],
@@ -417,7 +429,7 @@ const updateVillageList = (state: State) => {
             id,
             name,
             index,
-            position: { x, y },
+            position: {x, y},
         }
     })
 
@@ -435,7 +447,7 @@ const updateCurrentVillageStatus = (state: State) => {
     let iron = Utils.parseIntIgnoreNonNumeric($('#l3')[0].innerText)
     let crop = Utils.parseIntIgnoreNonNumeric($('#l4')[0].innerText)
 
-    villages[currentVillageId].resources = { lumber, clay, iron, crop }
+    villages[currentVillageId].resources = {lumber, clay, iron, crop}
 
     const warehouseCapacity = Utils.parseIntIgnoreNonNumeric($('.warehouse .capacity > div').text())
     const granaryCapacity = Utils.parseIntIgnoreNonNumeric($('.granary .capacity > div').text())
@@ -528,6 +540,7 @@ const updateCurrentVillageStatus = (state: State) => {
         villages[currentVillageId].incomingTroops = incomingTroops
         villages[currentVillageId].outgoingTroops = outgoingTroops
         villages[currentVillageId].lastUpdatedTime = new Date()
+        villages[currentVillageId].nextCustomFarmTime = villages[currentVillageId].nextCustomFarmTime || new Date()
     }
 
     state.villages = villages
@@ -687,6 +700,104 @@ const farm = async (state: State) => {
     }
 }
 
+const executeCustomFarm = async (state: State) => {
+    const params = new URLSearchParams(window.location.search);
+    const villages = state.villages
+    const village = villages[state.currentVillageId]
+    const customFarm = village?.customFarm
+
+    if (customFarm) {
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
+            await Utils.delayClick()
+            $('a[href="/build.php?id=39&gid=16&tt=2"]')[0].click()
+            return
+        } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
+            await Utils.delayClick();
+
+            const sendTroopButton = $("#ok")
+            const confirmButton = $("#checksum")
+            if (sendTroopButton.length > 0) {
+                Object.keys(customFarm.troops).forEach(troopKey => {
+                    const troopInputEle = $(`input[name="${troopKey}"]`);
+                    troopInputEle[0].click();
+                    troopInputEle.val(customFarm.troops[troopKey]);
+                })
+                $("#xCoordInput").val(customFarm.position.x)
+                $("#yCoordInput").val(customFarm.position.y)
+
+                $("#build > div > form > div.option > label:nth-child(5) > input")[0].click();
+
+                await Utils.delayClick();
+                sendTroopButton[0].click();
+
+            } else if (confirmButton.length > 0) {
+                await Utils.delayClick()
+                confirmButton[0].click()
+            }
+
+            return;
+        } else if (state.currentPage === CurrentPageEnum.BUILDING && state.currentAction === CurrentActionEnum.CUSTOM_FARM
+            && params.get('gid') === '16' && params.get('tt') === '1') {
+            village.nextCustomFarmTime = Utils.addToDate(
+                new Date(),
+                0,
+                Utils.randInt(customFarm.farmIntervalMinutes.min, customFarm.farmIntervalMinutes.max),
+                Utils.randInt(0, 59)
+            );
+
+            state.villages = villages
+
+            await Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            return;
+        } else if (state.currentPage === CurrentPageEnum.TOWN) {
+            await Navigation.goToBuilding(
+                state,
+                39,
+                16,
+                CurrentActionEnum.CUSTOM_FARM
+            );
+            return;
+        } else {
+            await Navigation.goToTown(state, CurrentActionEnum.CUSTOM_FARM);
+            return;
+        }
+    }
+}
+
+const customFarm = async (state: State) => {
+    const villages = state.villages
+
+    // Check current village custom farm
+    if (villages[state.currentVillageId].customFarm &&
+        villages[state.currentVillageId].nextCustomFarmTime) {
+        // @ts-ignore
+        if (new Date(villages[state.currentVillageId].nextCustomFarmTime) < new Date()) {
+            state.feature.debug && console.log("Execute custom farm")
+            await executeCustomFarm(state)
+            return
+        }
+    }
+
+    // Check other villages
+    const nextVillageIdToCustomFarm = Object.entries(state.villages)
+        .filter(([_, village]) =>
+            village.id !== state.currentVillageId &&
+            village.customFarm &&
+            village.nextCustomFarmTime &&
+            new Date(village.nextCustomFarmTime) < new Date()
+        )
+        .map(([id, _]) => id)
+        .find(_ => true)
+
+    if (nextVillageIdToCustomFarm) {
+        state.feature.debug && console.log("Go to village")
+        await Navigation.goToVillage(state, nextVillageIdToCustomFarm, CurrentActionEnum.NAVIGATE_TO_FIELDS)
+    } else {
+        state.feature.debug && console.log("No custom farm required in other villages")
+        state.currentAction = CurrentActionEnum.IDLE
+    }
+}
+
 const nextVillage = async (state: State) => {
     const nextRotationTime = new Date(state.nextVillageRotationTime)
     const currentTime = new Date()
@@ -719,6 +830,7 @@ const handleFeatureToggle = (selector: string, state: State, key: keyof Feature)
 
 const render = (state: State) => {
     const villages = state.villages
+    const params = new URLSearchParams(window.location.search);
 
     $('#console').html(`
         <div class="flex-row">
@@ -727,6 +839,7 @@ const render = (state: State) => {
             <input id="toggleAutoScan" class="ml-5" type="checkbox" ${state.feature.autoScan ? 'checked' : ''}/> Auto scan
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
+            <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
@@ -739,19 +852,42 @@ const render = (state: State) => {
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
             <div>Next farm: ${Utils.formatDate(state.nextFarmTime)}</div>
         </div>
+        <br />
         <div class="flex-row">
             ${Object.entries(villages).map(([id, village]) => `
                 <div class="village-container">
                     <h4>${village.name} (id: ${id}) (${village.position.x}, ${village.position.y})</h4>
+                    <br />
                     <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
+                    <br />
+                    <div class="flex-row">
+                        <div>Next custom farm time: ${Utils.formatDate(village.nextCustomFarmTime)}</div>
+                    </div>
+                    ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id
+                    && params.get('gid') === '16' && params.get('tt') === '2' ?
+                        `<div class="flex-row">
+                            <input id="minCustomFarmMinutes" style="width: 5%">min</input>
+                            <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
+                            <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
+                        </div>` 
+                    : ''}
+                    ${village.customFarm ? 
+                    `<div>Target: (${village.customFarm?.position.x}|${village.customFarm?.position.y})</div>
+                    <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => village.customFarm?.troops[key]).map(key => key + ": " + village.customFarm?.troops[key]).join(", ")}</div>
+                    <div>Interval Range: ${village.customFarm?.farmIntervalMinutes.min}mins - ${village.customFarm?.farmIntervalMinutes.max}mins</div>` 
+                    : ''}
+                    
+                    <br />
                     <h5>Resources</h5>
                     <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
+                    <br />
                     <h5>Current build tasks</h5>
                     ${village.currentBuildTasks.map(task => `
                         <div>${task.name} ${task.level} ${Utils.formatDate(task.finishTime)}</div>
                     `).join('')}
+                    <br />
                     <div class="flex-row">
                         <h5>Pending build tasks</h5> 
                         ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id ? `<button id="addCurrentToPending" class="ml-5">Add Current</button>` : ''}
@@ -763,10 +899,12 @@ const render = (state: State) => {
                             <button class="removeFromPending" village-id="${id}" idx="${i}">x</button>
                         </div>
                     `).join('')}
+                    <br />
                     <h5>Incoming Troop Movements</h5>
                     ${village.incomingTroops.map(troop => `
                         <div>${troop.type} ${troop.count} ${Utils.formatDate(troop.time)}</div>
                     `).join('')}
+                    <br />
                     <h5>Outgoing Troop Movements</h5>
                     ${village.outgoingTroops.map(troop => `
                         <div>${troop.type} ${troop.count} ${Utils.formatDate(troop.time)}</div>
@@ -775,6 +913,42 @@ const render = (state: State) => {
             `).join('')}
         </div>
     `)
+
+    state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2' &&
+    $('#addCurrentToCustomFarm').on('click', () => {
+        const villages = state.villages
+        let customFarm = {
+            position: {
+                "x": -999,
+                "y": -999
+            },
+            farmIntervalMinutes: {
+                "min": 999,
+                "max": 999
+            },
+            troops: {}
+        } as CustomFarm
+
+        $("#troops > tbody").find("td").each((column, td) => {
+                const troopInput = $(td).find("input")
+                const troopKey = troopInput.attr('name')
+                const troopCount = troopInput.val() as string
+
+                if (troopKey && troopInput) {
+                    customFarm.troops[troopKey] = troopCount
+                }
+            }
+        )
+
+        customFarm.position.x = parseInt($("#xCoordInput").val() as string)
+        customFarm.position.y = parseInt($("#yCoordInput").val() as string)
+
+        customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val() as string)
+        customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val() as string)
+
+        villages[state.currentVillageId].customFarm = customFarm
+        state.villages = villages
+    })
 
     state.currentPage === CurrentPageEnum.BUILDING && $('#addCurrentToPending').on('click', () => {
         const villages = state.villages
@@ -827,6 +1001,7 @@ const render = (state: State) => {
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan')
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm')
+    handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm')
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue')
     handleFeatureToggle('#toggleAlertResourceCapacityFull', state, 'alertResourceCapacityFull')
@@ -875,6 +1050,11 @@ const run = async (state: State) => {
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.FARM].includes(state.currentAction)) {
                 state.feature.debug && console.log("Attempting farm")
                 await farm(state)
+            }
+
+            if ([CurrentActionEnum.IDLE, CurrentActionEnum.CUSTOM_FARM].includes(state.currentAction) && state.feature.autoCustomFarm) {
+                state.feature.debug && console.log("Attempting custom farm")
+                await customFarm(state)
             }
 
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
