@@ -1062,13 +1062,21 @@ const run = async (state: State) => {
             }
 
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.FARM].includes(state.currentAction)) {
-                state.feature.debug && console.log("Attempting farm")
-                await farm(state)
+                if (state.feature.autoFarm) {
+                    state.feature.debug && console.log("Attempting farm")
+                    await farm(state)
+                } else {
+                    state.currentAction = CurrentActionEnum.IDLE
+                }
             }
 
-            if ([CurrentActionEnum.IDLE, CurrentActionEnum.CUSTOM_FARM].includes(state.currentAction) && state.feature.autoCustomFarm) {
-                state.feature.debug && console.log("Attempting custom farm")
-                await customFarm(state)
+            if ([CurrentActionEnum.IDLE, CurrentActionEnum.CUSTOM_FARM].includes(state.currentAction)) {
+                if (state.feature.autoCustomFarm) {
+                    state.feature.debug && console.log("Attempting custom farm")
+                    await customFarm(state)
+                } else {
+                    state.currentAction = CurrentActionEnum.IDLE
+                }
             }
 
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
