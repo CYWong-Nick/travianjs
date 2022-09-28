@@ -843,6 +843,10 @@ const handleFeatureToggle = (selector: string, state: State, key: keyof Feature)
 }
 
 const render = (state: State) => {
+    if (state.currentPage === CurrentPageEnum.BUILDING && $('#addCurrentToPendingInBuilding').length === 0) {
+        $('.upgradeBuilding').after('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>')
+    }
+
     const villages = state.villages
     const params = new URLSearchParams(window.location.search);
 
@@ -882,17 +886,16 @@ const render = (state: State) => {
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id
             && params.get('gid') === '16' && params.get('tt') === '2' ?
             `<div class="flex-row">
-                            <input id="minCustomFarmMinutes" style="width: 5%">min</input>
-                            <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
-                            <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
-                        </div>`
+                                        <input id="minCustomFarmMinutes" style="width: 5%">min</input>
+                                        <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
+                                        <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
+                                    </div>`
             : ''}
                     ${village.customFarm ?
             `<div>Target: (${village.customFarm?.position.x}|${village.customFarm?.position.y})</div>
-                    <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => village.customFarm?.troops[key]).map(key => key + ": " + village.customFarm?.troops[key]).join(", ")}</div>
-                    <div>Interval Range: ${village.customFarm?.farmIntervalMinutes.min}mins - ${village.customFarm?.farmIntervalMinutes.max}mins</div>`
+                                <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => village.customFarm?.troops[key]).map(key => key + ": " + village.customFarm?.troops[key]).join(", ")}</div>
+                                <div>Interval Range: ${village.customFarm?.farmIntervalMinutes.min}mins - ${village.customFarm?.farmIntervalMinutes.max}mins</div>`
             : ''}
-                    
                     <br />
                     <h5>Resources</h5>
                     <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
@@ -904,7 +907,7 @@ const render = (state: State) => {
                     <br />
                     <div class="flex-row">
                         <h5>Pending build tasks</h5> 
-                        ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id ? `<button id="addCurrentToPending" class="ml-5">Add Current</button>` : ''}
+                        ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id ? `<button class="addCurrentToPending" class="ml-5">Add Current</button>` : ''}
                     </div>
                     ${village.pendingBuildTasks.map((task, i) => `
                         <div>
@@ -964,7 +967,7 @@ const render = (state: State) => {
             state.villages = villages
         })
 
-    state.currentPage === CurrentPageEnum.BUILDING && $('#addCurrentToPending').on('click', () => {
+    state.currentPage === CurrentPageEnum.BUILDING && $('.addCurrentToPending').on('click', () => {
         const villages = state.villages
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
 
