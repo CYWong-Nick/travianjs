@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/28 11:11:50";
+const BUILD_TIME = "2022/09/28 11:24:22";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -680,8 +680,11 @@ const handleFeatureToggle = (selector, state, key) => {
     });
 };
 const render = (state) => {
-    if (state.currentPage === CurrentPageEnum.BUILDING && $('#addCurrentToPendingInBuilding').length === 0) {
-        $('.upgradeBuilding').after('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>');
+    if (state.currentPage === CurrentPageEnum.BUILDING) {
+        if ($('#addCurrentToPendingInBuilding').length === 0)
+            $('.upgradeBuilding').after('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>');
+        else
+            $('#addCurrentToPendingInBuilding').replaceWith('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>');
     }
     const villages = state.villages;
     const params = new URLSearchParams(window.location.search);
@@ -720,18 +723,17 @@ const render = (state) => {
                     <div class="flex-row">
                         <div>Next custom farm time: ${Utils.formatDate(village.nextCustomFarmTime)}</div>
                     </div>
-                    ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id
-            && params.get('gid') === '16' && params.get('tt') === '2' ?
+                    ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
             `<div class="flex-row">
-                                        <input id="minCustomFarmMinutes" style="width: 5%">min</input>
-                                        <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
-                                        <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
-                                    </div>`
+                            <input id="minCustomFarmMinutes" style="width: 5%">min</input>
+                            <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
+                            <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
+                        </div>`
             : ''}
                     ${village.customFarm ?
             `<div>Target: (${(_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.position.x}|${(_d = village.customFarm) === null || _d === void 0 ? void 0 : _d.position.y})</div>
-                                <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => { var _c; return (_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]; }).map(key => { var _c; return key + ": " + ((_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]); }).join(", ")}</div>
-                                <div>Interval Range: ${(_e = village.customFarm) === null || _e === void 0 ? void 0 : _e.farmIntervalMinutes.min}mins - ${(_f = village.customFarm) === null || _f === void 0 ? void 0 : _f.farmIntervalMinutes.max}mins</div>`
+                        <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => { var _c; return (_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]; }).map(key => { var _c; return key + ": " + ((_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]); }).join(", ")}</div>
+                        <div>Interval Range: ${(_e = village.customFarm) === null || _e === void 0 ? void 0 : _e.farmIntervalMinutes.min}mins - ${(_f = village.customFarm) === null || _f === void 0 ? void 0 : _f.farmIntervalMinutes.max}mins</div>`
             : ''}
                     <br />
                     <h5>Resources</h5>
