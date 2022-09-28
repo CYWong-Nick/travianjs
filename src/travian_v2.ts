@@ -214,7 +214,7 @@ class Navigation {
             state.currentAction = action
             state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
             if (aid === 40) { // Special case for wall
-                $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click')
+                $('#villageContent > div.buildingSlot.a40.top > svg > g.hoverShape > path').trigger('click')
             } else {
                 $(`a[href="/build.php?id=${aid}&gid=${gid}"]`)[0].click()
             }

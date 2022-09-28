@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/28 11:03:12";
+const BUILD_TIME = "2022/09/28 11:11:50";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -176,7 +176,7 @@ Navigation.goToBuilding = (state, aid, gid, action) => __awaiter(void 0, void 0,
         state.currentAction = action;
         state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
         if (aid === 40) { // Special case for wall
-            $('#villageContent > div.buildingSlot.a40.g33.top.gaul > svg > g.hoverShape > path').trigger('click');
+            $('#villageContent > div.buildingSlot.a40.top > svg > g.hoverShape > path').trigger('click');
         }
         else {
             $(`a[href="/build.php?id=${aid}&gid=${gid}"]`)[0].click();
