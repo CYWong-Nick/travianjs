@@ -403,7 +403,7 @@ const updateVillageList = (state: State) => {
         const villageDefaults: Village = {
             id: '',
             name: '',
-            position: {x: 0, y: 0},
+            position: { x: 0, y: 0 },
             index: -1,
             currentBuildTasks: [],
             pendingBuildTasks: [],
@@ -429,7 +429,7 @@ const updateVillageList = (state: State) => {
             id,
             name,
             index,
-            position: {x, y},
+            position: { x, y },
         }
     })
 
@@ -447,7 +447,7 @@ const updateCurrentVillageStatus = (state: State) => {
     let iron = Utils.parseIntIgnoreNonNumeric($('#l3')[0].innerText)
     let crop = Utils.parseIntIgnoreNonNumeric($('#l4')[0].innerText)
 
-    villages[currentVillageId].resources = {lumber, clay, iron, crop}
+    villages[currentVillageId].resources = { lumber, clay, iron, crop }
 
     const warehouseCapacity = Utils.parseIntIgnoreNonNumeric($('.warehouse .capacity > div').text())
     const granaryCapacity = Utils.parseIntIgnoreNonNumeric($('.granary .capacity > div').text())
@@ -644,6 +644,20 @@ const build = async (state: State) => {
 
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
+
+            // Prevent infinite loop due to mismatch in resources requirements
+            const resourceRequirementEle = $('#contract .value')
+            if (!resourceRequirementEle.length) {
+                return
+            }
+
+            const lumber = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[0].innerText)
+            const clay = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[1].innerText)
+            const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText)
+            const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText)
+
+            village.pendingBuildTasks[0].resources = { lumber, clay, iron, crop }
+
             const bulidButton = $('.section1 > button.green')
             if (bulidButton.length) {
                 await Utils.delayClick()
@@ -866,18 +880,18 @@ const render = (state: State) => {
                         <div>Next custom farm time: ${Utils.formatDate(village.nextCustomFarmTime)}</div>
                     </div>
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id
-                    && params.get('gid') === '16' && params.get('tt') === '2' ?
-                        `<div class="flex-row">
+            && params.get('gid') === '16' && params.get('tt') === '2' ?
+            `<div class="flex-row">
                             <input id="minCustomFarmMinutes" style="width: 5%">min</input>
                             <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
                             <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
-                        </div>` 
-                    : ''}
-                    ${village.customFarm ? 
-                    `<div>Target: (${village.customFarm?.position.x}|${village.customFarm?.position.y})</div>
+                        </div>`
+            : ''}
+                    ${village.customFarm ?
+            `<div>Target: (${village.customFarm?.position.x}|${village.customFarm?.position.y})</div>
                     <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => village.customFarm?.troops[key]).map(key => key + ": " + village.customFarm?.troops[key]).join(", ")}</div>
-                    <div>Interval Range: ${village.customFarm?.farmIntervalMinutes.min}mins - ${village.customFarm?.farmIntervalMinutes.max}mins</div>` 
-                    : ''}
+                    <div>Interval Range: ${village.customFarm?.farmIntervalMinutes.min}mins - ${village.customFarm?.farmIntervalMinutes.max}mins</div>`
+            : ''}
                     
                     <br />
                     <h5>Resources</h5>
@@ -915,21 +929,21 @@ const render = (state: State) => {
     `)
 
     state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2' &&
-    $('#addCurrentToCustomFarm').on('click', () => {
-        const villages = state.villages
-        let customFarm = {
-            position: {
-                "x": -999,
-                "y": -999
-            },
-            farmIntervalMinutes: {
-                "min": 999,
-                "max": 999
-            },
-            troops: {}
-        } as CustomFarm
+        $('#addCurrentToCustomFarm').on('click', () => {
+            const villages = state.villages
+            let customFarm = {
+                position: {
+                    "x": -999,
+                    "y": -999
+                },
+                farmIntervalMinutes: {
+                    "min": 999,
+                    "max": 999
+                },
+                troops: {}
+            } as CustomFarm
 
-        $("#troops > tbody").find("td").each((column, td) => {
+            $("#troops > tbody").find("td").each((column, td) => {
                 const troopInput = $(td).find("input")
                 const troopKey = troopInput.attr('name')
                 const troopCount = troopInput.val() as string
@@ -938,17 +952,17 @@ const render = (state: State) => {
                     customFarm.troops[troopKey] = troopCount
                 }
             }
-        )
+            )
 
-        customFarm.position.x = parseInt($("#xCoordInput").val() as string)
-        customFarm.position.y = parseInt($("#yCoordInput").val() as string)
+            customFarm.position.x = parseInt($("#xCoordInput").val() as string)
+            customFarm.position.y = parseInt($("#yCoordInput").val() as string)
 
-        customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val() as string)
-        customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val() as string)
+            customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val() as string)
+            customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val() as string)
 
-        villages[state.currentVillageId].customFarm = customFarm
-        state.villages = villages
-    })
+            villages[state.currentVillageId].customFarm = customFarm
+            state.villages = villages
+        })
 
     state.currentPage === CurrentPageEnum.BUILDING && $('#addCurrentToPending').on('click', () => {
         const villages = state.villages

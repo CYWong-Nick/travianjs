@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/28 01:11:14";
+const BUILD_TIME = "2022/09/28 09:51:08";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -508,6 +508,16 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         }
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
+            // Prevent infinite loop due to mismatch in resources requirements
+            const resourceRequirementEle = $('#contract .value');
+            if (!resourceRequirementEle.length) {
+                return;
+            }
+            const lumber = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[0].innerText);
+            const clay = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[1].innerText);
+            const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText);
+            const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText);
+            village.pendingBuildTasks[0].resources = { lumber, clay, iron, crop };
             const bulidButton = $('.section1 > button.green');
             if (bulidButton.length) {
                 yield Utils.delayClick();
