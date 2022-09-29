@@ -735,7 +735,7 @@ const render = (state) => {
             `<div>Target: (${(_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.position.x}|${(_d = village.customFarm) === null || _d === void 0 ? void 0 : _d.position.y})</div>
                         <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => { var _c; return (_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]; }).map(key => { var _c; return key + ": " + ((_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]); }).join(", ")}</div>
                         <div>Interval Range: ${(_e = village.customFarm) === null || _e === void 0 ? void 0 : _e.farmIntervalMinutes.min}mins - ${(_f = village.customFarm) === null || _f === void 0 ? void 0 : _f.farmIntervalMinutes.max}mins</div>
-                        <button id="removeCustomFarm" village-id="${id}" class="ml-5">x</button>`
+                        <button class="removeCustomFarm" village-id="${id}">x</button>`
             : ''}
                     <br />
                     <h5>Resources</h5>
@@ -801,13 +801,13 @@ const render = (state) => {
             villages[state.currentVillageId].customFarm = customFarm;
             state.villages = villages;
         });
-    $('#removeCustomFarm').on('click', (ele) => {
+    $('.removeCustomFarm').on('click', (ele) => {
         var _c;
         const villages = state.villages;
         const villageId = (_c = ele.target.attributes.getNamedItem('village-id')) === null || _c === void 0 ? void 0 : _c.value;
         if (!villageId)
             return;
-        villages[villageId].customFarm = undefined;
+        delete villages[villageId].customFarm;
         state.villages = villages;
     });
     state.currentPage === CurrentPageEnum.BUILDING && $('.addCurrentToPending').on('click', () => {

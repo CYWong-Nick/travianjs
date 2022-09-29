@@ -899,7 +899,7 @@ const render = (state: State) => {
             `<div>Target: (${village.customFarm?.position.x}|${village.customFarm?.position.y})</div>
                         <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => village.customFarm?.troops[key]).map(key => key + ": " + village.customFarm?.troops[key]).join(", ")}</div>
                         <div>Interval Range: ${village.customFarm?.farmIntervalMinutes.min}mins - ${village.customFarm?.farmIntervalMinutes.max}mins</div>
-                        <button id="removeCustomFarm" village-id="${id}" class="ml-5">x</button>`
+                        <button class="removeCustomFarm" village-id="${id}">x</button>`
             : ''
         }
                     <br />
@@ -973,12 +973,12 @@ const render = (state: State) => {
             state.villages = villages
         })
 
-    $('#removeCustomFarm').on('click', (ele) => {
+    $('.removeCustomFarm').on('click', (ele) => {
         const villages = state.villages
         const villageId = ele.target.attributes.getNamedItem('village-id')?.value
         if (!villageId) return
 
-        villages[villageId].customFarm = undefined
+        delete villages[villageId].customFarm
 
         state.villages = villages
     })
