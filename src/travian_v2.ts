@@ -845,14 +845,32 @@ const handleFeatureToggle = (selector: string, state: State, key: keyof Feature)
 
 const render = (state: State) => {
     if (state.currentPage === CurrentPageEnum.BUILDING) {
+        const btn = '<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>'
         if ($('#addCurrentToPendingInBuilding').length === 0)
-            $('.upgradeBuilding').after('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>')
+            $('.upgradeBuilding').after(btn)
         else
-            $('#addCurrentToPendingInBuilding').replaceWith('<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>')
+            $('#addCurrentToPendingInBuilding').replaceWith(btn)
     }
 
     const villages = state.villages
     const params = new URLSearchParams(window.location.search);
+
+    if (state.currentPage === CurrentPageEnum.FIELDS) {
+        const records = villages[state.currentVillageId].pendingBuildTasks.reduce((group, task) => {
+            group[task.aid] = group[task.aid] || 0
+            group[task.aid]++
+            return group
+        }, {} as Record<number, number>)
+
+        Object.entries(records).forEach(([id, count]) => {
+            const div = `<div class="tjs-pending">+${count}</div>`
+            if ($(`.buildingSlot${id} .tjs-pending`).length) {
+                $(`.buildingSlot${id} .labelLayer`).after(div)
+            } else {
+                $(`.buildingSlot${id} .tjs-pending`).replaceWith(div)
+            }
+        })
+    }
 
     $('#console').html(`
         <div class="flex-row">

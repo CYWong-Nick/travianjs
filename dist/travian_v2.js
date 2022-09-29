@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/29 21:56:37";
+const BUILD_TIME = "2022/09/29 22:27:09";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -682,13 +682,30 @@ const handleFeatureToggle = (selector, state, key) => {
 };
 const render = (state) => {
     if (state.currentPage === CurrentPageEnum.BUILDING) {
+        const btn = '<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>';
         if ($('#addCurrentToPendingInBuilding').length === 0)
-            $('.upgradeBuilding').after('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>');
+            $('.upgradeBuilding').after(btn);
         else
-            $('#addCurrentToPendingInBuilding').replaceWith('<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>');
+            $('#addCurrentToPendingInBuilding').replaceWith(btn);
     }
     const villages = state.villages;
     const params = new URLSearchParams(window.location.search);
+    if (state.currentPage === CurrentPageEnum.FIELDS) {
+        const records = villages[state.currentVillageId].pendingBuildTasks.reduce((group, task) => {
+            group[task.aid] = group[task.aid] || 0;
+            group[task.aid]++;
+            return group;
+        }, {});
+        Object.entries(records).forEach(([id, count]) => {
+            const div = `<div class="tjs-pending">+${count}</div>`;
+            if ($(`.buildingSlot${id} .tjs-pending`).length) {
+                $(`.buildingSlot${id} .labelLayer`).after(div);
+            }
+            else {
+                $(`.buildingSlot${id} .tjs-pending`).replaceWith(div);
+            }
+        });
+    }
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
