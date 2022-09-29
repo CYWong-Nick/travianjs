@@ -330,6 +330,10 @@ const createStyle = () => {
             border: 1px solid black;
             border-radius: 3px;
         }
+
+        .tjs-pending {
+            background: lightblue;
+        }
     `;
     document.head.append(style);
 }
@@ -855,19 +859,21 @@ const render = (state: State) => {
     const villages = state.villages
     const params = new URLSearchParams(window.location.search);
 
-    if (state.currentPage === CurrentPageEnum.FIELDS) {
+    if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
         const records = villages[state.currentVillageId].pendingBuildTasks.reduce((group, task) => {
             group[task.aid] = group[task.aid] || 0
             group[task.aid]++
             return group
         }, {} as Record<number, number>)
 
+        const classNamePrefix = state.currentPage === CurrentPageEnum.FIELDS ? "buildingSlot" : "aid"
+
         Object.entries(records).forEach(([id, count]) => {
             const div = `<div class="tjs-pending">+${count}</div>`
-            if ($(`.buildingSlot${id} .tjs-pending`).length === 0) {
-                $(`.buildingSlot${id} .labelLayer`).after(div)
+            if ($(`.${classNamePrefix}${id} .tjs-pending`).length === 0) {
+                $(`.${classNamePrefix}${id} .labelLayer`).after(div)
             } else {
-                $(`.buildingSlot${id} .tjs-pending`).replaceWith(div)
+                $(`.${classNamePrefix}${id} .tjs-pending`).replaceWith(div)
             }
         })
     }
