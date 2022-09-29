@@ -44,7 +44,8 @@ const GID_NAME_MAP: Record<string, string> = {
     "20": "Stable",
     "22": "Academy",
     "30": "Great Stable",
-    "40": "Wonder of the World"
+    "40": "Wonder of the World",
+    "46": "Hospital"
 }
 
 enum CurrentPageEnum {

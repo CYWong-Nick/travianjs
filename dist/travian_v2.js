@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/29 21:49:17";
+const BUILD_TIME = "2022/09/29 21:53:13";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -55,7 +55,8 @@ const GID_NAME_MAP = {
     "20": "Stable",
     "22": "Academy",
     "30": "Great Stable",
-    "40": "Wonder of the World"
+    "40": "Wonder of the World",
+    "46": "Hospital"
 };
 var CurrentPageEnum;
 (function (CurrentPageEnum) {
