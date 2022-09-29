@@ -864,7 +864,7 @@ const render = (state: State) => {
 
         Object.entries(records).forEach(([id, count]) => {
             const div = `<div class="tjs-pending">+${count}</div>`
-            if ($(`.buildingSlot${id} .tjs-pending`).length) {
+            if ($(`.buildingSlot${id} .tjs-pending`).length === 0) {
                 $(`.buildingSlot${id} .labelLayer`).after(div)
             } else {
                 $(`.buildingSlot${id} .tjs-pending`).replaceWith(div)

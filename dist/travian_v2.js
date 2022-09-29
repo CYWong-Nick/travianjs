@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/29 22:28:35";
+const BUILD_TIME = "2022/09/29 22:34:52";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -698,7 +698,7 @@ const render = (state) => {
         }, {});
         Object.entries(records).forEach(([id, count]) => {
             const div = `<div class="tjs-pending">+${count}</div>`;
-            if ($(`.buildingSlot${id} .tjs-pending`).length) {
+            if ($(`.buildingSlot${id} .tjs-pending`).length === 0) {
                 $(`.buildingSlot${id} .labelLayer`).after(div);
             }
             else {
