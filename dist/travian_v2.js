@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/29 21:55:10";
+const BUILD_TIME = "2022/09/29 21:56:37";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -237,7 +237,7 @@ const createStyle = () => {
             margin-right: 5px;
         }
         
-        #console button {
+        .tjs-btn, #console button {
             border: 1px solid black;
             border-radius: 3px;
         }
@@ -685,7 +685,7 @@ const render = (state) => {
         if ($('#addCurrentToPendingInBuilding').length === 0)
             $('.upgradeBuilding').after('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>');
         else
-            $('#addCurrentToPendingInBuilding').replaceWith('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>');
+            $('#addCurrentToPendingInBuilding').replaceWith('<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>');
     }
     const villages = state.villages;
     const params = new URLSearchParams(window.location.search);

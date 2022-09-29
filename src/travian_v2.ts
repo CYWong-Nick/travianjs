@@ -326,7 +326,7 @@ const createStyle = () => {
             margin-right: 5px;
         }
         
-        #console button {
+        .tjs-btn, #console button {
             border: 1px solid black;
             border-radius: 3px;
         }
@@ -848,7 +848,7 @@ const render = (state: State) => {
         if ($('#addCurrentToPendingInBuilding').length === 0)
             $('.upgradeBuilding').after('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>')
         else
-            $('#addCurrentToPendingInBuilding').replaceWith('<button id="addCurrentToPendingInBuilding" class="addCurrentToPending">Add to queue</button>')
+            $('#addCurrentToPendingInBuilding').replaceWith('<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>')
     }
 
     const villages = state.villages
