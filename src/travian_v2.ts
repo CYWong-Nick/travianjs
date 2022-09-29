@@ -897,7 +897,8 @@ const render = (state: State) => {
                     ${village.customFarm ?
             `<div>Target: (${village.customFarm?.position.x}|${village.customFarm?.position.y})</div>
                         <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => village.customFarm?.troops[key]).map(key => key + ": " + village.customFarm?.troops[key]).join(", ")}</div>
-                        <div>Interval Range: ${village.customFarm?.farmIntervalMinutes.min}mins - ${village.customFarm?.farmIntervalMinutes.max}mins</div>`
+                        <div>Interval Range: ${village.customFarm?.farmIntervalMinutes.min}mins - ${village.customFarm?.farmIntervalMinutes.max}mins</div>
+                        <button id="removeCustomFarm" village-id="${id}" class="ml-5">x</button>`
             : ''
         }
                     <br />
@@ -970,6 +971,16 @@ const render = (state: State) => {
             villages[state.currentVillageId].customFarm = customFarm
             state.villages = villages
         })
+
+    $('#removeCustomFarm').on('click', (ele) => {
+        const villages = state.villages
+        const villageId = ele.target.attributes.getNamedItem('village-id')?.value
+        if (!villageId) return
+
+        villages[villageId].customFarm = undefined
+
+        state.villages = villages
+    })
 
     state.currentPage === CurrentPageEnum.BUILDING && $('.addCurrentToPending').on('click', () => {
         const villages = state.villages

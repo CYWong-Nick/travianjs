@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/28 11:24:22";
+const BUILD_TIME = "2022/09/29 21:49:17";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -733,7 +733,8 @@ const render = (state) => {
                     ${village.customFarm ?
             `<div>Target: (${(_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.position.x}|${(_d = village.customFarm) === null || _d === void 0 ? void 0 : _d.position.y})</div>
                         <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => { var _c; return (_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]; }).map(key => { var _c; return key + ": " + ((_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]); }).join(", ")}</div>
-                        <div>Interval Range: ${(_e = village.customFarm) === null || _e === void 0 ? void 0 : _e.farmIntervalMinutes.min}mins - ${(_f = village.customFarm) === null || _f === void 0 ? void 0 : _f.farmIntervalMinutes.max}mins</div>`
+                        <div>Interval Range: ${(_e = village.customFarm) === null || _e === void 0 ? void 0 : _e.farmIntervalMinutes.min}mins - ${(_f = village.customFarm) === null || _f === void 0 ? void 0 : _f.farmIntervalMinutes.max}mins</div>
+                        <button id="removeCustomFarm" village-id="${id}" class="ml-5">x</button>`
             : ''}
                     <br />
                     <h5>Resources</h5>
@@ -799,6 +800,15 @@ const render = (state) => {
             villages[state.currentVillageId].customFarm = customFarm;
             state.villages = villages;
         });
+    $('#removeCustomFarm').on('click', (ele) => {
+        var _c;
+        const villages = state.villages;
+        const villageId = (_c = ele.target.attributes.getNamedItem('village-id')) === null || _c === void 0 ? void 0 : _c.value;
+        if (!villageId)
+            return;
+        villages[villageId].customFarm = undefined;
+        state.villages = villages;
+    });
     state.currentPage === CurrentPageEnum.BUILDING && $('.addCurrentToPending').on('click', () => {
         const villages = state.villages;
         const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks;
