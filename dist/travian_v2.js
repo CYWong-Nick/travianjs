@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/09/29 23:05:47";
+const BUILD_TIME = "2022/10/02 01:25:38";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -523,6 +523,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText);
             const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText);
             village.pendingBuildTasks[0].resources = { lumber, clay, iron, crop };
+            state.villages = villages;
             const bulidButton = $('.section1 > button.green');
             if (bulidButton.length) {
                 yield Utils.delayClick();

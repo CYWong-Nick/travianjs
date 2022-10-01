@@ -662,6 +662,7 @@ const build = async (state: State) => {
             const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText)
 
             village.pendingBuildTasks[0].resources = { lumber, clay, iron, crop }
+            state.villages = villages
 
             const bulidButton = $('.section1 > button.green')
             if (bulidButton.length) {
