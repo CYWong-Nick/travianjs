@@ -869,6 +869,7 @@ const render = (state: State) => {
 
         const classNamePrefix = state.currentPage === CurrentPageEnum.FIELDS ? "buildingSlot" : "aid"
 
+        $('.tjs-pending').remove()
         Object.entries(records).forEach(([id, count]) => {
             const div = `<div class="tjs-pending">+${count}</div>`
             if ($(`.${classNamePrefix}${id} .tjs-pending`).length === 0) {

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/02 01:25:38";
+const BUILD_TIME = "2022/10/02 21:16:44";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -702,6 +702,7 @@ const render = (state) => {
             return group;
         }, {});
         const classNamePrefix = state.currentPage === CurrentPageEnum.FIELDS ? "buildingSlot" : "aid";
+        $('.tjs-pending').remove();
         Object.entries(records).forEach(([id, count]) => {
             const div = `<div class="tjs-pending">+${count}</div>`;
             if ($(`.${classNamePrefix}${id} .tjs-pending`).length === 0) {
