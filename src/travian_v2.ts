@@ -995,6 +995,8 @@ const render = (state: State) => {
         customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val() as string)
         customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val() as string)
 
+        customFarm.nextCustomFarmTime = new Date()
+
         villages[state.currentVillageId].customFarms = (villages[state.currentVillageId].customFarms || []).concat(customFarm)
         state.villages = villages
     })

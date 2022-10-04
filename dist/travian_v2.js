@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/04 20:04:09";
+const BUILD_TIME = "2022/10/04 20:11:02";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -820,6 +820,7 @@ const render = (state) => {
             customFarm.position.y = parseInt($("#yCoordInput").val());
             customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val());
             customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val());
+            customFarm.nextCustomFarmTime = new Date();
             villages[state.currentVillageId].customFarms = (villages[state.currentVillageId].customFarms || []).concat(customFarm);
             state.villages = villages;
         });
