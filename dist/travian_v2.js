@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/02 21:16:56";
+const BUILD_TIME = "2022/10/04 20:04:09";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -418,7 +418,6 @@ const updateCurrentVillageStatus = (state) => {
         villages[currentVillageId].incomingTroops = incomingTroops;
         villages[currentVillageId].outgoingTroops = outgoingTroops;
         villages[currentVillageId].lastUpdatedTime = new Date();
-        villages[currentVillageId].nextCustomFarmTime = villages[currentVillageId].nextCustomFarmTime || new Date();
     }
     state.villages = villages;
 };
@@ -578,11 +577,12 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
 });
-const executeCustomFarm = (state) => __awaiter(void 0, void 0, void 0, function* () {
+const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages;
     const village = villages[state.currentVillageId];
-    const customFarm = village === null || village === void 0 ? void 0 : village.customFarm;
+    const customFarm = (_c = village.customFarms) === null || _c === void 0 ? void 0 : _c[idx];
     if (customFarm) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
             yield Utils.delayClick();
@@ -613,7 +613,7 @@ const executeCustomFarm = (state) => __awaiter(void 0, void 0, void 0, function*
         }
         else if (state.currentPage === CurrentPageEnum.BUILDING && state.currentAction === CurrentActionEnum.CUSTOM_FARM
             && params.get('gid') === '16' && params.get('tt') === '1') {
-            village.nextCustomFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(customFarm.farmIntervalMinutes.min, customFarm.farmIntervalMinutes.max), Utils.randInt(0, 59));
+            village.customFarms[idx].nextCustomFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(customFarm.farmIntervalMinutes.min, customFarm.farmIntervalMinutes.max), Utils.randInt(0, 59));
             state.villages = villages;
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
@@ -630,23 +630,25 @@ const executeCustomFarm = (state) => __awaiter(void 0, void 0, void 0, function*
 });
 const customFarm = (state) => __awaiter(void 0, void 0, void 0, function* () {
     const villages = state.villages;
+    const customFarms = villages[state.currentVillageId].customFarms || [];
     // Check current village custom farm
-    if (villages[state.currentVillageId].customFarm &&
-        villages[state.currentVillageId].nextCustomFarmTime) {
-        // @ts-ignore
-        if (new Date(villages[state.currentVillageId].nextCustomFarmTime) < new Date()) {
-            state.feature.debug && console.log("Execute custom farm");
-            yield executeCustomFarm(state);
-            return;
+    for (const idxStr in customFarms) {
+        const idx = parseInt(idxStr);
+        if (customFarms[idx].nextCustomFarmTime) {
+            // @ts-ignore
+            if (new Date(villages[state.currentVillageId].nextCustomFarmTime) < new Date()) {
+                state.feature.debug && console.log("Execute custom farm");
+                yield executeCustomFarm(state, idx);
+                return;
+            }
         }
     }
     // Check other villages
     const nextVillageIdToCustomFarm = Object.entries(state.villages)
         .filter(([_, village]) => village.id !== state.currentVillageId &&
-        village.customFarm &&
-        village.nextCustomFarmTime &&
-        new Date(village.nextCustomFarmTime) < new Date())
-        .map(([id, _]) => id)
+        village.customFarms &&
+        village.customFarms.length > 0 &&
+        village.customFarms.some(customFarm => customFarm.nextCustomFarmTime && new Date(customFarm.nextCustomFarmTime) < new Date())).map(([id, _]) => id)
         .find(_ => true);
     if (nextVillageIdToCustomFarm) {
         state.feature.debug && console.log("Go to village");
@@ -735,9 +737,7 @@ const render = (state) => {
         </div>
         <br />
         <div class="flex-row">
-            ${Object.entries(villages).map(([id, village]) => {
-        var _c, _d, _e, _f;
-        return `
+            ${Object.entries(villages).map(([id, village]) => `
                 <div class="village-container">
                     <h4>${village.name} (id: ${id}) (${village.position.x}, ${village.position.y})</h4>
                     <br />
@@ -745,22 +745,21 @@ const render = (state) => {
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
                     <br />
-                    <div class="flex-row">
-                        <div>Next custom farm time: ${Utils.formatDate(village.nextCustomFarmTime)}</div>
-                    </div>
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
-            `<div class="flex-row">
+        `<div class="flex-row">
                             <input id="minCustomFarmMinutes" style="width: 5%">min</input>
                             <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
                             <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
                         </div>`
-            : ''}
-                    ${village.customFarm ?
-            `<div>Target: (${(_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.position.x}|${(_d = village.customFarm) === null || _d === void 0 ? void 0 : _d.position.y})</div>
-                        <div>Troops: ${Object.keys(village.customFarm.troops).filter(key => { var _c; return (_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]; }).map(key => { var _c; return key + ": " + ((_c = village.customFarm) === null || _c === void 0 ? void 0 : _c.troops[key]); }).join(", ")}</div>
-                        <div>Interval Range: ${(_e = village.customFarm) === null || _e === void 0 ? void 0 : _e.farmIntervalMinutes.min}mins - ${(_f = village.customFarm) === null || _f === void 0 ? void 0 : _f.farmIntervalMinutes.max}mins</div>
-                        <button class="removeCustomFarm" village-id="${id}">x</button>`
-            : ''}
+        : ''}
+                    ${(village.customFarms || []).map((customFarm, idx) => `                    
+                    <div class="flex-row">
+                        <div>Next custom farm time: ${Utils.formatDate(customFarm.nextCustomFarmTime)}</div>
+                    </div>
+                        <div>Target: (${customFarm.position.x}|${customFarm.position.y})</div>
+                        <div>Troops: ${Object.keys(customFarm.troops).filter(key => customFarm.troops[key]).map(key => key + ": " + customFarm.troops[key]).join(", ")}</div>
+                        <div>Interval Range: ${customFarm.farmIntervalMinutes.min}mins - ${customFarm.farmIntervalMinutes.max}mins</div>
+                        <button class="removeCustomFarm" village-id="${id}" idx="${idx}">x</button>`)}
                     <br />
                     <h5>Resources</h5>
                     <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
@@ -792,8 +791,7 @@ const render = (state) => {
                         <div>${troop.type} ${troop.count} ${Utils.formatDate(troop.time)}</div>
                     `).join('')}
                 </div>
-            `;
-    }).join('')}
+            `).join('')}
         </div>
     `);
     state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2' &&
@@ -822,16 +820,17 @@ const render = (state) => {
             customFarm.position.y = parseInt($("#yCoordInput").val());
             customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val());
             customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val());
-            villages[state.currentVillageId].customFarm = customFarm;
+            villages[state.currentVillageId].customFarms = (villages[state.currentVillageId].customFarms || []).concat(customFarm);
             state.villages = villages;
         });
     $('.removeCustomFarm').on('click', (ele) => {
-        var _c;
-        const villages = state.villages;
-        const villageId = (_c = ele.target.attributes.getNamedItem('village-id')) === null || _c === void 0 ? void 0 : _c.value;
-        if (!villageId)
+        var _c, _d, _e;
+        const idx = (_c = ele.target.attributes.getNamedItem('idx')) === null || _c === void 0 ? void 0 : _c.value;
+        const villageId = (_d = ele.target.attributes.getNamedItem('village-id')) === null || _d === void 0 ? void 0 : _d.value;
+        if (!idx || !villageId)
             return;
-        delete villages[villageId].customFarm;
+        const villages = state.villages;
+        (_e = villages[villageId].customFarms) === null || _e === void 0 ? void 0 : _e.splice(Utils.parseIntIgnoreNonNumeric(idx), 1);
         state.villages = villages;
     });
     state.currentPage === CurrentPageEnum.BUILDING && $('.addCurrentToPending').on('click', () => {
