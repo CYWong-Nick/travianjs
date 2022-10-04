@@ -737,10 +737,12 @@ const executeCustomFarm = async (state: State, idx: number) => {
             const confirmButton = $("#checksum")
             if (sendTroopButton.length > 0) {
                 Object.keys(customFarm.troops).forEach(troopKey => {
-                    state.feature.debug && (console.log("Troop Key: ", troopKey))
-                    const troopInputEle = $(`input[name="${troopKey}"]`);
-                    // troopInputEle[0].click();
-                    troopInputEle.val(customFarm.troops[troopKey]);
+                    if (customFarm.troops[troopKey]) {
+                        state.feature.debug && (console.log("Troop Key: ", troopKey))
+                        const troopInputEle = $(`input[name="${troopKey}"]`);
+                        troopInputEle[0].click();
+                        troopInputEle.val(customFarm.troops[troopKey]);
+                    }
                 })
                 $("#xCoordInput").val(customFarm.position.x)
                 $("#yCoordInput").val(customFarm.position.y)

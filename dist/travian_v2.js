@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/04 20:57:42";
+const BUILD_TIME = "2022/10/04 20:59:11";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -595,10 +595,12 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
             const confirmButton = $("#checksum");
             if (sendTroopButton.length > 0) {
                 Object.keys(customFarm.troops).forEach(troopKey => {
-                    state.feature.debug && (console.log("Troop Key: ", troopKey));
-                    const troopInputEle = $(`input[name="${troopKey}"]`);
-                    // troopInputEle[0].click();
-                    troopInputEle.val(customFarm.troops[troopKey]);
+                    if (customFarm.troops[troopKey]) {
+                        state.feature.debug && (console.log("Troop Key: ", troopKey));
+                        const troopInputEle = $(`input[name="${troopKey}"]`);
+                        troopInputEle[0].click();
+                        troopInputEle.val(customFarm.troops[troopKey]);
+                    }
                 });
                 $("#xCoordInput").val(customFarm.position.x);
                 $("#yCoordInput").val(customFarm.position.y);
