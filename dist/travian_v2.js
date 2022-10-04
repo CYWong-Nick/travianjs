@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/04 20:11:02";
+const BUILD_TIME = "2022/10/04 20:15:15";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -634,9 +634,10 @@ const customFarm = (state) => __awaiter(void 0, void 0, void 0, function* () {
     // Check current village custom farm
     for (const idxStr in customFarms) {
         const idx = parseInt(idxStr);
-        if (customFarms[idx].nextCustomFarmTime) {
+        const customFarm = customFarms[idx];
+        if (customFarm.nextCustomFarmTime) {
             // @ts-ignore
-            if (new Date(villages[state.currentVillageId].nextCustomFarmTime) < new Date()) {
+            if (new Date(customFarm.nextCustomFarmTime) < new Date()) {
                 state.feature.debug && console.log("Execute custom farm");
                 yield executeCustomFarm(state, idx);
                 return;

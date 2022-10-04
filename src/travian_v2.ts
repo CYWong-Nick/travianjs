@@ -790,9 +790,10 @@ const customFarm = async (state: State) => {
     // Check current village custom farm
     for (const idxStr in customFarms) {
         const idx = parseInt(idxStr)
-        if (customFarms[idx].nextCustomFarmTime) {
+        const customFarm = customFarms[idx]
+        if (customFarm.nextCustomFarmTime) {
             // @ts-ignore
-            if (new Date(villages[state.currentVillageId].nextCustomFarmTime) < new Date()) {
+            if (new Date(customFarm.nextCustomFarmTime) < new Date()) {
                 state.feature.debug && console.log("Execute custom farm")
                 await executeCustomFarm(state, idx)
                 return
