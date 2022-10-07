@@ -864,10 +864,11 @@ const render = (state: State) => {
     }
 
     const villages = state.villages
+    const currentVillage = villages[state.currentVillageId]
     const params = new URLSearchParams(window.location.search);
 
-    if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
-        const records = villages[state.currentVillageId].pendingBuildTasks.reduce((group, task) => {
+    if (currentVillage && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
+        const records = currentVillage.pendingBuildTasks.reduce((group, task) => {
             group[task.aid] = group[task.aid] || 0
             group[task.aid]++
             return group
@@ -1001,7 +1002,7 @@ const render = (state: State) => {
 
         customFarm.nextCustomFarmTime = new Date()
 
-        villages[state.currentVillageId].customFarms = (villages[state.currentVillageId].customFarms || []).concat(customFarm)
+        currentVillage.customFarms = (currentVillage.customFarms || []).concat(customFarm)
         state.villages = villages
     })
 
@@ -1017,7 +1018,7 @@ const render = (state: State) => {
 
     state.currentPage === CurrentPageEnum.BUILDING && $('.addCurrentToPending').on('click', () => {
         const villages = state.villages
-        const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks
+        const pendingBuildTasks = currentVillage.pendingBuildTasks
 
         const params = new URLSearchParams(window.location.search);
         const aid = params.get('id')

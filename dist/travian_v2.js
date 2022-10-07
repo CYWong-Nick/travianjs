@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/04 20:59:11";
+const BUILD_TIME = "2022/10/07 12:27:50";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "1": "Woodcutter",
@@ -700,9 +700,10 @@ const render = (state) => {
             $('#addCurrentToPendingInBuilding').replaceWith(btn);
     }
     const villages = state.villages;
+    const currentVillage = villages[state.currentVillageId];
     const params = new URLSearchParams(window.location.search);
-    if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
-        const records = villages[state.currentVillageId].pendingBuildTasks.reduce((group, task) => {
+    if (currentVillage && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
+        const records = currentVillage.pendingBuildTasks.reduce((group, task) => {
             group[task.aid] = group[task.aid] || 0;
             group[task.aid]++;
             return group;
@@ -825,7 +826,7 @@ const render = (state) => {
             customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val());
             customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val());
             customFarm.nextCustomFarmTime = new Date();
-            villages[state.currentVillageId].customFarms = (villages[state.currentVillageId].customFarms || []).concat(customFarm);
+            currentVillage.customFarms = (currentVillage.customFarms || []).concat(customFarm);
             state.villages = villages;
         });
     $('.removeCustomFarm').on('click', (ele) => {
@@ -840,7 +841,7 @@ const render = (state) => {
     });
     state.currentPage === CurrentPageEnum.BUILDING && $('.addCurrentToPending').on('click', () => {
         const villages = state.villages;
-        const pendingBuildTasks = villages[state.currentVillageId].pendingBuildTasks;
+        const pendingBuildTasks = currentVillage.pendingBuildTasks;
         const params = new URLSearchParams(window.location.search);
         const aid = params.get('id');
         const gid = params.get('gid');
