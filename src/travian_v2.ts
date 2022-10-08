@@ -648,7 +648,13 @@ const build = async (state: State) => {
         }
 
         const params = new URLSearchParams(window.location.search);
-        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
+        const aid = params.get('id') 
+        const gid = params.get('gid') 
+
+        if (state.currentPage === CurrentPageEnum.BUILDING 
+            && aid === `${task.aid}`
+            && (gid === `${task.gid}` || task.gid === -1)
+        ) {
 
             // Prevent infinite loop due to mismatch in resources requirements
             const resourceRequirementEle = $('#contract .value')

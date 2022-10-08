@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/08 18:44:06";
+const BUILD_TIME = "2022/10/08 18:50:42";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -512,7 +512,11 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         const params = new URLSearchParams(window.location.search);
-        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === `${task.aid}` && params.get('gid') === `${task.gid}`) {
+        const aid = params.get('id');
+        const gid = params.get('gid');
+        if (state.currentPage === CurrentPageEnum.BUILDING
+            && aid === `${task.aid}`
+            && (gid === `${task.gid}` || task.gid === -1)) {
             // Prevent infinite loop due to mismatch in resources requirements
             const resourceRequirementEle = $('#contract .value');
             if (!resourceRequirementEle.length) {
