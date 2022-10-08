@@ -9,9 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/07 12:27:50";
+const BUILD_TIME = "2022/10/08 18:44:06";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
+    "-1": "Unknown",
     "1": "Woodcutter",
     "2": "Clay Pit",
     "3": "Iron Mine",
@@ -740,6 +741,10 @@ const render = (state) => {
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
             <div>Next farm: ${Utils.formatDate(state.nextFarmTime)}</div>
         </div>
+        <div>
+            <h4>Action</h4>
+            ${state.currentPage === CurrentPageEnum.FIELDS ? '<button id="addAllFields">Add all fields</button>' : ''}
+        </div>
         <br />
         <div class="flex-row">
             ${Object.entries(villages).map(([id, village]) => `
@@ -876,6 +881,23 @@ const render = (state) => {
             return;
         const villages = state.villages;
         villages[villageId].pendingBuildTasks.splice(Utils.parseIntIgnoreNonNumeric(idx), 1);
+        state.villages = villages;
+    });
+    state.currentPage === CurrentPageEnum.FIELDS && $('#addAllFields').on('click', (ele) => {
+        const villages = state.villages;
+        const pendingBuildTasks = currentVillage.pendingBuildTasks;
+        for (let aid = 1; aid <= 18; aid++) {
+            pendingBuildTasks.push({
+                aid,
+                gid: -1,
+                resources: {
+                    lumber: 0,
+                    clay: 0,
+                    iron: 0,
+                    crop: 0
+                }
+            });
+        }
         state.villages = villages;
     });
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin');
