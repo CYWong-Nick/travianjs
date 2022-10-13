@@ -317,6 +317,7 @@ const createStyle = () => {
         
         #console .village-container {
             flex: 0 1 33%;
+            margin-top: 10px
         }
         
         #console .ml-5 {

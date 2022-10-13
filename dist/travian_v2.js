@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/08 18:50:42";
+const BUILD_TIME = "2022/10/13 08:31:48";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -228,6 +228,7 @@ const createStyle = () => {
         
         #console .village-container {
             flex: 0 1 33%;
+            margin-top: 10px
         }
         
         #console .ml-5 {
