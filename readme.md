@@ -9,3 +9,8 @@ Install
 
 Build
 1. npm run deploy
+
+RoadMap
+1. Disable empty build queue alert for specific village
+2. Re-order build items
+3. Change village rotation strategy to ensure no village last update time > 5 mins
