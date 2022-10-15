@@ -1175,7 +1175,7 @@ const run = async (state: State) => {
             updateCurrentVillageStatus(state)
             if (state.feature.alertAttack) {
                 state.feature.debug && console.log("Checking for attacks")
-                alertAttack(state)
+                checkIncomingAttack(state)
             }
 
             if (state.feature.alertEmptyBuildQueue) {

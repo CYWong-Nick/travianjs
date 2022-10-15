@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/15 11:36:57";
+const BUILD_TIME = "2022/10/15 11:40:02";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -978,7 +978,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
             updateCurrentVillageStatus(state);
             if (state.feature.alertAttack) {
                 state.feature.debug && console.log("Checking for attacks");
-                alertAttack(state);
+                checkIncomingAttack(state);
             }
             if (state.feature.alertEmptyBuildQueue) {
                 state.feature.debug && console.log("Checking empty build queue");
