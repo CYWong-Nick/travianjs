@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/15 10:37:30";
+const BUILD_TIME = "2022/10/15 11:08:03";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -122,6 +122,7 @@ StateHandler.INITIAL_STATE = {
     nextVillageRotationTime: new Date(),
     nextScoutTime: new Date(),
     nextFarmTime: new Date(),
+    alertedPlusIncomingAttack: false,
     telegramChatId: '',
     telegramToken: '',
     username: '',
@@ -426,24 +427,40 @@ const updateCurrentVillageStatus = (state) => {
     }
     state.villages = villages;
 };
-const alertAttack = (state) => {
+const alertAttack = (state, village, attackTime) => {
     const villages = state.villages;
-    const village = villages[state.currentVillageId];
-    const attack = village.incomingTroops.find(e => e.type === TroopMovementType.ATTACK);
-    if (attack) {
-        if (!state.telegramChatId || !state.telegramToken) {
-            state.feature.debug && console.log("Telegram chat id or token not set");
-            return;
-        }
+    if (!state.telegramChatId || !state.telegramToken) {
+        state.feature.debug && console.log("Telegram chat id or token not set");
+        return;
+    }
+    if (village) {
         if (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date()) {
             state.feature.debug && console.log(`Send alert for attack at village ${village.name}`);
             village.attackAlertBackoff = Utils.addToDate(new Date(), 0, 5, 0);
             state.villages = villages;
-            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} under attack at ${Utils.formatDate(attack.time)}`);
+            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} under attack ${attackTime && `at ${Utils.formatDate(attackTime)}`}`);
         }
         else {
             state.feature.debug && console.log(`Not alerting attack due to backoff at ${Utils.formatDate(village.attackAlertBackoff)}`);
         }
+    }
+};
+const checkIncomingAttack = (state) => {
+    const villages = state.villages;
+    const village = villages[state.currentVillageId];
+    const attack = village.incomingTroops.find(e => e.type === TroopMovementType.ATTACK);
+    if (attack) {
+        alertAttack(state, village, attack.time);
+    }
+    const plusAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) => {
+        return $(attack).css('visibility') !== 'hidden';
+    });
+    if (plusAttack.length > 0 && !state.alertedPlusIncomingAttack) {
+        alertAttack(state);
+        state.alertedPlusIncomingAttack = true;
+    }
+    else if (plusAttack.length === 0 && state.alertedPlusIncomingAttack) {
+        state.alertedPlusIncomingAttack = false;
     }
 };
 const alertEmptyBuildQueue = (state) => {
