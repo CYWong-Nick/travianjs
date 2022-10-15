@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/15 11:44:30";
+const BUILD_TIME = "2022/10/15 21:09:59";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -610,7 +610,9 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (new Date(state.nextFarmTime) < new Date()) {
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
-            const startButtonEle = $('.startButton[value=Start]');
+            const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
+                return $(button).parent().parent().find('.listName').find('span').text() !== "Scout";
+            });
             for (let i = 0; i < startButtonEle.length; i++) {
                 yield Utils.delayClick();
                 startButtonEle[i].click();

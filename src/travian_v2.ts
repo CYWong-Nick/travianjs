@@ -759,7 +759,9 @@ const farm = async (state: State) => {
     if (new Date(state.nextFarmTime) < new Date()) {
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
-            const startButtonEle = $('.startButton[value=Start]')
+            const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
+                return $(button).parent().parent().find('.listName').find('span').text() !== "Scout"
+            })
             for (let i = 0; i < startButtonEle.length; i++) {
                 await Utils.delayClick()
                 startButtonEle[i].click()
