@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/15 11:40:02";
+const BUILD_TIME = "2022/10/15 11:44:30";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -444,6 +444,10 @@ const alertAttack = (state, village, attackTime) => {
             state.feature.debug && console.log(`Not alerting attack due to backoff at ${Utils.formatDate(village.attackAlertBackoff)}`);
         }
     }
+    else {
+        fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village is under attack`);
+        state.alertedPlusIncomingAttack = true;
+    }
 };
 const checkIncomingAttack = (state) => {
     const villages = state.villages;
@@ -455,7 +459,6 @@ const checkIncomingAttack = (state) => {
     const plusNoAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) => $(attack).css('visibility') === 'hidden');
     if (plusNoAttack.length !== Object.keys(villages).length && !state.alertedPlusIncomingAttack) {
         alertAttack(state);
-        state.alertedPlusIncomingAttack = true;
     }
     else if (plusNoAttack.length === Object.keys(villages).length && state.alertedPlusIncomingAttack) {
         state.alertedPlusIncomingAttack = false;

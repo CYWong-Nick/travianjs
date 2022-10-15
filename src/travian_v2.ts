@@ -575,6 +575,9 @@ const alertAttack = (state: State, village?: Village, attackTime?: Date) => {
         } else {
             state.feature.debug && console.log(`Not alerting attack due to backoff at ${Utils.formatDate(village.attackAlertBackoff)}`)
         }
+    } else {
+        fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village is under attack`)
+        state.alertedPlusIncomingAttack = true
     }
 }
 
@@ -590,7 +593,6 @@ const checkIncomingAttack = (state: State) => {
         $(attack).css('visibility') === 'hidden')
     if (plusNoAttack.length !== Object.keys(villages).length && !state.alertedPlusIncomingAttack) {
         alertAttack(state)
-        state.alertedPlusIncomingAttack = true
     } else if (plusNoAttack.length === Object.keys(villages).length && state.alertedPlusIncomingAttack) {
         state.alertedPlusIncomingAttack = false
     }
