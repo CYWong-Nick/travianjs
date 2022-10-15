@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/13 08:31:48";
+const BUILD_TIME = "2022/10/15 10:37:30";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -72,6 +72,7 @@ var CurrentActionEnum;
     CurrentActionEnum["IDLE"] = "IDLE";
     CurrentActionEnum["BUILD"] = "BUILD";
     CurrentActionEnum["NAVIGATE_TO_FIELDS"] = "NAVIGATE_TO_FIELDS";
+    CurrentActionEnum["SCOUT"] = "SCOUT";
     CurrentActionEnum["FARM"] = "FARM";
     CurrentActionEnum["CUSTOM_FARM"] = "CUSTOM_FARM";
 })(CurrentActionEnum || (CurrentActionEnum = {}));
@@ -113,11 +114,13 @@ StateHandler.INITIAL_STATE = {
         alertAttack: false,
         alertEmptyBuildQueue: false,
         alertResourceCapacityFull: false,
+        autoScout: false,
         autoFarm: false,
         autoCustomFarm: false,
         debug: false
     },
     nextVillageRotationTime: new Date(),
+    nextScoutTime: new Date(),
     nextFarmTime: new Date(),
     telegramChatId: '',
     telegramToken: '',
@@ -555,6 +558,36 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
         state.currentAction = CurrentActionEnum.IDLE;
     }
 });
+const scout = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    if (new Date(state.nextScoutTime) < new Date()) {
+        const params = new URLSearchParams(window.location.search);
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
+            const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
+                return $(button).parent().parent().find('.listName').find('span').text() === "Scout";
+            });
+            for (let i = 0; i < startButtonEle.length; i++) {
+                yield Utils.delayClick();
+                startButtonEle[i].click();
+            }
+            state.nextScoutTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0);
+            yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            return;
+        }
+        else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
+            yield Utils.delayClick();
+            $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click();
+            return;
+        }
+        else if (state.currentPage === CurrentPageEnum.TOWN) {
+            yield Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.SCOUT);
+            return;
+        }
+        else {
+            yield Navigation.goToTown(state, CurrentActionEnum.SCOUT);
+            return;
+        }
+    }
+});
 const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (new Date(state.nextFarmTime) < new Date()) {
         const params = new URLSearchParams(window.location.search);
@@ -732,6 +765,7 @@ const render = (state) => {
             <input id="toggleAutoLogin" class="ml-5" type="checkbox" ${state.feature.autoLogin ? 'checked' : ''}/> Auto login
             <input id="toggleAutoScan" class="ml-5" type="checkbox" ${state.feature.autoScan ? 'checked' : ''}/> Auto village rotation
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
+            <input id="toggleAutoScout" class="ml-5" type="checkbox" ${state.feature.autoScout ? 'checked' : ''}/> Auto scout
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
             <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
@@ -744,6 +778,7 @@ const render = (state) => {
             <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
             <div>Current Action: ${state.currentAction}</div>
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
+            <div>Next scout: ${Utils.formatDate(state.nextScoutTime)}</div>
             <div>Next farm: ${Utils.formatDate(state.nextFarmTime)}</div>
         </div>
         <div>
@@ -908,6 +943,7 @@ const render = (state) => {
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin');
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan');
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild');
+    handleFeatureToggle('#toggleAutoScout', state, 'autoScout');
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm');
     handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm');
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack');
@@ -946,6 +982,15 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
                     state.currentAction = CurrentActionEnum.IDLE;
                 else
                     yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            }
+            if ([CurrentActionEnum.IDLE, CurrentActionEnum.SCOUT].includes(state.currentAction)) {
+                if (state.feature.autoScout) {
+                    state.feature.debug && console.log("Attempting scout");
+                    yield scout(state);
+                }
+                else {
+                    state.currentAction = CurrentActionEnum.IDLE;
+                }
             }
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.FARM].includes(state.currentAction)) {
                 if (state.feature.autoFarm) {
