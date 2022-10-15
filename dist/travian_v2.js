@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/15 11:08:03";
+const BUILD_TIME = "2022/10/15 11:36:57";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -452,14 +452,12 @@ const checkIncomingAttack = (state) => {
     if (attack) {
         alertAttack(state, village, attack.time);
     }
-    const plusAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) => {
-        return $(attack).css('visibility') !== 'hidden';
-    });
-    if (plusAttack.length > 0 && !state.alertedPlusIncomingAttack) {
+    const plusNoAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) => $(attack).css('visibility') === 'hidden');
+    if (plusNoAttack.length !== Object.keys(villages).length && !state.alertedPlusIncomingAttack) {
         alertAttack(state);
         state.alertedPlusIncomingAttack = true;
     }
-    else if (plusAttack.length === 0 && state.alertedPlusIncomingAttack) {
+    else if (plusNoAttack.length === Object.keys(villages).length && state.alertedPlusIncomingAttack) {
         state.alertedPlusIncomingAttack = false;
     }
 };
