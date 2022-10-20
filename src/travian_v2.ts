@@ -1193,7 +1193,7 @@ const render = (state: State) => {
                         <input id="evadeRaidTargetY-${id}" style="width: 5%">y</input>
                         <button id="updateEvadeRaidTarget-${id}" class="ml-5">Update</button>
                     </div>
-                    <input id="toggleAutoEvade" class="ml-5" type="checkbox" ${village.autoEvade ? 'checked' : ''} />Enable Auto Evade
+                    <input id="toggleAutoEvade-${id}" class="ml-5" type="checkbox" ${village.autoEvade ? 'checked' : ''} />Enable Auto Evade
                     
                     <br />
                     <h5>Resources</h5>

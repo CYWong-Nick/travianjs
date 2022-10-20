@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 00:48:16";
+const BUILD_TIME = "2022/10/21 00:50:40";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1006,7 +1006,7 @@ const render = (state) => {
                         <input id="evadeRaidTargetY-${id}" style="width: 5%">y</input>
                         <button id="updateEvadeRaidTarget-${id}" class="ml-5">Update</button>
                     </div>
-                    <input id="toggleAutoEvade" class="ml-5" type="checkbox" ${village.autoEvade ? 'checked' : ''} />Enable Auto Evade
+                    <input id="toggleAutoEvade-${id}" class="ml-5" type="checkbox" ${village.autoEvade ? 'checked' : ''} />Enable Auto Evade
                     
                     <br />
                     <h5>Resources</h5>
