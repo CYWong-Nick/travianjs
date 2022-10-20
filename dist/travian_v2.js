@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/20 22:14:52";
+const BUILD_TIME = "2022/10/20 22:19:26";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -840,6 +840,7 @@ const render = (state) => {
                         <div>Target: (${customFarm.position.x}|${customFarm.position.y})</div>
                         <div>Troops: ${Object.keys(customFarm.troops).filter(key => customFarm.troops[key]).map(key => key + ": " + customFarm.troops[key]).join(", ")}</div>
                         <div>Interval Range: ${customFarm.farmIntervalMinutes.min}mins - ${customFarm.farmIntervalMinutes.max}mins</div>
+                        <div>Type: ${customFarm.type === FarmType.ATTACK ? 'Attack' : 'Raid'}</div>
                         <button class="removeCustomFarm" village-id="${id}" idx="${idx}">x</button>`)}
                     <br />
                     <h5>Resources</h5>

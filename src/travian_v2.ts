@@ -1014,6 +1014,7 @@ const render = (state: State) => {
                         <div>Target: (${customFarm.position.x}|${customFarm.position.y})</div>
                         <div>Troops: ${Object.keys(customFarm.troops).filter(key => customFarm.troops[key]).map(key => key + ": " + customFarm.troops[key]).join(", ")}</div>
                         <div>Interval Range: ${customFarm.farmIntervalMinutes.min}mins - ${customFarm.farmIntervalMinutes.max}mins</div>
+                        <div>Type: ${customFarm.type === FarmType.ATTACK ? 'Attack' : 'Raid'}</div>
                         <button class="removeCustomFarm" village-id="${id}" idx="${idx}">x</button>`)}
                     <br />
                     <h5>Resources</h5>
