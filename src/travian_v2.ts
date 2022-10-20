@@ -1016,7 +1016,32 @@ const render = (state: State) => {
             }
         })
     }
-
+    
+    if (state.currentPage === CurrentPageEnum.REPORT) {
+        const resourcesFromReport = {
+            lumber: 0,
+            clay: 0,
+            iron: 0,
+            crop: 0
+        };
+        resourcesFromReport.lumber = Utils.parseIntIgnoreNonNumeric($($('.resources').find('span.value')[0]).text());
+        resourcesFromReport.clay = Utils.parseIntIgnoreNonNumeric($($('.resources').find('span.value')[1]).text());
+        resourcesFromReport.iron = Utils.parseIntIgnoreNonNumeric($($('.resources').find('span.value')[2]).text());
+        resourcesFromReport.crop = Utils.parseIntIgnoreNonNumeric($($('.resources').find('span.value')[3]).text());
+        const sum = resourcesFromReport.lumber + resourcesFromReport.clay + resourcesFromReport.iron + resourcesFromReport.crop;
+        const cranny = Utils.parseIntIgnoreNonNumeric($('.rArea').text());
+        const troops70 = `<div id="troops-required-70">Troops Required: ${Math.ceil((sum - cranny * 4) / 70)} | ${Math.ceil((sum - (cranny * 0.85) * 4) / 70)} with hero (70 per troop)</div>`;
+        if ($('#troops-required-70').length === 0)
+            $(".additionalInformation").after(troops70);
+        else
+            $('#troops-required-70').replaceWith(troops70);
+        const troops50 = `<div id="troops-required-50">Troops Required: ${Math.ceil((sum - cranny * 4) / 50)} | ${Math.ceil((sum - (cranny * 0.85) * 4) / 50)} with hero (50 per troop)</div>`;
+        if ($('#troops-required-50').length === 0)
+            $(".additionalInformation").after(troops50);
+        else
+            $('#troops-required-50').replaceWith(troops50);
+    }
+    
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
@@ -1025,6 +1050,7 @@ const render = (state: State) => {
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAutoScout" class="ml-5" type="checkbox" ${state.feature.autoScout ? 'checked' : ''}/> Auto scout
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
+            <input id="toggleDisableStopOnLoss" class="ml-5" type="checkbox" ${state.feature.disableStopOnLoss ? 'checked' : ''}/> Disable stop on loss
             <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
@@ -1035,6 +1061,12 @@ const render = (state: State) => {
             <h4>Summary (Build: ${BUILD_TIME})</h4>
             <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
             <div>Current Action: ${state.currentAction}</div>
+            <div>Interval Range: ${state.farmIntervalMinutes.min}mins - ${state.farmIntervalMinutes.max}mins</div>
+            <div class="flex-row">
+                <input id="minFarmMinutes" style="width: 5%">min</input>
+                <input id="maxFarmMinutes" style="width: 5%">max</input>
+                <button id="updateFarmInterval" class="ml-5">Update</button>
+            </div>
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
             <div>Next scout: ${Utils.formatDate(state.nextScoutTime)}</div>
             <div>Next farm: ${Utils.formatDate(state.nextFarmTime)}</div>
@@ -1224,11 +1256,20 @@ const render = (state: State) => {
         state.villages = villages
     })
 
+    $('#updateFarmInterval').on('click', () => {
+        const farmIntervalMinutes = {
+            min: parseInt($("#minFarmMinutes").val() as string),
+            max: parseInt($("#maxFarmMinutes").val() as string)
+        };
+        state.farmIntervalMinutes = farmIntervalMinutes;
+    });
+
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin')
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan')
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')
     handleFeatureToggle('#toggleAutoScout', state, 'autoScout')
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm')
+    handleFeatureToggle('#toggleDisableStopOnLoss', state, 'disableStopOnLoss');
     handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm')
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue')
