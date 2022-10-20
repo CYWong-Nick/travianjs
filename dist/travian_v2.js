@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 00:58:56";
+const BUILD_TIME = "2022/10/21 01:22:04";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -722,6 +722,7 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages;
     const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.evadeTime < new Date());
+    console.log(villageRequireEvade);
     if (villageRequireEvade) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
             yield Utils.delayClick();
@@ -758,6 +759,7 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
             return;
         }
         else if (state.currentPage === CurrentPageEnum.TOWN) {
+            console.log("Go to building");
             yield Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.EVADE);
             return;
         }

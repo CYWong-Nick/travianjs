@@ -872,6 +872,7 @@ const checkAutoEvade = async (state: State) => {
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages
     const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.evadeTime! < new Date())
+    console.log(villageRequireEvade)
 
     if (villageRequireEvade) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
@@ -914,6 +915,7 @@ const checkAutoEvade = async (state: State) => {
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
+            console.log("Go to building")
             await Navigation.goToBuilding(
                 state,
                 39,
