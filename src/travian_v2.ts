@@ -80,8 +80,8 @@ interface Feature {
 }
 
 enum FarmType {
-    'ATTACK',
-    'RAID'
+    ATTACK = 'ATTACK',
+    RAID = 'RAID'
 }
 
 interface CustomFarm {
