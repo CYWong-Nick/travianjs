@@ -911,6 +911,7 @@ const checkAutoEvade = async (state: State) => {
         } else if (state.currentPage === CurrentPageEnum.BUILDING && state.currentAction === CurrentActionEnum.EVADE
             && params.get('gid') === '16' && params.get('tt') === '1') {
             informTroopsEvaded(state, villageRequireEvade)
+            villageRequireEvade.evadeTime = undefined
 
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
