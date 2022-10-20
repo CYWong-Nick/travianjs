@@ -79,11 +79,17 @@ interface Feature {
     debug: boolean
 }
 
+enum FarmType {
+    'ATTACK',
+    'RAID'
+}
+
 interface CustomFarm {
     nextCustomFarmTime?: Date,
     position: Position,
     farmIntervalMinutes: { min: number, max: number },
-    troops: Record<string, string>
+    troops: Record<string, string>,
+    type: FarmType
 }
 
 interface State {
@@ -811,6 +817,12 @@ const executeCustomFarm = async (state: State, idx: number) => {
                 $("#xCoordInput").val(customFarm.position.x)
                 $("#yCoordInput").val(customFarm.position.y)
 
+                if (customFarm.type === FarmType.ATTACK) {
+                    $('.radio')[1].click()
+                } else {
+                    $('.radio')[2].click()
+                }
+
                 $("#build > div > form > div.option > label:nth-child(5) > input")[0].click();
 
                 await Utils.delayClick();
@@ -1046,6 +1058,7 @@ const render = (state: State) => {
                 "x": -999,
                 "y": -999
             },
+            type: FarmType.RAID,
             farmIntervalMinutes: {
                 "min": 999,
                 "max": 999
@@ -1063,6 +1076,9 @@ const render = (state: State) => {
                 }
             }
         )
+
+        const typeString = $('input[type=radio]:checked').parent().text()
+        customFarm.type = typeString.includes('Normal') ? FarmType.ATTACK : FarmType.RAID
 
         customFarm.position.x = parseInt($("#xCoordInput").val() as string)
         customFarm.position.y = parseInt($("#yCoordInput").val() as string)

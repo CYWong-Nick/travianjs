@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/15 21:09:59";
+const BUILD_TIME = "2022/10/20 22:14:52";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -76,6 +76,11 @@ var CurrentActionEnum;
     CurrentActionEnum["FARM"] = "FARM";
     CurrentActionEnum["CUSTOM_FARM"] = "CUSTOM_FARM";
 })(CurrentActionEnum || (CurrentActionEnum = {}));
+var FarmType;
+(function (FarmType) {
+    FarmType[FarmType["ATTACK"] = 0] = "ATTACK";
+    FarmType[FarmType["RAID"] = 1] = "RAID";
+})(FarmType || (FarmType = {}));
 class StateHandler {
     constructor() {
         this.parseState = (prop) => {
@@ -663,6 +668,12 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
                 });
                 $("#xCoordInput").val(customFarm.position.x);
                 $("#yCoordInput").val(customFarm.position.y);
+                if (customFarm.type === FarmType.ATTACK) {
+                    $('.radio')[1].click();
+                }
+                else {
+                    $('.radio')[2].click();
+                }
                 $("#build > div > form > div.option > label:nth-child(5) > input")[0].click();
                 yield Utils.delayClick();
                 sendTroopButton[0].click();
@@ -872,6 +883,7 @@ const render = (state) => {
                     "x": -999,
                     "y": -999
                 },
+                type: FarmType.RAID,
                 farmIntervalMinutes: {
                     "min": 999,
                     "max": 999
@@ -886,6 +898,8 @@ const render = (state) => {
                     customFarm.troops[troopKey] = troopCount;
                 }
             });
+            const typeString = $('input[type=radio]:checked').parent().text();
+            customFarm.type = typeString.includes('Normal') ? FarmType.ATTACK : FarmType.RAID;
             customFarm.position.x = parseInt($("#xCoordInput").val());
             customFarm.position.y = parseInt($("#yCoordInput").val());
             customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val());
