@@ -54,6 +54,9 @@ enum CurrentPageEnum {
     FIELDS = "FIELDS",
     TOWN = "TOWN",
     BUILDING = "BUILDING",
+    REPORT = "REPORT",
+    OFF_REPORT = "OFF_REPORT",
+    SCOUT_REPORT = "SCOUT_REPORT",
     UNKNOWN = "UNKNOWN"
 }
 
@@ -75,6 +78,7 @@ interface Feature {
     alertResourceCapacityFull: boolean
     autoScout: boolean
     autoFarm: boolean
+    disableStopOnLoss: boolean
     autoCustomFarm: boolean
     debug: boolean
 }
@@ -101,6 +105,8 @@ interface State {
     nextVillageRotationTime: Date
     nextScoutTime: Date
     nextFarmTime: Date
+    nextCheckReportTime: Date
+    farmIntervalMinutes: { min: number, max: number }
     alertedPlusIncomingAttack: boolean
     telegramChatId: string
     telegramToken: string
@@ -123,12 +129,15 @@ class StateHandler implements ProxyHandler<State> {
             alertResourceCapacityFull: false,
             autoScout: false,
             autoFarm: false,
+            disableStopOnLoss: false,
             autoCustomFarm: false,
             debug: false
         },
         nextVillageRotationTime: new Date(),
         nextScoutTime: new Date(),
         nextFarmTime: new Date(),
+        nextCheckReportTime: new Date(),
+        farmIntervalMinutes: { min: 2, max: 4 },
         alertedPlusIncomingAttack: false,
         telegramChatId: '',
         telegramToken: '',
@@ -256,6 +265,14 @@ class Navigation {
         $('.village.buildingView')[0].click()
         return true
     }
+
+    static goToReport = async (state: State, action: CurrentActionEnum): Promise<boolean> => {
+        await Utils.delayClick()
+        state.currentAction = action
+        state.feature.debug && console.log('Go to report')
+        $('.reports')[0].click()
+        return true
+    }
 }
 
 interface Resource {
@@ -372,6 +389,19 @@ const updateCurrentPage = (state: State) => {
         }
         case '/build.php': {
             state.currentPage = CurrentPageEnum.BUILDING
+            break
+        }
+        case '/report':
+        case '/report/overview': {
+            state.currentPage = CurrentPageEnum.REPORT
+            break
+        }
+        case '/report/offensive': {
+            state.currentPage = CurrentPageEnum.OFF_REPORT
+            break
+        }
+        case '/report/scouting': {
+            state.currentPage = CurrentPageEnum.SCOUT_REPORT
             break
         }
         case '/': {
@@ -764,7 +794,25 @@ const scout = async (state: State) => {
 const farm = async (state: State) => {
     if (new Date(state.nextFarmTime) < new Date()) {
         const params = new URLSearchParams(window.location.search);
-        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
+        if (state.currentPage === CurrentPageEnum.REPORT) {
+            await Utils.delayClick()
+            $('a[href="/report/offensive"]')[0].click()
+            return
+        } else if (state.currentPage === CurrentPageEnum.OFF_REPORT) {
+            const unreadReports = $("#overview > tbody").find(".messageStatusUnread")
+            // const unreadReports = $("#overview > tbody").find(".messageStatusUnread")
+            //     .filter((_, msg) => !$($(msg).parent().parent().find('a')[2]).text().includes("Unoccupied oasis"))
+            state.feature.debug && console.log("Unread report: " + unreadReports.length)
+            if (unreadReports.length > 0) {
+                const feature = state.feature;
+                feature.autoFarm = false;
+                state.feature = feature;
+                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`)
+            }
+            state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0)
+            await Navigation.goToTown(state, CurrentActionEnum.FARM)
+            return
+        } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
             const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
                 return $(button).parent().parent().find('.listName').find('span').text() !== "Scout"
             })
@@ -772,7 +820,7 @@ const farm = async (state: State) => {
                 await Utils.delayClick()
                 startButtonEle[i].click()
             }
-            state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0)
+            state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59))
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
@@ -780,10 +828,18 @@ const farm = async (state: State) => {
             $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click()
             return
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
-            await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
+            if (!state.feature.disableStopOnLoss && new Date(state.nextCheckReportTime) < new Date()) {
+                await Navigation.goToReport(state, CurrentActionEnum.FARM)
+            } else {
+                await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
+            }
             return
         } else {
-            await Navigation.goToTown(state, CurrentActionEnum.FARM)
+            if (!state.feature.disableStopOnLoss && new Date(state.nextCheckReportTime) < new Date()) {
+                await Navigation.goToReport(state, CurrentActionEnum.FARM)
+            } else {
+                await Navigation.goToTown(state, CurrentActionEnum.FARM)
+            }
             return
         }
     }
@@ -822,8 +878,6 @@ const executeCustomFarm = async (state: State, idx: number) => {
                 } else {
                     $('.radio')[2].click()
                 }
-
-                $("#build > div > form > div.option > label:nth-child(5) > input")[0].click();
 
                 await Utils.delayClick();
                 sendTroopButton[0].click();

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/20 22:22:28";
+const BUILD_TIME = "2022/10/20 22:31:47";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -65,6 +65,9 @@ var CurrentPageEnum;
     CurrentPageEnum["FIELDS"] = "FIELDS";
     CurrentPageEnum["TOWN"] = "TOWN";
     CurrentPageEnum["BUILDING"] = "BUILDING";
+    CurrentPageEnum["REPORT"] = "REPORT";
+    CurrentPageEnum["OFF_REPORT"] = "OFF_REPORT";
+    CurrentPageEnum["SCOUT_REPORT"] = "SCOUT_REPORT";
     CurrentPageEnum["UNKNOWN"] = "UNKNOWN";
 })(CurrentPageEnum || (CurrentPageEnum = {}));
 var CurrentActionEnum;
@@ -121,12 +124,15 @@ StateHandler.INITIAL_STATE = {
         alertResourceCapacityFull: false,
         autoScout: false,
         autoFarm: false,
+        disableStopOnLoss: false,
         autoCustomFarm: false,
         debug: false
     },
     nextVillageRotationTime: new Date(),
     nextScoutTime: new Date(),
     nextFarmTime: new Date(),
+    nextCheckReportTime: new Date(),
+    farmIntervalMinutes: { min: 2, max: 4 },
     alertedPlusIncomingAttack: false,
     telegramChatId: '',
     telegramToken: '',
@@ -213,6 +219,13 @@ Navigation.goToTown = (state, action) => __awaiter(void 0, void 0, void 0, funct
     $('.village.buildingView')[0].click();
     return true;
 });
+Navigation.goToReport = (state, action) => __awaiter(void 0, void 0, void 0, function* () {
+    yield Utils.delayClick();
+    state.currentAction = action;
+    state.feature.debug && console.log('Go to report');
+    $('.reports')[0].click();
+    return true;
+});
 var TroopMovementType;
 (function (TroopMovementType) {
     TroopMovementType["REINFORCE"] = "REINFORCE";
@@ -277,6 +290,19 @@ const updateCurrentPage = (state) => {
         }
         case '/build.php': {
             state.currentPage = CurrentPageEnum.BUILDING;
+            break;
+        }
+        case '/report':
+        case '/report/overview': {
+            state.currentPage = CurrentPageEnum.REPORT;
+            break;
+        }
+        case '/report/offensive': {
+            state.currentPage = CurrentPageEnum.OFF_REPORT;
+            break;
+        }
+        case '/report/scouting': {
+            state.currentPage = CurrentPageEnum.SCOUT_REPORT;
             break;
         }
         case '/': {
@@ -614,7 +640,27 @@ const scout = (state) => __awaiter(void 0, void 0, void 0, function* () {
 const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
     if (new Date(state.nextFarmTime) < new Date()) {
         const params = new URLSearchParams(window.location.search);
-        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
+        if (state.currentPage === CurrentPageEnum.REPORT) {
+            yield Utils.delayClick();
+            $('a[href="/report/offensive"]')[0].click();
+            return;
+        }
+        else if (state.currentPage === CurrentPageEnum.OFF_REPORT) {
+            const unreadReports = $("#overview > tbody").find(".messageStatusUnread");
+            // const unreadReports = $("#overview > tbody").find(".messageStatusUnread")
+            //     .filter((_, msg) => !$($(msg).parent().parent().find('a')[2]).text().includes("Unoccupied oasis"))
+            state.feature.debug && console.log("Unread report: " + unreadReports.length);
+            if (unreadReports.length > 0) {
+                const feature = state.feature;
+                feature.autoFarm = false;
+                state.feature = feature;
+                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`);
+            }
+            state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0);
+            yield Navigation.goToTown(state, CurrentActionEnum.FARM);
+            return;
+        }
+        else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
             const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
                 return $(button).parent().parent().find('.listName').find('span').text() !== "Scout";
             });
@@ -622,7 +668,7 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 yield Utils.delayClick();
                 startButtonEle[i].click();
             }
-            state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0);
+            state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59));
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
         }
@@ -632,11 +678,21 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         else if (state.currentPage === CurrentPageEnum.TOWN) {
-            yield Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM);
+            if (!state.feature.disableStopOnLoss && new Date(state.nextCheckReportTime) < new Date()) {
+                yield Navigation.goToReport(state, CurrentActionEnum.FARM);
+            }
+            else {
+                yield Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM);
+            }
             return;
         }
         else {
-            yield Navigation.goToTown(state, CurrentActionEnum.FARM);
+            if (!state.feature.disableStopOnLoss && new Date(state.nextCheckReportTime) < new Date()) {
+                yield Navigation.goToReport(state, CurrentActionEnum.FARM);
+            }
+            else {
+                yield Navigation.goToTown(state, CurrentActionEnum.FARM);
+            }
             return;
         }
     }
@@ -674,7 +730,6 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
                 else {
                     $('.radio')[2].click();
                 }
-                $("#build > div > form > div.option > label:nth-child(5) > input")[0].click();
                 yield Utils.delayClick();
                 sendTroopButton[0].click();
             }
