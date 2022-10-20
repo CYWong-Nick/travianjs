@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 00:41:19";
+const BUILD_TIME = "2022/10/21 00:48:16";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1002,9 +1002,9 @@ const render = (state) => {
                     <h5>Auto Evade</h5>
                     <div>Evade Raid Target: ${village.evadeRaidPosition ? `(${village.evadeRaidPosition.x}|${village.evadeRaidPosition.y})` : 'N/A'}</div>
                     <div class="flex-row">
-                        <input id="evadeRaidTargetX" style="width: 5%">x</input>
-                        <input id="evadeRaidTargetY" style="width: 5%">y</input>
-                        <button id="updateEvadeRaidTarget" class="ml-5">Update</button>
+                        <input id="evadeRaidTargetX-${id}" style="width: 5%">x</input>
+                        <input id="evadeRaidTargetY-${id}" style="width: 5%">y</input>
+                        <button id="updateEvadeRaidTarget-${id}" class="ml-5">Update</button>
                     </div>
                     <input id="toggleAutoEvade" class="ml-5" type="checkbox" ${village.autoEvade ? 'checked' : ''} />Enable Auto Evade
                     
@@ -1042,22 +1042,20 @@ const render = (state) => {
             `).join('')}
         </div>
     `);
-    $('#updateEvadeRaidTarget').on('click', () => {
-        const villages = state.villages;
-        const positionX = parseInt($("#evadeRaidTargetX").val());
-        const positionY = parseInt($("#evadeRaidTargetY").val());
-        currentVillage.evadeRaidPosition = {
-            x: positionX,
-            y: positionY
-        };
-        console.log({
-            x: positionX,
-            y: positionY
+    Object.values(villages).forEach(village => {
+        $(`#updateEvadeRaidTarget-${village.id}`).on('click', () => {
+            const villages = state.villages;
+            const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val());
+            const positionY = parseInt($(`#evadeRaidTargetY-${village.id}`).val());
+            currentVillage.evadeRaidPosition = {
+                x: positionX,
+                y: positionY
+            };
+            state.villages = villages;
         });
-        state.villages = villages;
-    });
-    $('#toggleAutoEvade').on('click', () => {
-        currentVillage.autoEvade = !currentVillage.autoEvade;
+        $(`#toggleAutoEvade-${village.id}`).on('click', () => {
+            currentVillage.autoEvade = !currentVillage.autoEvade;
+        });
     });
     state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2' &&
         $('#addCurrentToCustomFarm').on('click', () => {

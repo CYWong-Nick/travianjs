@@ -1189,9 +1189,9 @@ const render = (state: State) => {
                     <h5>Auto Evade</h5>
                     <div>Evade Raid Target: ${village.evadeRaidPosition ? `(${village.evadeRaidPosition.x}|${village.evadeRaidPosition.y})` : 'N/A'}</div>
                     <div class="flex-row">
-                        <input id="evadeRaidTargetX" style="width: 5%">x</input>
-                        <input id="evadeRaidTargetY" style="width: 5%">y</input>
-                        <button id="updateEvadeRaidTarget" class="ml-5">Update</button>
+                        <input id="evadeRaidTargetX-${id}" style="width: 5%">x</input>
+                        <input id="evadeRaidTargetY-${id}" style="width: 5%">y</input>
+                        <button id="updateEvadeRaidTarget-${id}" class="ml-5">Update</button>
                     </div>
                     <input id="toggleAutoEvade" class="ml-5" type="checkbox" ${village.autoEvade ? 'checked' : ''} />Enable Auto Evade
                     
@@ -1230,25 +1230,24 @@ const render = (state: State) => {
         </div>
     `)
 
-    $('#updateEvadeRaidTarget').on('click', () => {
-        const villages = state.villages
-        const positionX = parseInt($("#evadeRaidTargetX").val() as string)
-        const positionY = parseInt($("#evadeRaidTargetY").val() as string)
+    Object.values(villages).forEach(village => {
+        $(`#updateEvadeRaidTarget-${village.id}`).on('click', () => {
+            const villages = state.villages
+            const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val() as string)
+            const positionY = parseInt($(`#evadeRaidTargetY-${village.id}`).val() as string)
 
-        currentVillage.evadeRaidPosition = {
-            x: positionX,
-            y: positionY
-        } as Position
-        console.log({
-            x: positionX,
-            y: positionY
-        } as Position)
+            currentVillage.evadeRaidPosition = {
+                x: positionX,
+                y: positionY
+            } as Position
 
-        state.villages = villages
+            state.villages = villages
+        })
+        $(`#toggleAutoEvade-${village.id}`).on('click', () => {
+            currentVillage.autoEvade = !currentVillage.autoEvade
+        })
     })
-    $('#toggleAutoEvade').on('click', () => {
-        currentVillage.autoEvade = !currentVillage.autoEvade
-    })
+
 
     state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2' &&
     $('#addCurrentToCustomFarm').on('click', () => {
@@ -1402,7 +1401,7 @@ const run = async (state: State) => {
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
             updateVillageList(state)
             updateCurrentVillageStatus(state)
-            
+
             await checkAutoEvade(state)
 
             if (state.feature.alertAttack) {
