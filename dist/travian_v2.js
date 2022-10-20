@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/20 22:56:52";
+const BUILD_TIME = "2022/10/20 23:04:00";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -845,7 +845,7 @@ const render = (state) => {
             }
         });
     }
-    else if (state.currentPage === CurrentPageEnum.REPORT) {
+    else if ([CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
         const resourcesFromReport = {
             lumber: 0,
             clay: 0,

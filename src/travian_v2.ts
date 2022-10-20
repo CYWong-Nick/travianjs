@@ -1015,7 +1015,7 @@ const render = (state: State) => {
                 $(`.${classNamePrefix}${id} .tjs-pending`).replaceWith(div)
             }
         })
-    } else if (state.currentPage === CurrentPageEnum.REPORT) {
+    } else if ([CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
         const resourcesFromReport = {
             lumber: 0,
             clay: 0,
