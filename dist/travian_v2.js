@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 00:34:06";
+const BUILD_TIME = "2022/10/21 00:41:19";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -915,7 +915,7 @@ const render = (state) => {
             }
         });
     }
-    else if ([CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
+    if ([CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
         const resourcesFromReport = {
             lumber: 0,
             clay: 0,
@@ -1180,7 +1180,6 @@ const render = (state) => {
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     while (true) {
         updateCurrentPage(state);
-        yield checkAutoEvade(state);
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
             state.feature.debug && console.log("Attempt login");
             yield login(state);
@@ -1188,6 +1187,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
             updateVillageList(state);
             updateCurrentVillageStatus(state);
+            yield checkAutoEvade(state);
             if (state.feature.alertAttack) {
                 state.feature.debug && console.log("Checking for attacks");
                 checkIncomingAttack(state);

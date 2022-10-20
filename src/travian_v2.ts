@@ -1098,7 +1098,9 @@ const render = (state: State) => {
                 $(`.${classNamePrefix}${id} .tjs-pending`).replaceWith(div)
             }
         })
-    } else if ([CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
+    }
+
+    if ([CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
         const resourcesFromReport = {
             lumber: 0,
             clay: 0,
@@ -1392,8 +1394,6 @@ const run = async (state: State) => {
     while (true) {
         updateCurrentPage(state)
 
-        await checkAutoEvade(state)
-
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
             state.feature.debug && console.log("Attempt login")
             await login(state)
@@ -1402,6 +1402,9 @@ const run = async (state: State) => {
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
             updateVillageList(state)
             updateCurrentVillageStatus(state)
+            
+            await checkAutoEvade(state)
+
             if (state.feature.alertAttack) {
                 state.feature.debug && console.log("Checking for attacks")
                 checkIncomingAttack(state)
