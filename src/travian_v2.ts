@@ -582,15 +582,15 @@ const updateCurrentVillageStatus = (state: State) => {
                     })
                     break
                 case 'att1':
+                    if (villages[currentVillageId].autoEvade && villages[currentVillageId].evadeRaidPosition) {
+                        villages[currentVillageId].evadeTime = Utils.addToDate(time, 0, -1, 0)
+                    }
                 case 'att3':
                     incomingTroops.push({
                         type: TroopMovementType.ATTACK,
                         count,
                         time
                     })
-                    if (villages[currentVillageId].autoEvade && villages[currentVillageId].evadeRaidPosition) {
-                        villages[currentVillageId].evadeTime = Utils.addToDate(time, 0, -1, 0)
-                    }
                     break
             }
         })

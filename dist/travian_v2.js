@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 01:43:06";
+const BUILD_TIME = "2022/10/21 01:52:03";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -445,15 +445,15 @@ const updateCurrentVillageStatus = (state) => {
                     });
                     break;
                 case 'att1':
+                    if (villages[currentVillageId].autoEvade && villages[currentVillageId].evadeRaidPosition) {
+                        villages[currentVillageId].evadeTime = Utils.addToDate(time, 0, -1, 0);
+                    }
                 case 'att3':
                     incomingTroops.push({
                         type: TroopMovementType.ATTACK,
                         count,
                         time
                     });
-                    if (villages[currentVillageId].autoEvade && villages[currentVillageId].evadeRaidPosition) {
-                        villages[currentVillageId].evadeTime = Utils.addToDate(time, 0, -1, 0);
-                    }
                     break;
             }
         });
