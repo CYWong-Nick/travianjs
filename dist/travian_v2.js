@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 01:30:10";
+const BUILD_TIME = "2022/10/21 01:43:06";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1049,16 +1049,16 @@ const render = (state) => {
             const villages = state.villages;
             const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val());
             const positionY = parseInt($(`#evadeRaidTargetY-${village.id}`).val());
-            currentVillage.evadeRaidPosition = {
+            village.evadeRaidPosition = {
                 x: positionX,
                 y: positionY
             };
             state.villages = villages;
         });
         $(`#toggleAutoEvade-${village.id}`).on('click', () => {
-            let autoEvade = currentVillage.autoEvade;
+            let autoEvade = village.autoEvade;
             autoEvade = !autoEvade;
-            currentVillage.autoEvade = autoEvade;
+            village.autoEvade = autoEvade;
             state.villages = villages;
         });
     });

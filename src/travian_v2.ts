@@ -1238,7 +1238,7 @@ const render = (state: State) => {
             const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val() as string)
             const positionY = parseInt($(`#evadeRaidTargetY-${village.id}`).val() as string)
 
-            currentVillage.evadeRaidPosition = {
+            village.evadeRaidPosition = {
                 x: positionX,
                 y: positionY
             } as Position
@@ -1246,9 +1246,9 @@ const render = (state: State) => {
             state.villages = villages
         })
         $(`#toggleAutoEvade-${village.id}`).on('click', () => {
-            let autoEvade = currentVillage.autoEvade
+            let autoEvade = village.autoEvade
             autoEvade = !autoEvade
-            currentVillage.autoEvade = autoEvade
+            village.autoEvade = autoEvade
             state.villages = villages
         })
     })
