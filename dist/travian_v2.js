@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 00:53:40";
+const BUILD_TIME = "2022/10/21 00:53:52";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1054,6 +1054,7 @@ const render = (state) => {
             state.villages = villages;
         });
         $(`#toggleAutoEvade-${village.id}`).on('click', () => {
+            const villages = state.villages;
             currentVillage.autoEvade = !currentVillage.autoEvade;
             state.villages = villages;
         });

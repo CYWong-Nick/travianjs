@@ -1244,6 +1244,7 @@ const render = (state: State) => {
             state.villages = villages
         })
         $(`#toggleAutoEvade-${village.id}`).on('click', () => {
+            const villages = state.villages
             currentVillage.autoEvade = !currentVillage.autoEvade
             state.villages = villages
         })
