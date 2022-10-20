@@ -1015,9 +1015,7 @@ const render = (state: State) => {
                 $(`.${classNamePrefix}${id} .tjs-pending`).replaceWith(div)
             }
         })
-    }
-    
-    if (state.currentPage === CurrentPageEnum.REPORT) {
+    } else if (state.currentPage === CurrentPageEnum.REPORT) {
         const resourcesFromReport = {
             lumber: 0,
             clay: 0,
@@ -1286,7 +1284,7 @@ const run = async (state: State) => {
             await login(state)
         }
 
-        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING].includes(state.currentPage)) {
+        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT ].includes(state.currentPage)) {
             updateVillageList(state)
             updateCurrentVillageStatus(state)
             if (state.feature.alertAttack) {

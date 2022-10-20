@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/20 22:40:49";
+const BUILD_TIME = "2022/10/20 22:56:52";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -845,7 +845,7 @@ const render = (state) => {
             }
         });
     }
-    if (state.currentPage === CurrentPageEnum.REPORT) {
+    else if (state.currentPage === CurrentPageEnum.REPORT) {
         const resourcesFromReport = {
             lumber: 0,
             clay: 0,
@@ -1087,7 +1087,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
             state.feature.debug && console.log("Attempt login");
             yield login(state);
         }
-        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING].includes(state.currentPage)) {
+        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
             updateVillageList(state);
             updateCurrentVillageStatus(state);
             if (state.feature.alertAttack) {
