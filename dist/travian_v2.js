@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 01:22:04";
+const BUILD_TIME = "2022/10/21 01:24:10";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -722,7 +722,6 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages;
     const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.evadeTime < new Date());
-    console.log(villageRequireEvade);
     if (villageRequireEvade) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
             yield Utils.delayClick();
@@ -1190,6 +1189,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
             updateVillageList(state);
             updateCurrentVillageStatus(state);
+            console.log("Check auto evade", state);
             yield checkAutoEvade(state);
             if (state.feature.alertAttack) {
                 state.feature.debug && console.log("Checking for attacks");

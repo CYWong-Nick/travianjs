@@ -872,7 +872,6 @@ const checkAutoEvade = async (state: State) => {
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages
     const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.evadeTime! < new Date())
-    console.log(villageRequireEvade)
 
     if (villageRequireEvade) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
@@ -1407,6 +1406,7 @@ const run = async (state: State) => {
             updateVillageList(state)
             updateCurrentVillageStatus(state)
 
+            console.log("Check auto evade", state)
             await checkAutoEvade(state)
 
             if (state.feature.alertAttack) {
