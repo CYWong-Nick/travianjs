@@ -1237,6 +1237,11 @@ const render = (state: State) => {
             x: positionX,
             y: positionY
         } as Position
+        console.log({
+            x: positionX,
+            y: positionY
+        } as Position)
+
         state.villages = villages
     })
     $('#toggleAutoEvade').on('click', () => {
