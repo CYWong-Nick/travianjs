@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/20 23:04:00";
+const BUILD_TIME = "2022/10/21 00:11:36";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -77,6 +77,7 @@ var CurrentActionEnum;
     CurrentActionEnum["NAVIGATE_TO_FIELDS"] = "NAVIGATE_TO_FIELDS";
     CurrentActionEnum["SCOUT"] = "SCOUT";
     CurrentActionEnum["FARM"] = "FARM";
+    CurrentActionEnum["EVADE"] = "EVADE";
     CurrentActionEnum["CUSTOM_FARM"] = "CUSTOM_FARM";
 })(CurrentActionEnum || (CurrentActionEnum = {}));
 var FarmType;
@@ -449,6 +450,9 @@ const updateCurrentVillageStatus = (state) => {
                         count,
                         time
                     });
+                    if (villages[currentVillageId].autoEvade && villages[currentVillageId].evadeRaidPosition) {
+                        villages[currentVillageId].evadeTime = Utils.addToDate(time, 0, -1, 0);
+                    }
                     break;
             }
         });
@@ -480,7 +484,21 @@ const alertAttack = (state, village, attackTime) => {
         state.alertedPlusIncomingAttack = true;
     }
 };
+const informTroopsEvaded = (state, village) => {
+    const villages = state.villages;
+    if (!state.telegramChatId || !state.telegramToken) {
+        state.feature.debug && console.log("Telegram chat id or token not set");
+        return;
+    }
+    if (village) {
+        fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} troops evaded at ${new Date()}`);
+    }
+    else {
+        fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Troops evaded at ${new Date()}`);
+    }
+};
 const checkIncomingAttack = (state) => {
+    var _c;
     const villages = state.villages;
     const village = villages[state.currentVillageId];
     const attack = village.incomingTroops.find(e => e.type === TroopMovementType.ATTACK);
@@ -489,7 +507,9 @@ const checkIncomingAttack = (state) => {
     }
     const plusNoAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) => $(attack).css('visibility') === 'hidden');
     if (plusNoAttack.length !== Object.keys(villages).length && !state.alertedPlusIncomingAttack) {
-        alertAttack(state);
+        const villageIdBeingAttacked = (_c = $('div.listEntry.attack').find('.attack').parent().parent().parent().attr('href')) === null || _c === void 0 ? void 0 : _c.split('newdid=')[1].split('&')[0];
+        alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined);
+        villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE);
     }
     else if (plusNoAttack.length === Object.keys(villages).length && state.alertedPlusIncomingAttack) {
         state.alertedPlusIncomingAttack = false;
@@ -697,12 +717,62 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
 });
+const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c, _d;
+    const params = new URLSearchParams(window.location.search);
+    const villages = state.villages;
+    const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.evadeTime < new Date());
+    if (villageRequireEvade) {
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
+            yield Utils.delayClick();
+            $('a[href="/build.php?id=39&gid=16&tt=2"]')[0].click();
+            return;
+        }
+        else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
+            yield Utils.delayClick();
+            const sendTroopButton = $("#ok");
+            const confirmButton = $("#checksum");
+            if (sendTroopButton.length > 0) {
+                $("#troops > tbody").find("td").each((column, td) => {
+                    const troopInput = $(td).find("input");
+                    troopInput.val('99999');
+                });
+                if (((_c = villageRequireEvade.evadeRaidPosition) === null || _c === void 0 ? void 0 : _c.x) && ((_d = villageRequireEvade.evadeRaidPosition) === null || _d === void 0 ? void 0 : _d.y)) {
+                    $("#xCoordInput").val(villageRequireEvade.evadeRaidPosition.x);
+                    $("#yCoordInput").val(villageRequireEvade.evadeRaidPosition.y);
+                }
+                $('.radio')[2].click();
+                yield Utils.delayClick();
+                sendTroopButton[0].click();
+            }
+            else if (confirmButton.length > 0) {
+                yield Utils.delayClick();
+                confirmButton[0].click();
+            }
+            return;
+        }
+        else if (state.currentPage === CurrentPageEnum.BUILDING && state.currentAction === CurrentActionEnum.EVADE
+            && params.get('gid') === '16' && params.get('tt') === '1') {
+            informTroopsEvaded(state, villageRequireEvade);
+            yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            return;
+        }
+        else if (state.currentPage === CurrentPageEnum.TOWN) {
+            yield Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.EVADE);
+            return;
+        }
+        else {
+            yield Navigation.goToTown(state, CurrentActionEnum.EVADE);
+            return;
+        }
+    }
+});
 const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _e;
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages;
     const village = villages[state.currentVillageId];
-    const customFarm = (_c = village.customFarms) === null || _c === void 0 ? void 0 : _c[idx];
+    const customFarm = (_e = village.customFarms) === null || _e === void 0 ? void 0 : _e[idx];
     if (customFarm) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
             yield Utils.delayClick();
@@ -911,6 +981,7 @@ const render = (state) => {
                     <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
+                    ${village.evadeRaidPosition && `<div>Position to raid for evade: (${village.evadeRaidPosition.x}|${village.evadeRaidPosition.x})</div>`}
                     <br />
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
         `<div class="flex-row">
@@ -1083,6 +1154,7 @@ const render = (state) => {
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     while (true) {
         updateCurrentPage(state);
+        yield checkAutoEvade(state);
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
             state.feature.debug && console.log("Attempt login");
             yield login(state);

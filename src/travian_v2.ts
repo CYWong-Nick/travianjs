@@ -66,6 +66,7 @@ enum CurrentActionEnum {
     NAVIGATE_TO_FIELDS = "NAVIGATE_TO_FIELDS",
     SCOUT = "SCOUT",
     FARM = "FARM",
+    EVADE = "EVADE",
     CUSTOM_FARM = "CUSTOM_FARM"
 }
 
@@ -137,7 +138,7 @@ class StateHandler implements ProxyHandler<State> {
         nextScoutTime: new Date(),
         nextFarmTime: new Date(),
         nextCheckReportTime: new Date(),
-        farmIntervalMinutes: { min: 2, max: 4 },
+        farmIntervalMinutes: {min: 2, max: 4},
         alertedPlusIncomingAttack: false,
         telegramChatId: '',
         telegramToken: '',
@@ -197,7 +198,7 @@ class Utils {
         await Utils.sleep(Utils.randInt(1000, 5000))
     }
 
-    static addToDate = (date: Date, hour: number, minute: number, second: number) => {
+    static addToDate = (date: Date, hour: number, minute: number, second: number): Date => {
         return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000)
     }
 
@@ -310,6 +311,9 @@ interface Village {
     capacity: Resource
     incomingTroops: TroopMovement[]
     outgoingTroops: TroopMovement[]
+    autoEvade?: boolean
+    evadeRaidPosition?: Position
+    evadeTime?: Date
     lastUpdatedTime?: Date
     attackAlertBackoff?: Date
     emptyBuildQueueAlertBackoff?: Date
@@ -583,6 +587,9 @@ const updateCurrentVillageStatus = (state: State) => {
                         count,
                         time
                     })
+                    if (villages[currentVillageId].autoEvade && villages[currentVillageId].evadeRaidPosition) {
+                        villages[currentVillageId].evadeTime = Utils.addToDate(time, 0, -1, 0)
+                    }
                     break
             }
         })
@@ -617,6 +624,20 @@ const alertAttack = (state: State, village?: Village, attackTime?: Date) => {
     }
 }
 
+const informTroopsEvaded = (state: State, village?: Village) => {
+    const villages = state.villages
+
+    if (!state.telegramChatId || !state.telegramToken) {
+        state.feature.debug && console.log("Telegram chat id or token not set")
+        return
+    }
+    if (village) {
+        fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} troops evaded at ${new Date()}`)
+    } else {
+        fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Troops evaded at ${new Date()}`)
+    }
+}
+
 const checkIncomingAttack = (state: State) => {
     const villages = state.villages
     const village = villages[state.currentVillageId]
@@ -628,7 +649,9 @@ const checkIncomingAttack = (state: State) => {
     const plusNoAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) =>
         $(attack).css('visibility') === 'hidden')
     if (plusNoAttack.length !== Object.keys(villages).length && !state.alertedPlusIncomingAttack) {
-        alertAttack(state)
+        const villageIdBeingAttacked = $('div.listEntry.attack').find('.attack').parent().parent().parent().attr('href')?.split('newdid=')[1].split('&')[0]
+        alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined)
+        villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE)
     } else if (plusNoAttack.length === Object.keys(villages).length && state.alertedPlusIncomingAttack) {
         state.alertedPlusIncomingAttack = false
     }
@@ -711,10 +734,10 @@ const build = async (state: State) => {
         }
 
         const params = new URLSearchParams(window.location.search);
-        const aid = params.get('id') 
-        const gid = params.get('gid') 
+        const aid = params.get('id')
+        const gid = params.get('gid')
 
-        if (state.currentPage === CurrentPageEnum.BUILDING 
+        if (state.currentPage === CurrentPageEnum.BUILDING
             && aid === `${task.aid}`
             && (gid === `${task.gid}` || task.gid === -1)
         ) {
@@ -841,6 +864,66 @@ const farm = async (state: State) => {
                 await Navigation.goToTown(state, CurrentActionEnum.FARM)
             }
             return
+        }
+    }
+}
+
+const checkAutoEvade = async (state: State) => {
+    const params = new URLSearchParams(window.location.search);
+    const villages = state.villages
+    const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.evadeTime! < new Date())
+
+    if (villageRequireEvade) {
+        if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
+            await Utils.delayClick()
+            $('a[href="/build.php?id=39&gid=16&tt=2"]')[0].click()
+            return
+        } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
+            await Utils.delayClick();
+
+            const sendTroopButton = $("#ok")
+            const confirmButton = $("#checksum")
+
+            if (sendTroopButton.length > 0) {
+                $("#troops > tbody").find("td").each((column, td) => {
+                        const troopInput = $(td).find("input")
+                        troopInput.val('99999')
+                    }
+                )
+
+                if (villageRequireEvade.evadeRaidPosition?.x && villageRequireEvade.evadeRaidPosition?.y) {
+                    $("#xCoordInput").val(villageRequireEvade.evadeRaidPosition.x)
+                    $("#yCoordInput").val(villageRequireEvade.evadeRaidPosition.y)
+                }
+
+                $('.radio')[2].click()
+
+                await Utils.delayClick();
+                sendTroopButton[0].click();
+
+            } else if (confirmButton.length > 0) {
+                await Utils.delayClick()
+                confirmButton[0].click()
+            }
+
+            return;
+        } else if (state.currentPage === CurrentPageEnum.BUILDING && state.currentAction === CurrentActionEnum.EVADE
+            && params.get('gid') === '16' && params.get('tt') === '1') {
+            informTroopsEvaded(state, villageRequireEvade)
+
+            await Navigation.goToFields(state, CurrentActionEnum.IDLE);
+            return;
+        } else if (state.currentPage === CurrentPageEnum.TOWN) {
+            await Navigation.goToBuilding(
+                state,
+                39,
+                16,
+                CurrentActionEnum.EVADE
+            );
+            return;
+        } else {
+            await Navigation.goToTown(state, CurrentActionEnum.EVADE);
+            return;
         }
     }
 }
@@ -1039,7 +1122,7 @@ const render = (state: State) => {
         else
             $('#troops-required-50').replaceWith(troops50);
     }
-    
+
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
@@ -1082,6 +1165,7 @@ const render = (state: State) => {
                     <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
+                    ${village.evadeRaidPosition && `<div>Position to raid for evade: (${village.evadeRaidPosition.x}|${village.evadeRaidPosition.x})</div>`}
                     <br />
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
         `<div class="flex-row">
@@ -1279,12 +1363,14 @@ const run = async (state: State) => {
     while (true) {
         updateCurrentPage(state)
 
+        await checkAutoEvade(state)
+
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
             state.feature.debug && console.log("Attempt login")
             await login(state)
         }
 
-        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT ].includes(state.currentPage)) {
+        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
             updateVillageList(state)
             updateCurrentVillageStatus(state)
             if (state.feature.alertAttack) {
