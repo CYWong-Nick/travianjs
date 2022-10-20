@@ -871,7 +871,7 @@ const farm = async (state: State) => {
 const checkAutoEvade = async (state: State) => {
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages
-    const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.evadeTime! < new Date())
+    const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => new Date(v.evadeTime!) < new Date())
 
     if (villageRequireEvade) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {

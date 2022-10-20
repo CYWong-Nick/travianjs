@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 01:24:10";
+const BUILD_TIME = "2022/10/21 01:26:22";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -721,7 +721,7 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
     var _c, _d;
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages;
-    const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.evadeTime < new Date());
+    const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => new Date(v.evadeTime) < new Date());
     if (villageRequireEvade) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
             yield Utils.delayClick();
