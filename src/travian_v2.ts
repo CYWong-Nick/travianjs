@@ -1165,7 +1165,6 @@ const render = (state: State) => {
                     <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
-                    ${village.evadeRaidPosition && `<div>Position to raid for evade: (${village.evadeRaidPosition.x}|${village.evadeRaidPosition.x})</div>`}
                     <br />
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
         `<div class="flex-row">
@@ -1184,6 +1183,16 @@ const render = (state: State) => {
                         <div>Interval Range: ${customFarm.farmIntervalMinutes.min}mins - ${customFarm.farmIntervalMinutes.max}mins</div>
                         <div>Type: ${customFarm.type === FarmType.ATTACK ? 'Attack' : 'Raid'}</div>
                         <button class="removeCustomFarm" village-id="${id}" idx="${idx}">x</button>`)}
+                    <br />
+                    <h5>Auto Evade</h5>
+                    <div>Evade Raid Target: ${village.evadeRaidPosition ? `(${village.evadeRaidPosition.x}|${village.evadeRaidPosition.y})` : 'N/A'}</div>
+                    <div class="flex-row">
+                        <input id="evadeRaidTargetX" style="width: 5%">x</input>
+                        <input id="evadeRaidTargetY" style="width: 5%">y</input>
+                        <button id="updateEvadeRaidTarget" class="ml-5">Update</button>
+                    </div>
+                    <input id="toggleAutoEvade" class="ml-5" type="checkbox" ${village.autoEvade ? 'checked' : ''} />Enable Auto Evade
+                    
                     <br />
                     <h5>Resources</h5>
                     <div>Lumber: ${village.resources.lumber} Clay: ${village.resources.clay} Iron: ${village.resources.iron} Crop: ${village.resources.crop}</div>
@@ -1218,6 +1227,21 @@ const render = (state: State) => {
             `).join('')}
         </div>
     `)
+
+    $('#updateEvadeRaidTarget').on('click', () => {
+        const villages = state.villages
+        const positionX = parseInt($("#evadeRaidTargetX").val() as string)
+        const positionY = parseInt($("#evadeRaidTargetY").val() as string)
+
+        currentVillage.evadeRaidPosition = {
+            x: positionX,
+            y: positionY
+        } as Position
+        state.villages = villages
+    })
+    $('#toggleAutoEvade').on('click', () => {
+        currentVillage.autoEvade = !currentVillage.autoEvade
+    })
 
     state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2' &&
     $('#addCurrentToCustomFarm').on('click', () => {
