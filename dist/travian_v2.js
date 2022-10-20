@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 01:26:22";
+const BUILD_TIME = "2022/10/21 01:30:10";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -365,7 +365,8 @@ const updateVillageList = (state) => {
                 clay: 0,
                 iron: 0,
                 crop: 0
-            }
+            },
+            autoEvade: false
         };
         villages[id] = Object.assign(Object.assign(Object.assign({}, villageDefaults), villages[id]), { id,
             name,
@@ -1189,7 +1190,6 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
             updateVillageList(state);
             updateCurrentVillageStatus(state);
-            console.log("Check auto evade", state);
             yield checkAutoEvade(state);
             if (state.feature.alertAttack) {
                 state.feature.debug && console.log("Checking for attacks");

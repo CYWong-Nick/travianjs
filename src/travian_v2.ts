@@ -474,7 +474,8 @@ const updateVillageList = (state: State) => {
                 clay: 0,
                 iron: 0,
                 crop: 0
-            }
+            },
+            autoEvade: false
         }
 
         villages[id] = {
@@ -1406,7 +1407,6 @@ const run = async (state: State) => {
             updateVillageList(state)
             updateCurrentVillageStatus(state)
 
-            console.log("Check auto evade", state)
             await checkAutoEvade(state)
 
             if (state.feature.alertAttack) {
