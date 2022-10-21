@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 02:18:27";
+const BUILD_TIME = "2022/10/21 08:47:12";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -941,6 +941,14 @@ const render = (state) => {
             $(".additionalInformation").after(troops50);
         else
             $('#troops-required-50').replaceWith(troops50);
+        let total = 0;
+        // @ts-ignore
+        $('.reportInfo.carry').each((_, carry) => total += parseInt($(carry).attr("alt").split('/')[0] || '0'));
+        const totalResources = `<div id="total-res">Total Resouces: ${total}</div>`;
+        if ($('#total-res').length === 0)
+            $(".footer").after(totalResources);
+        else
+            $('#total-res').replaceWith(totalResources);
     }
     $('#console').html(`
         <div class="flex-row">
