@@ -828,9 +828,11 @@ const farm = async (state: State) => {
             //     .filter((_, msg) => !$($(msg).parent().parent().find('a')[2]).text().includes("Unoccupied oasis"))
             state.feature.debug && console.log("Unread report: " + unreadReports.length)
             if (unreadReports.length > 0) {
-                const feature = state.feature;
-                feature.autoFarm = false;
-                state.feature = feature;
+                if (!state.feature.disableStopOnLoss) {
+                    const feature = state.feature;
+                    feature.autoFarm = false;
+                    state.feature = feature;
+                }
                 fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`)
             }
             state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0)
@@ -852,14 +854,14 @@ const farm = async (state: State) => {
             $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click()
             return
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
-            if (!state.feature.disableStopOnLoss && new Date(state.nextCheckReportTime) < new Date()) {
+            if (new Date(state.nextCheckReportTime) < new Date()) {
                 await Navigation.goToReport(state, CurrentActionEnum.FARM)
             } else {
                 await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
             }
             return
         } else {
-            if (!state.feature.disableStopOnLoss && new Date(state.nextCheckReportTime) < new Date()) {
+            if (new Date(state.nextCheckReportTime) < new Date()) {
                 await Navigation.goToReport(state, CurrentActionEnum.FARM)
             } else {
                 await Navigation.goToTown(state, CurrentActionEnum.FARM)

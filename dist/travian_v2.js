@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 08:47:12";
+const BUILD_TIME = "2022/10/21 22:24:34";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -672,9 +672,11 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
             //     .filter((_, msg) => !$($(msg).parent().parent().find('a')[2]).text().includes("Unoccupied oasis"))
             state.feature.debug && console.log("Unread report: " + unreadReports.length);
             if (unreadReports.length > 0) {
-                const feature = state.feature;
-                feature.autoFarm = false;
-                state.feature = feature;
+                if (!state.feature.disableStopOnLoss) {
+                    const feature = state.feature;
+                    feature.autoFarm = false;
+                    state.feature = feature;
+                }
                 fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`);
             }
             state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0);
@@ -699,7 +701,7 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         else if (state.currentPage === CurrentPageEnum.TOWN) {
-            if (!state.feature.disableStopOnLoss && new Date(state.nextCheckReportTime) < new Date()) {
+            if (new Date(state.nextCheckReportTime) < new Date()) {
                 yield Navigation.goToReport(state, CurrentActionEnum.FARM);
             }
             else {
@@ -708,7 +710,7 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         else {
-            if (!state.feature.disableStopOnLoss && new Date(state.nextCheckReportTime) < new Date()) {
+            if (new Date(state.nextCheckReportTime) < new Date()) {
                 yield Navigation.goToReport(state, CurrentActionEnum.FARM);
             }
             else {
