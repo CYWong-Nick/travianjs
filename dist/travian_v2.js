@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/22 22:57:50";
+const BUILD_TIME = "2022/10/22 23:41:30";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -508,7 +508,7 @@ const checkIncomingAttack = (state) => {
     const villageIdBeingAttacked = (_c = $('div.listEntry.attack').find('.attack').parent().parent().parent().attr('href')) === null || _c === void 0 ? void 0 : _c.split('newdid=')[1].split('&')[0];
     if (plusNoAttack.length !== Object.keys(villages).length && villageIdBeingAttacked) {
         const villageBeingAttacked = villages[villageIdBeingAttacked];
-        if ((!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date())) {
+        if (!villageBeingAttacked.attackAlertBackoff || new Date(villageBeingAttacked.attackAlertBackoff) < new Date()) {
             alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined);
             villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE);
         }

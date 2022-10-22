@@ -650,7 +650,7 @@ const checkIncomingAttack = (state: State) => {
 
     if (plusNoAttack.length !== Object.keys(villages).length && villageIdBeingAttacked) {
         const villageBeingAttacked = villages[villageIdBeingAttacked]
-        if ((!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date())) {
+        if (!villageBeingAttacked.attackAlertBackoff || new Date(villageBeingAttacked.attackAlertBackoff) < new Date()) {
             alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined)
             villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE)
         }
