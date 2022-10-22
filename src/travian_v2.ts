@@ -646,8 +646,9 @@ const checkIncomingAttack = (state: State) => {
 
     const plusNoAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) =>
         $(attack).css('visibility') === 'hidden')
-    if (plusNoAttack.length !== Object.keys(villages).length && (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date())) {
-        const villageIdBeingAttacked = $('div.listEntry.attack').find('.attack').parent().parent().parent().attr('href')?.split('newdid=')[1].split('&')[0]
+    const villageIdBeingAttacked = $('div.listEntry.attack').find('.attack').parent().parent().parent().attr('href')?.split('newdid=')[1].split('&')[0]
+
+    if (plusNoAttack.length !== Object.keys(villages).length && villageIdBeingAttacked && (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date())) {
         alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined)
         villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE)
     }
