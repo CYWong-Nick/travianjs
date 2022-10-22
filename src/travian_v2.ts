@@ -648,9 +648,12 @@ const checkIncomingAttack = (state: State) => {
         $(attack).css('visibility') === 'hidden')
     const villageIdBeingAttacked = $('div.listEntry.attack').find('.attack').parent().parent().parent().attr('href')?.split('newdid=')[1].split('&')[0]
 
-    if (plusNoAttack.length !== Object.keys(villages).length && villageIdBeingAttacked && (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date())) {
-        alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined)
-        villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE)
+    if (plusNoAttack.length !== Object.keys(villages).length && villageIdBeingAttacked) {
+        const villageBeingAttacked = villages[villageIdBeingAttacked]
+        if ((!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date())) {
+            alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined)
+            villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE)
+        }
     }
 }
 
