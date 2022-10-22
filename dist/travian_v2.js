@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/21 22:24:34";
+const BUILD_TIME = "2022/10/22 22:52:48";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -134,7 +134,6 @@ StateHandler.INITIAL_STATE = {
     nextFarmTime: new Date(),
     nextCheckReportTime: new Date(),
     farmIntervalMinutes: { min: 2, max: 4 },
-    alertedPlusIncomingAttack: false,
     telegramChatId: '',
     telegramToken: '',
     username: '',
@@ -482,7 +481,6 @@ const alertAttack = (state, village, attackTime) => {
     }
     else {
         fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village is under attack`);
-        state.alertedPlusIncomingAttack = true;
     }
 };
 const informTroopsEvaded = (state, village) => {
@@ -507,13 +505,10 @@ const checkIncomingAttack = (state) => {
         alertAttack(state, village, attack.time);
     }
     const plusNoAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) => $(attack).css('visibility') === 'hidden');
-    if (plusNoAttack.length !== Object.keys(villages).length && !state.alertedPlusIncomingAttack) {
+    if (plusNoAttack.length !== Object.keys(villages).length && (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date())) {
         const villageIdBeingAttacked = (_c = $('div.listEntry.attack').find('.attack').parent().parent().parent().attr('href')) === null || _c === void 0 ? void 0 : _c.split('newdid=')[1].split('&')[0];
         alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined);
         villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE);
-    }
-    else if (plusNoAttack.length === Object.keys(villages).length && state.alertedPlusIncomingAttack) {
-        state.alertedPlusIncomingAttack = false;
     }
 };
 const alertEmptyBuildQueue = (state) => {
@@ -732,6 +727,10 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
             return;
         }
         else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
+            if (state.currentVillageId !== villageRequireEvade.id) {
+                yield Navigation.goToVillage(state, villageRequireEvade.id, CurrentActionEnum.EVADE);
+                return;
+            }
             yield Utils.delayClick();
             const sendTroopButton = $("#ok");
             const confirmButton = $("#checksum");
@@ -745,7 +744,6 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
                     $("#yCoordInput").val(villageRequireEvade.evadeRaidPosition.y);
                 }
                 $('.radio')[2].click();
-                yield Utils.delayClick();
                 sendTroopButton[0].click();
             }
             else if (confirmButton.length > 0) {
@@ -757,7 +755,8 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
         else if (state.currentPage === CurrentPageEnum.BUILDING && state.currentAction === CurrentActionEnum.EVADE
             && params.get('gid') === '16' && params.get('tt') === '1') {
             informTroopsEvaded(state, villageRequireEvade);
-            villageRequireEvade.evadeTime = undefined;
+            delete villageRequireEvade.evadeTime;
+            state.villages = villages;
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
         }

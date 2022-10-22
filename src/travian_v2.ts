@@ -108,7 +108,6 @@ interface State {
     nextFarmTime: Date
     nextCheckReportTime: Date
     farmIntervalMinutes: { min: number, max: number }
-    alertedPlusIncomingAttack: boolean
     telegramChatId: string
     telegramToken: string
     username: string
@@ -139,7 +138,6 @@ class StateHandler implements ProxyHandler<State> {
         nextFarmTime: new Date(),
         nextCheckReportTime: new Date(),
         farmIntervalMinutes: {min: 2, max: 4},
-        alertedPlusIncomingAttack: false,
         telegramChatId: '',
         telegramToken: '',
         username: '',
@@ -621,7 +619,6 @@ const alertAttack = (state: State, village?: Village, attackTime?: Date) => {
         }
     } else {
         fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village is under attack`)
-        state.alertedPlusIncomingAttack = true
     }
 }
 
@@ -649,12 +646,10 @@ const checkIncomingAttack = (state: State) => {
 
     const plusNoAttack = $('.sidebar #sidebarBoxVillagelist .content .villageList .listEntry:not(.attack) .iconAndNameWrapper svg.attack').filter((_, attack) =>
         $(attack).css('visibility') === 'hidden')
-    if (plusNoAttack.length !== Object.keys(villages).length && !state.alertedPlusIncomingAttack) {
+    if (plusNoAttack.length !== Object.keys(villages).length && (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date())) {
         const villageIdBeingAttacked = $('div.listEntry.attack').find('.attack').parent().parent().parent().attr('href')?.split('newdid=')[1].split('&')[0]
         alertAttack(state, !!villageIdBeingAttacked ? villages[villageIdBeingAttacked] : undefined)
         villageIdBeingAttacked && villageIdBeingAttacked !== state.currentVillageId && Navigation.goToVillage(state, villageIdBeingAttacked, CurrentActionEnum.IDLE)
-    } else if (plusNoAttack.length === Object.keys(villages).length && state.alertedPlusIncomingAttack) {
-        state.alertedPlusIncomingAttack = false
     }
 }
 
@@ -882,6 +877,11 @@ const checkAutoEvade = async (state: State) => {
             $('a[href="/build.php?id=39&gid=16&tt=2"]')[0].click()
             return
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
+            if (state.currentVillageId !== villageRequireEvade.id) {
+                await Navigation.goToVillage(state, villageRequireEvade.id, CurrentActionEnum.EVADE)
+                return
+            }
+
             await Utils.delayClick();
 
             const sendTroopButton = $("#ok")
@@ -901,7 +901,6 @@ const checkAutoEvade = async (state: State) => {
 
                 $('.radio')[2].click()
 
-                await Utils.delayClick();
                 sendTroopButton[0].click();
 
             } else if (confirmButton.length > 0) {
@@ -913,7 +912,8 @@ const checkAutoEvade = async (state: State) => {
         } else if (state.currentPage === CurrentPageEnum.BUILDING && state.currentAction === CurrentActionEnum.EVADE
             && params.get('gid') === '16' && params.get('tt') === '1') {
             informTroopsEvaded(state, villageRequireEvade)
-            villageRequireEvade.evadeTime = undefined
+            delete villageRequireEvade.evadeTime
+            state.villages = villages
 
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
