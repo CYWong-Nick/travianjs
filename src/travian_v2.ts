@@ -960,7 +960,17 @@ const executeCustomFarm = async (state: State, idx: number) => {
                         const troopInputEle = $(`input[name="${troopKey}"]`);
 
                         if (troopInputEle.prop('disabled')) {
+                            village.customFarms![idx].nextCustomFarmTime = Utils.addToDate(
+                                new Date(),
+                                0,
+                                1,
+                                Utils.randInt(0, 59)
+                            );
+
+                            state.villages = villages
+
                             await Navigation.goToTown(state, CurrentActionEnum.IDLE);
+                            return
                         }
 
                         troopInputEle[0].click();
