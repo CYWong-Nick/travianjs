@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/23 14:54:42";
+const BUILD_TIME = "2022/10/28 01:39:55";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -152,7 +152,7 @@ Utils.sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
 Utils.delayClick = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield Utils.sleep(Utils.randInt(1000, 5000));
+    yield Utils.sleep(Utils.randInt(1000, 2000));
 });
 Utils.addToDate = (date, hour, minute, second) => {
     return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000);
@@ -791,14 +791,17 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
             const sendTroopButton = $("#ok");
             const confirmButton = $("#checksum");
             if (sendTroopButton.length > 0) {
-                Object.keys(customFarm.troops).forEach(troopKey => {
+                for (const troopKey of Object.keys(customFarm.troops)) {
                     if (customFarm.troops[troopKey]) {
                         state.feature.debug && (console.log("Troop Key: ", troopKey));
                         const troopInputEle = $(`input[name="${troopKey}"]`);
+                        if (troopInputEle.prop('disabled')) {
+                            yield Navigation.goToTown(state, CurrentActionEnum.IDLE);
+                        }
                         troopInputEle[0].click();
                         troopInputEle.val(customFarm.troops[troopKey]);
                     }
-                });
+                }
                 $("#xCoordInput").val(customFarm.position.x);
                 $("#yCoordInput").val(customFarm.position.y);
                 if (customFarm.type === FarmType.ATTACK) {

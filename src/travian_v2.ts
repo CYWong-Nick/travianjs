@@ -193,7 +193,7 @@ class Utils {
     }
 
     static delayClick = async () => {
-        await Utils.sleep(Utils.randInt(1000, 5000))
+        await Utils.sleep(Utils.randInt(1000, 2000))
     }
 
     static addToDate = (date: Date, hour: number, minute: number, second: number): Date => {
@@ -954,14 +954,20 @@ const executeCustomFarm = async (state: State, idx: number) => {
             const sendTroopButton = $("#ok")
             const confirmButton = $("#checksum")
             if (sendTroopButton.length > 0) {
-                Object.keys(customFarm.troops).forEach(troopKey => {
+                for (const troopKey of Object.keys(customFarm.troops)) {
                     if (customFarm.troops[troopKey]) {
                         state.feature.debug && (console.log("Troop Key: ", troopKey))
                         const troopInputEle = $(`input[name="${troopKey}"]`);
+
+                        if (troopInputEle.prop('disabled')) {
+                            await Navigation.goToTown(state, CurrentActionEnum.IDLE);
+                        }
+
                         troopInputEle[0].click();
                         troopInputEle.val(customFarm.troops[troopKey]);
                     }
-                })
+                }
+
                 $("#xCoordInput").val(customFarm.position.x)
                 $("#yCoordInput").val(customFarm.position.y)
 
