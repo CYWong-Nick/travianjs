@@ -964,7 +964,7 @@ const executeCustomFarm = async (state: State, idx: number) => {
                                 new Date(),
                                 0,
                                 1,
-                                Utils.randInt(0, 59)
+                                0
                             );
 
                             state.villages = villages
@@ -1002,7 +1002,7 @@ const executeCustomFarm = async (state: State, idx: number) => {
                 new Date(),
                 0,
                 Utils.randInt(customFarm.farmIntervalMinutes.min, customFarm.farmIntervalMinutes.max),
-                Utils.randInt(0, 59)
+                Utils.randInt(0, 10)
             );
 
             state.villages = villages

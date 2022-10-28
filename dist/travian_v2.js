@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/28 02:05:30";
+const BUILD_TIME = "2022/10/28 08:26:19";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -796,7 +796,7 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
                         state.feature.debug && (console.log("Troop Key: ", troopKey));
                         const troopInputEle = $(`input[name="${troopKey}"]`);
                         if (troopInputEle.prop('disabled')) {
-                            village.customFarms[idx].nextCustomFarmTime = Utils.addToDate(new Date(), 0, 1, Utils.randInt(0, 59));
+                            village.customFarms[idx].nextCustomFarmTime = Utils.addToDate(new Date(), 0, 1, 0);
                             state.villages = villages;
                             yield Navigation.goToTown(state, CurrentActionEnum.IDLE);
                             return;
@@ -824,7 +824,7 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
         }
         else if (state.currentPage === CurrentPageEnum.BUILDING && state.currentAction === CurrentActionEnum.CUSTOM_FARM
             && params.get('gid') === '16' && params.get('tt') === '1') {
-            village.customFarms[idx].nextCustomFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(customFarm.farmIntervalMinutes.min, customFarm.farmIntervalMinutes.max), Utils.randInt(0, 59));
+            village.customFarms[idx].nextCustomFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(customFarm.farmIntervalMinutes.min, customFarm.farmIntervalMinutes.max), Utils.randInt(0, 10));
             state.villages = villages;
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
