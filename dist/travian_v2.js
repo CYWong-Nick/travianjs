@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/28 22:49:12";
+const BUILD_TIME = "2022/10/28 23:01:32";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -170,18 +170,17 @@ Utils.formatDate = (dateInput) => {
 Utils.isSufficientResources = (required, own) => {
     return required.lumber <= own.lumber && required.clay <= own.clay && required.iron <= own.iron && required.crop <= own.crop;
 };
+Utils.sumRecord = (r1, r2) => {
+    let result = {};
+    Object.entries(r1).map(([key, value]) => {
+        if (Object.keys(r2).includes(key)) {
+            result = Object.assign(Object.assign({}, result), { [key]: (parseInt(value) + parseInt(result[key] || "0")).toString() });
+        }
+    });
+    return result;
+};
 Utils.groupByAndSum = (records) => {
-    return records.reduce((res, value) => {
-        console.log(res);
-        console.log(value);
-        if (!res[value.key]) {
-            res = Object.assign(Object.assign({}, res), { [value.key]: value.value });
-        }
-        else {
-            res = Object.assign(Object.assign({}, res), { [value.key]: (parseInt(res[value.key]) + parseInt(value.value)).toString() });
-        }
-        return res;
-    }, {});
+    return records.reduce((res, value) => Utils.sumRecord(res, value), {});
 };
 class Navigation {
 }

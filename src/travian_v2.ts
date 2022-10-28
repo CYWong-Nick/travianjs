@@ -216,23 +216,22 @@ class Utils {
         return required.lumber <= own.lumber && required.clay <= own.clay && required.iron <= own.iron && required.crop <= own.crop
     }
 
-    static groupByAndSum = (records: Record<string, string>[]): Record<string, string> => {
-        return records.reduce((res, value) => {
-            console.log(res)
-            console.log(value)
-            if (!res[value.key]) {
-                res = {
-                    ...res,
-                    [value.key]: value.value
-                }
-            } else {
-                res = {
-                    ...res,
-                    [value.key]: (parseInt(res[value.key]) + parseInt(value.value)).toString()
+    static sumRecord = (r1: Record<string, string>, r2: Record<string, string>): Record<string, string> => {
+        let result = {} as Record<string, string>
+        Object.entries(r1).map(([key, value]) => {
+            if (Object.keys(r2).includes(key)) {
+                result = {
+                    ...result,
+                    [key]: (parseInt(value) + parseInt(result[key] || "0")).toString()
                 }
             }
-            return res;
-        }, {});
+        })
+
+        return result
+    }
+
+    static groupByAndSum = (records: Record<string, string>[]): Record<string, string> => {
+        return records.reduce((res, value) => Utils.sumRecord(res, value), {});
     }
 }
 
