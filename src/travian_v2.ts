@@ -220,9 +220,10 @@ class Utils {
         let result = {} as Record<string, string>
         Object.entries(r1).map(([key, value]) => {
             if (Object.keys(r2).includes(key)) {
+                const r2Value = r2[key]
                 result = {
                     ...result,
-                    [key]: (parseInt(value) + parseInt(result[key] || "0")).toString()
+                    [key]: (parseInt(value) + parseInt(r2Value)).toString()
                 }
             }
         })
@@ -1329,7 +1330,7 @@ const render = (state: State) => {
                 const troopKey = troopInput.attr('name')
                 const troopCount = troopInput.val() as string
 
-                if (troopKey && troopInput) {
+                if (troopKey && troopInput && !!troopCount) {
                     customFarm.troops[troopKey] = troopCount
                 }
             }
