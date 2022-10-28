@@ -218,6 +218,7 @@ class Utils {
 
     static groupByAndSum = (records: Record<string, string>[]): Record<string, string> => {
         return records.reduce((res, value) => {
+            console.log(value)
             if (!res[value.key]) {
                 res = {
                     ...res,
