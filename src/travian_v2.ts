@@ -220,6 +220,23 @@ class Utils {
 
     static sumRecord = (r1: Record<string, string>, r2: Record<string, string>): Record<string, string> => {
         let result = {} as Record<string, string>
+        Object.keys(r1).forEach(key => {
+            if (!Object.keys(result).includes(key)) {
+                result = {
+                    ...result,
+                    [key]: "0"
+                }
+            }
+        })
+        Object.keys(21).forEach(key => {
+            if (!Object.keys(result).includes(key)) {
+                result = {
+                    ...result,
+                    [key]: "0"
+                }
+            }
+        })
+
         Object.entries(r1).map(([key, value]) => {
             if (!!value || !!r2[key]) {
                 const r2Value = r2[key]
