@@ -108,6 +108,7 @@ interface State {
     nextFarmTime: Date
     nextCheckReportTime: Date
     farmIntervalMinutes: { min: number, max: number }
+    plusEnabled: boolean
     telegramChatId: string
     telegramToken: string
     username: string
@@ -138,6 +139,7 @@ class StateHandler implements ProxyHandler<State> {
         nextFarmTime: new Date(),
         nextCheckReportTime: new Date(),
         farmIntervalMinutes: {min: 2, max: 4},
+        plusEnabled: false,
         telegramChatId: '',
         telegramToken: '',
         username: '',
@@ -738,7 +740,8 @@ const build = async (state: State) => {
     const village = villages[state.currentVillageId]
     if (village.pendingBuildTasks.length > 0) {
         const task = village.pendingBuildTasks[0]
-        if (village.currentBuildTasks.length < 2
+        const buildQueueThreshold = state.plusEnabled ? 2 : 1
+        if (village.currentBuildTasks.length < buildQueueThreshold
             && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)
             && Utils.isSufficientResources(task.resources, village.resources)
         ) {
@@ -1119,6 +1122,8 @@ const render = (state: State) => {
         else
             $('#addCurrentToPendingInBuilding').replaceWith(btn)
     }
+
+    state.plusEnabled = !!$('.market.gold').length
 
     const villages = state.villages
     const currentVillage = villages[state.currentVillageId]

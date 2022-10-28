@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/28 23:15:32";
+const BUILD_TIME = "2022/10/28 23:24:21";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -134,6 +134,7 @@ StateHandler.INITIAL_STATE = {
     nextFarmTime: new Date(),
     nextCheckReportTime: new Date(),
     farmIntervalMinutes: { min: 2, max: 4 },
+    plusEnabled: false,
     telegramChatId: '',
     telegramToken: '',
     username: '',
@@ -584,7 +585,8 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
     const village = villages[state.currentVillageId];
     if (village.pendingBuildTasks.length > 0) {
         const task = village.pendingBuildTasks[0];
-        if (village.currentBuildTasks.length < 2
+        const buildQueueThreshold = state.plusEnabled ? 2 : 1;
+        if (village.currentBuildTasks.length < buildQueueThreshold
             && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)
             && Utils.isSufficientResources(task.resources, village.resources)) {
             const success = yield Navigation.goToBuilding(state, task.aid, task.gid, CurrentActionEnum.BUILD);
@@ -920,6 +922,7 @@ const render = (state) => {
         else
             $('#addCurrentToPendingInBuilding').replaceWith(btn);
     }
+    state.plusEnabled = !!$('.market.gold').length;
     const villages = state.villages;
     const currentVillage = villages[state.currentVillageId];
     const params = new URLSearchParams(window.location.search);
