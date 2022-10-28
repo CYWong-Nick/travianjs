@@ -1123,8 +1123,6 @@ const render = (state: State) => {
             $('#addCurrentToPendingInBuilding').replaceWith(btn)
     }
 
-    state.plusEnabled = !!!$('.market.gold').length
-
     const villages = state.villages
     const currentVillage = villages[state.currentVillageId]
     const params = new URLSearchParams(window.location.search);
@@ -1466,6 +1464,7 @@ const render = (state: State) => {
 const run = async (state: State) => {
     while (true) {
         updateCurrentPage(state)
+        state.plusEnabled = !!!$('.market.gold').length
 
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
             state.feature.debug && console.log("Attempt login")

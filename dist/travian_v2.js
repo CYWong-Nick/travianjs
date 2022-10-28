@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/28 23:25:15";
+const BUILD_TIME = "2022/10/28 23:30:22";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -922,7 +922,6 @@ const render = (state) => {
         else
             $('#addCurrentToPendingInBuilding').replaceWith(btn);
     }
-    state.plusEnabled = !!!$('.market.gold').length;
     const villages = state.villages;
     const currentVillage = villages[state.currentVillageId];
     const params = new URLSearchParams(window.location.search);
@@ -1228,6 +1227,7 @@ const render = (state) => {
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
     while (true) {
         updateCurrentPage(state);
+        state.plusEnabled = !!!$('.market.gold').length;
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
             state.feature.debug && console.log("Attempt login");
             yield login(state);
