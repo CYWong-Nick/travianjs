@@ -1187,7 +1187,11 @@ const render = (state: State) => {
         const y = parseInt($("#yCoordInput").val() as string)
 
         if ((currentVillage.customFarms || []).find(customFarm => customFarm.position.x === x && customFarm.position.y === y)) {
-            $("#ok").after('<br/><br/>This position is included in custom farm already')
+            const customFarmWarning = `<div id="custom-farm-warning"><br/><br/>This position is included in custom farm already</div>`
+            if ($('#custom-farm-warning').length === 0)
+                $("#ok").after(customFarmWarning)
+            else
+                $('#custom-farm-warning').replaceWith(customFarmWarning);
         }
     }
 
