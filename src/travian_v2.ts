@@ -215,6 +215,23 @@ class Utils {
     static isSufficientResources = (required: Resource, own: Resource) => {
         return required.lumber <= own.lumber && required.clay <= own.clay && required.iron <= own.iron && required.crop <= own.crop
     }
+
+    static groupByAndSum = (records: Record<string, string>[]): Record<string, string> => {
+        return records.reduce((res, value) => {
+            if (!res[value.key]) {
+                res = {
+                    ...res,
+                    [value.key]: value.value
+                }
+            } else {
+                res = {
+                    ...res,
+                    [value.key]: (parseInt(res[value.key]) + parseInt(value.value)).toString()
+                }
+            }
+            return res;
+        }, {});
+    }
 }
 
 class Navigation {
@@ -1202,6 +1219,9 @@ const render = (state: State) => {
                     <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
+                    ${village.customFarms && `<div>
+                            Custom farm summary: ${Object.entries(Utils.groupByAndSum(village.customFarms.map(customFarm => customFarm.troops))).map((key, value) => `<div>${key}: ${value}</div>`)}
+                    </div>`}
                     <br />
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
         `<div class="flex-row">

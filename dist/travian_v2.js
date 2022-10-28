@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/28 08:26:19";
+const BUILD_TIME = "2022/10/28 22:43:19";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -169,6 +169,17 @@ Utils.formatDate = (dateInput) => {
 };
 Utils.isSufficientResources = (required, own) => {
     return required.lumber <= own.lumber && required.clay <= own.clay && required.iron <= own.iron && required.crop <= own.crop;
+};
+Utils.groupByAndSum = (records) => {
+    return records.reduce((res, value) => {
+        if (!res[value.key]) {
+            res = Object.assign(Object.assign({}, res), { [value.key]: value.value });
+        }
+        else {
+            res = Object.assign(Object.assign({}, res), { [value.key]: (parseInt(res[value.key]) + parseInt(value.value)).toString() });
+        }
+        return res;
+    }, {});
 };
 class Navigation {
 }
@@ -1002,6 +1013,9 @@ const render = (state) => {
                     <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
+                    ${village.customFarms && `<div>
+                            Custom farm summary: ${Object.entries(Utils.groupByAndSum(village.customFarms.map(customFarm => customFarm.troops))).map((key, value) => `<div>${key}: ${value}</div>`)}
+                    </div>`}
                     <br />
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
         `<div class="flex-row">
