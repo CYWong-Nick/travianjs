@@ -1179,6 +1179,15 @@ const render = (state: State) => {
             $('#total-res').replaceWith(totalResources);
     }
 
+    if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
+        const x = parseInt($("#xCoordInput").val() as string)
+        const y = parseInt($("#yCoordInput").val() as string)
+
+        if ((currentVillage.customFarms || []).find(customFarm => customFarm.position.x === x && customFarm.position.y === y)) {
+            $("#ok").after('<br/><br/>This position is included in custom farm already')
+        }
+    }
+
     $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>

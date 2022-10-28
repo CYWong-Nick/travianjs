@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/28 23:10:02";
+const BUILD_TIME = "2022/10/28 23:15:32";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -972,6 +972,13 @@ const render = (state) => {
             $(".footer").after(totalResources);
         else
             $('#total-res').replaceWith(totalResources);
+    }
+    if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
+        const x = parseInt($("#xCoordInput").val());
+        const y = parseInt($("#yCoordInput").val());
+        if ((currentVillage.customFarms || []).find(customFarm => customFarm.position.x === x && customFarm.position.y === y)) {
+            $("#ok").after('<br/><br/>This position is included in custom farm already');
+        }
     }
     $('#console').html(`
         <div class="flex-row">
