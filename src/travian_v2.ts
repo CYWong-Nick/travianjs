@@ -738,9 +738,9 @@ const build = async (state: State) => {
     // Try building in current village
     const villages = state.villages
     const village = villages[state.currentVillageId]
+    const buildQueueThreshold = state.plusEnabled ? 2 : 1
     if (village.pendingBuildTasks.length > 0) {
         const task = village.pendingBuildTasks[0]
-        const buildQueueThreshold = state.plusEnabled ? 2 : 1
         if (village.currentBuildTasks.length < buildQueueThreshold
             && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)
             && Utils.isSufficientResources(task.resources, village.resources)
@@ -794,7 +794,7 @@ const build = async (state: State) => {
     const nextVillageIdToBuild = Object.entries(state.villages)
         .filter(([_, village]) =>
             village.pendingBuildTasks.length > 0
-            && village.currentBuildTasks.filter(task => new Date(task.finishTime) > new Date()).length < 2
+            && village.currentBuildTasks.filter(task => new Date(task.finishTime) > new Date()).length < buildQueueThreshold
             && Utils.isSufficientResources(village.pendingBuildTasks[0].resources, village.resources)
         )
         .map(([id, _]) => id)
