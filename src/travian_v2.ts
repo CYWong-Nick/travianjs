@@ -1123,7 +1123,7 @@ const render = (state: State) => {
             $('#addCurrentToPendingInBuilding').replaceWith(btn)
     }
 
-    state.plusEnabled = !!$('.market.gold').length
+    state.plusEnabled = !!!$('.market.gold').length
 
     const villages = state.villages
     const currentVillage = villages[state.currentVillageId]
