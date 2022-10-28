@@ -219,7 +219,7 @@ class Utils {
     static sumRecord = (r1: Record<string, string>, r2: Record<string, string>): Record<string, string> => {
         let result = {} as Record<string, string>
         Object.entries(r1).map(([key, value]) => {
-            if (Object.keys(r2).includes(key)) {
+            if (!!value || !!r2[key]) {
                 const r2Value = r2[key]
                 result = {
                     ...result,

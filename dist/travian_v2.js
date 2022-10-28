@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/28 23:05:06";
+const BUILD_TIME = "2022/10/28 23:10:02";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -173,7 +173,7 @@ Utils.isSufficientResources = (required, own) => {
 Utils.sumRecord = (r1, r2) => {
     let result = {};
     Object.entries(r1).map(([key, value]) => {
-        if (Object.keys(r2).includes(key)) {
+        if (!!value || !!r2[key]) {
             const r2Value = r2[key];
             result = Object.assign(Object.assign({}, result), { [key]: (parseInt(value) + parseInt(r2Value)).toString() });
         }
