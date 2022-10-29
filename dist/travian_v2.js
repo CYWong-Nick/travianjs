@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/28 23:49:28";
+const BUILD_TIME = "2022/10/29 09:30:04";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -125,6 +125,7 @@ StateHandler.INITIAL_STATE = {
         alertResourceCapacityFull: false,
         autoScout: false,
         autoFarm: false,
+        disableReportChecking: false,
         disableStopOnLoss: false,
         autoCustomFarm: false,
         debug: false
@@ -724,7 +725,7 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         else if (state.currentPage === CurrentPageEnum.TOWN) {
-            if (new Date(state.nextCheckReportTime) < new Date()) {
+            if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
                 yield Navigation.goToReport(state, CurrentActionEnum.FARM);
             }
             else {
@@ -733,7 +734,7 @@ const farm = (state) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         else {
-            if (new Date(state.nextCheckReportTime) < new Date()) {
+            if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
                 yield Navigation.goToReport(state, CurrentActionEnum.FARM);
             }
             else {
@@ -1004,6 +1005,7 @@ const render = (state) => {
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAutoScout" class="ml-5" type="checkbox" ${state.feature.autoScout ? 'checked' : ''}/> Auto scout
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
+            <input id="toggleDisableReportChecking" class="ml-5" type="checkbox" ${state.feature.disableReportChecking ? 'checked' : ''}/> Disable report checking
             <input id="toggleDisableStopOnLoss" class="ml-5" type="checkbox" ${state.feature.disableStopOnLoss ? 'checked' : ''}/> Disable stop on loss
             <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
@@ -1231,6 +1233,7 @@ const render = (state) => {
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild');
     handleFeatureToggle('#toggleAutoScout', state, 'autoScout');
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm');
+    handleFeatureToggle('#toggleDisableReportChecking', state, 'disableReportChecking');
     handleFeatureToggle('#toggleDisableStopOnLoss', state, 'disableStopOnLoss');
     handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm');
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack');

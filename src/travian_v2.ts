@@ -79,6 +79,7 @@ interface Feature {
     alertResourceCapacityFull: boolean
     autoScout: boolean
     autoFarm: boolean
+    disableReportChecking: boolean
     disableStopOnLoss: boolean
     autoCustomFarm: boolean
     debug: boolean
@@ -130,6 +131,7 @@ class StateHandler implements ProxyHandler<State> {
             alertResourceCapacityFull: false,
             autoScout: false,
             autoFarm: false,
+            disableReportChecking: false,
             disableStopOnLoss: false,
             autoCustomFarm: false,
             debug: false
@@ -892,14 +894,14 @@ const farm = async (state: State) => {
             $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click()
             return
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
-            if (new Date(state.nextCheckReportTime) < new Date()) {
+            if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
                 await Navigation.goToReport(state, CurrentActionEnum.FARM)
             } else {
                 await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
             }
             return
         } else {
-            if (new Date(state.nextCheckReportTime) < new Date()) {
+            if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
                 await Navigation.goToReport(state, CurrentActionEnum.FARM)
             } else {
                 await Navigation.goToTown(state, CurrentActionEnum.FARM)
@@ -1220,6 +1222,7 @@ const render = (state: State) => {
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAutoScout" class="ml-5" type="checkbox" ${state.feature.autoScout ? 'checked' : ''}/> Auto scout
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
+            <input id="toggleDisableReportChecking" class="ml-5" type="checkbox" ${state.feature.disableReportChecking ? 'checked' : ''}/> Disable report checking
             <input id="toggleDisableStopOnLoss" class="ml-5" type="checkbox" ${state.feature.disableStopOnLoss ? 'checked' : ''}/> Disable stop on loss
             <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
@@ -1474,6 +1477,7 @@ const render = (state: State) => {
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')
     handleFeatureToggle('#toggleAutoScout', state, 'autoScout')
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm')
+    handleFeatureToggle('#toggleDisableReportChecking', state, 'disableReportChecking')
     handleFeatureToggle('#toggleDisableStopOnLoss', state, 'disableStopOnLoss');
     handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm')
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
