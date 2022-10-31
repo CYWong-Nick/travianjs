@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/31 23:42:05";
+const BUILD_TIME = "2022/11/01 00:40:25";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -390,7 +390,8 @@ const updateVillageList = (state) => {
                 iron: 0,
                 crop: 0
             },
-            autoEvade: false
+            autoEvade: false,
+            customFarms: []
         };
         villages[id] = Object.assign(Object.assign(Object.assign({}, villageDefaults), villages[id]), { id,
             name,

@@ -513,7 +513,8 @@ const updateVillageList = (state: State) => {
                 iron: 0,
                 crop: 0
             },
-            autoEvade: false
+            autoEvade: false,
+            customFarms: []
         }
 
         villages[id] = {
