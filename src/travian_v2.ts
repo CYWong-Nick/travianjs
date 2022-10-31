@@ -926,6 +926,10 @@ const checkAutoEvade = async (state: State) => {
                 await Navigation.goToVillage(state, villageRequireEvade.id, CurrentActionEnum.EVADE)
                 return
             }
+            if ($('.error').length > 0) {
+                await Navigation.goToFields(state, CurrentActionEnum.IDLE)
+                return
+            }
 
             await Utils.delayClick();
 
@@ -935,7 +939,9 @@ const checkAutoEvade = async (state: State) => {
             if (sendTroopButton.length > 0) {
                 $("#troops > tbody").find("td").each((column, td) => {
                         const troopInput = $(td).find("input")
-                        troopInput.val('99999')
+                        if (!troopInput.prop('disabled')) {
+                            troopInput.val('99999')
+                        }
                     }
                 )
 

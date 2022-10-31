@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/29 09:30:04";
+const BUILD_TIME = "2022/10/31 23:14:35";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -760,13 +760,19 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
                 yield Navigation.goToVillage(state, villageRequireEvade.id, CurrentActionEnum.EVADE);
                 return;
             }
+            if ($('.error').length > 0) {
+                yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
+                return;
+            }
             yield Utils.delayClick();
             const sendTroopButton = $("#ok");
             const confirmButton = $("#checksum");
             if (sendTroopButton.length > 0) {
                 $("#troops > tbody").find("td").each((column, td) => {
                     const troopInput = $(td).find("input");
-                    troopInput.val('99999');
+                    if (!troopInput.prop('disabled')) {
+                        troopInput.val('99999');
+                    }
                 });
                 if (((_c = villageRequireEvade.evadeRaidPosition) === null || _c === void 0 ? void 0 : _c.x) && ((_d = villageRequireEvade.evadeRaidPosition) === null || _d === void 0 ? void 0 : _d.y)) {
                     $("#xCoordInput").val(villageRequireEvade.evadeRaidPosition.x);
