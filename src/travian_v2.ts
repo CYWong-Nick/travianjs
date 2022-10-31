@@ -964,8 +964,10 @@ const checkAutoEvade = async (state: State) => {
             && params.get('gid') === '16' && params.get('tt') === '1') {
             informTroopsEvaded(state, villageRequireEvade)
             delete villageRequireEvade.evadeTime
+
             state.villages = villages
 
+            await Utils.delayClick()
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
         } else if (state.currentPage === CurrentPageEnum.TOWN) {

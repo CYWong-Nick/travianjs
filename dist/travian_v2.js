@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/10/31 23:14:35";
+const BUILD_TIME = "2022/10/31 23:42:05";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -792,6 +792,7 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
             informTroopsEvaded(state, villageRequireEvade);
             delete villageRequireEvade.evadeTime;
             state.villages = villages;
+            yield Utils.delayClick();
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
         }
