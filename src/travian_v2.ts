@@ -1186,18 +1186,31 @@ const render = (state: State) => {
         resourcesFromReport.clay = Utils.parseIntIgnoreNonNumeric($($('.resources').find('span.value')[1]).text());
         resourcesFromReport.iron = Utils.parseIntIgnoreNonNumeric($($('.resources').find('span.value')[2]).text());
         resourcesFromReport.crop = Utils.parseIntIgnoreNonNumeric($($('.resources').find('span.value')[3]).text());
-        const sum = resourcesFromReport.lumber + resourcesFromReport.clay + resourcesFromReport.iron + resourcesFromReport.crop;
         const cranny = Utils.parseIntIgnoreNonNumeric($('.rArea').text());
-        const troops70 = `<div id="troops-required-70">Troops Required: ${Math.ceil((sum - cranny * 4) / 70)} | ${Math.ceil((sum - (cranny * 0.85) * 4) / 70)} with hero (70 per troop)</div>`;
-        if ($('#troops-required-70').length === 0)
-            $(".additionalInformation").after(troops70);
+        // const troops70 = `<div id="troops-required-70">Troops Required: ${Math.ceil((sum - cranny * 4) / 70)} | ${Math.ceil((sum - (cranny * 0.85) * 4) / 70)} with hero (70 per troop)</div>`;
+        // if ($('#troops-required-70').length === 0)
+        //     $(".additionalInformation").after(troops70);
+        // else
+        //     $('#troops-required-70').replaceWith(troops70);
+        // const troops50 = `<div id="troops-required-50">Troops Required: ${Math.ceil((sum - cranny * 4) / 50)} | ${Math.ceil((sum - (cranny * 0.85) * 4) / 50)} with hero (50 per troop)</div>`;
+        // if ($('#troops-required-50').length === 0)
+        //     $(".additionalInformation").after(troops50);
+        // else
+        //     $('#troops-required-50').replaceWith(troops50);
+
+        const troops60 = `<div id="troops-required-60">Troops Required: ${Math.ceil((resourcesFromReport.lumber - cranny) / 60) + 
+        Math.ceil((resourcesFromReport.clay - cranny) / 60) + 
+        Math.ceil((resourcesFromReport.iron - cranny) / 60) + 
+        Math.ceil((resourcesFromReport.crop - cranny) / 60)} | ${
+            Math.ceil((resourcesFromReport.lumber - cranny*0.8) / 60) + 
+        Math.ceil((resourcesFromReport.clay - cranny*0.8) / 60) + 
+        Math.ceil((resourcesFromReport.iron - cranny*0.8) / 60) + 
+        Math.ceil((resourcesFromReport.crop - cranny*0.8) / 60)
+        } with hero (60 per troop)</div>`;
+        if ($('#troops-required-60').length === 0)
+            $(".additionalInformation").after(troops60);
         else
-            $('#troops-required-70').replaceWith(troops70);
-        const troops50 = `<div id="troops-required-50">Troops Required: ${Math.ceil((sum - cranny * 4) / 50)} | ${Math.ceil((sum - (cranny * 0.85) * 4) / 50)} with hero (50 per troop)</div>`;
-        if ($('#troops-required-50').length === 0)
-            $(".additionalInformation").after(troops50);
-        else
-            $('#troops-required-50').replaceWith(troops50);
+            $('#troops-required-60').replaceWith(troops60);
 
 
         let total = 0;
