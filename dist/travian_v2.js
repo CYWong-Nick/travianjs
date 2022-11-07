@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/04 00:40:51";
+const BUILD_TIME = "2022/11/07 21:15:35";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -128,6 +128,7 @@ StateHandler.INITIAL_STATE = {
         disableReportChecking: false,
         disableStopOnLoss: false,
         autoCustomFarm: false,
+        randomAction: false,
         debug: false
     },
     nextVillageRotationTime: new Date(),
@@ -933,6 +934,22 @@ const handleFeatureToggle = (selector, state, key) => {
         state.feature = feature;
     });
 };
+const randomAction = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    state.feature.debug && console.log("Do random action");
+    const actions = [];
+    $('#sidebarBoxLinklist li').each((_, ele) => {
+        const name = $(ele).find('.name').text();
+        const href = $(ele).find('a').attr('href');
+        if (!name.startsWith('#') && href) {
+            actions.push(href);
+        }
+    });
+    const target = actions[Math.floor(Math.random() * actions.length)];
+    yield Utils.delayClick();
+    state.currentAction = CurrentActionEnum.NAVIGATE_TO_FIELDS;
+    state.feature.debug && console.log(`Go to ${target}`);
+    $(`a[href='${target}']`)[0].click();
+});
 const render = (state) => {
     if (state.currentPage === CurrentPageEnum.BUILDING) {
         const btn = '<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>';
@@ -1029,6 +1046,7 @@ const render = (state) => {
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
+            <input id="toggleRandomAction" class="ml-5" type="checkbox" ${state.feature.randomAction ? 'checked' : ''}/> Random Action
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
         <div>
@@ -1257,6 +1275,7 @@ const render = (state) => {
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack');
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue');
     handleFeatureToggle('#toggleAlertResourceCapacityFull', state, 'alertResourceCapacityFull');
+    handleFeatureToggle('#toggleRandomAction', state, 'randomAction');
     handleFeatureToggle('#toggleDebug', state, 'debug');
 };
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
@@ -1266,6 +1285,12 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
             state.feature.debug && console.log("Attempt login");
             yield login(state);
+        }
+        if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
+            if (state.currentPage === CurrentPageEnum.FIELDS)
+                state.currentAction = CurrentActionEnum.IDLE;
+            else
+                yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
         }
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
             updateVillageList(state);
@@ -1286,12 +1311,6 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
                 state.feature.debug && console.log("Attempting build");
                 yield build(state);
-            }
-            if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
-                if (state.currentPage === CurrentPageEnum.FIELDS)
-                    state.currentAction = CurrentActionEnum.IDLE;
-                else
-                    yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             }
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.SCOUT].includes(state.currentAction)) {
                 if (state.feature.autoScout) {
@@ -1323,6 +1342,10 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
                 state.feature.debug && console.log("Try next village");
                 yield nextVillage(state);
+            }
+            if (state.currentAction === CurrentActionEnum.IDLE && state.feature.randomAction) {
+                if (Math.random() > 0.8)
+                    yield randomAction(state);
             }
         }
         state.feature.debug && console.log(`Awaiting ${RUN_INTERVAL}ms`);

@@ -82,6 +82,7 @@ interface Feature {
     disableReportChecking: boolean
     disableStopOnLoss: boolean
     autoCustomFarm: boolean
+    randomAction: boolean
     debug: boolean
 }
 
@@ -134,13 +135,14 @@ class StateHandler implements ProxyHandler<State> {
             disableReportChecking: false,
             disableStopOnLoss: false,
             autoCustomFarm: false,
+            randomAction: false,
             debug: false
         },
         nextVillageRotationTime: new Date(),
         nextScoutTime: new Date(),
         nextFarmTime: new Date(),
         nextCheckReportTime: new Date(),
-        farmIntervalMinutes: {min: 2, max: 4},
+        farmIntervalMinutes: { min: 2, max: 4 },
         plusEnabled: false,
         telegramChatId: '',
         telegramToken: '',
@@ -495,7 +497,7 @@ const updateVillageList = (state: State) => {
         const villageDefaults: Village = {
             id: '',
             name: '',
-            position: {x: 0, y: 0},
+            position: { x: 0, y: 0 },
             index: -1,
             currentBuildTasks: [],
             pendingBuildTasks: [],
@@ -523,7 +525,7 @@ const updateVillageList = (state: State) => {
             id,
             name,
             index,
-            position: {x, y},
+            position: { x, y },
         }
     })
 
@@ -541,7 +543,7 @@ const updateCurrentVillageStatus = (state: State) => {
     let iron = Utils.parseIntIgnoreNonNumeric($('#l3')[0].innerText)
     let crop = Utils.parseIntIgnoreNonNumeric($('#l4')[0].innerText)
 
-    villages[currentVillageId].resources = {lumber, clay, iron, crop}
+    villages[currentVillageId].resources = { lumber, clay, iron, crop }
 
     const warehouseCapacity = Utils.parseIntIgnoreNonNumeric($('.warehouse .capacity > div').text())
     const granaryCapacity = Utils.parseIntIgnoreNonNumeric($('.granary .capacity > div').text())
@@ -795,7 +797,7 @@ const build = async (state: State) => {
             const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText)
             const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText)
 
-            village.pendingBuildTasks[0].resources = {lumber, clay, iron, crop}
+            village.pendingBuildTasks[0].resources = { lumber, clay, iron, crop }
             state.villages = villages
 
             const bulidButton = $('.section1 > button.green')
@@ -939,11 +941,11 @@ const checkAutoEvade = async (state: State) => {
 
             if (sendTroopButton.length > 0) {
                 $("#troops > tbody").find("td").each((column, td) => {
-                        const troopInput = $(td).find("input")
-                        if (!troopInput.prop('disabled')) {
-                            troopInput.val('99999')
-                        }
+                    const troopInput = $(td).find("input")
+                    if (!troopInput.prop('disabled')) {
+                        troopInput.val('99999')
                     }
+                }
                 )
 
                 if (villageRequireEvade.evadeRaidPosition?.x && villageRequireEvade.evadeRaidPosition?.y) {
@@ -1142,6 +1144,26 @@ const handleFeatureToggle = (selector: string, state: State, key: keyof Feature)
     })
 }
 
+const randomAction = async (state: State) => {
+    state.feature.debug && console.log("Do random action")
+
+    const actions: string[] = []
+    $('#sidebarBoxLinklist li').each((_, ele) => {
+        const name = $(ele).find('.name').text()
+        const href = $(ele).find('a').attr('href')
+        if (!name.startsWith('#') && href) {
+            actions.push(href)
+        }
+    })
+
+    const target = actions[Math.floor(Math.random() * actions.length)];
+    await Utils.delayClick()
+    state.currentAction = CurrentActionEnum.NAVIGATE_TO_FIELDS
+    state.feature.debug && console.log(`Go to ${target}`)
+    $(`a[href='${target}']`)[0].click()
+
+}
+
 const render = (state: State) => {
     if (state.currentPage === CurrentPageEnum.BUILDING) {
         const btn = '<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>'
@@ -1198,15 +1220,14 @@ const render = (state: State) => {
         // else
         //     $('#troops-required-50').replaceWith(troops50);
 
-        const troops60 = `<div id="troops-required-60">Troops Required: ${Math.ceil((resourcesFromReport.lumber - cranny) / 60) + 
-        Math.ceil((resourcesFromReport.clay - cranny) / 60) + 
-        Math.ceil((resourcesFromReport.iron - cranny) / 60) + 
-        Math.ceil((resourcesFromReport.crop - cranny) / 60)} | ${
-            Math.ceil((resourcesFromReport.lumber - cranny*0.8) / 60) + 
-        Math.ceil((resourcesFromReport.clay - cranny*0.8) / 60) + 
-        Math.ceil((resourcesFromReport.iron - cranny*0.8) / 60) + 
-        Math.ceil((resourcesFromReport.crop - cranny*0.8) / 60)
-        } with hero (60 per troop)</div>`;
+        const troops60 = `<div id="troops-required-60">Troops Required: ${Math.ceil((resourcesFromReport.lumber - cranny) / 60) +
+            Math.ceil((resourcesFromReport.clay - cranny) / 60) +
+            Math.ceil((resourcesFromReport.iron - cranny) / 60) +
+            Math.ceil((resourcesFromReport.crop - cranny) / 60)} | ${Math.ceil((resourcesFromReport.lumber - cranny * 0.8) / 60) +
+            Math.ceil((resourcesFromReport.clay - cranny * 0.8) / 60) +
+            Math.ceil((resourcesFromReport.iron - cranny * 0.8) / 60) +
+            Math.ceil((resourcesFromReport.crop - cranny * 0.8) / 60)
+            } with hero (60 per troop)</div>`;
         if ($('#troops-required-60').length === 0)
             $(".additionalInformation").after(troops60);
         else
@@ -1250,6 +1271,7 @@ const render = (state: State) => {
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
+            <input id="toggleRandomAction" class="ml-5" type="checkbox" ${state.feature.randomAction ? 'checked' : ''}/> Random Action
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
         <div>
@@ -1284,13 +1306,13 @@ const render = (state: State) => {
                     </div>`}
                     <br />
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
-        `<div class="flex-row">
+            `<div class="flex-row">
                             <input id="minCustomFarmMinutes" style="width: 5%">min</input>
                             <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
                             <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
                         </div>`
-        : ''
-    }
+            : ''
+        }
                     ${(village.customFarms || []).map((customFarm, idx) => `                    
                     <div class="flex-row">
                         <div>Next custom farm time: ${Utils.formatDate(customFarm.nextCustomFarmTime)}</div>
@@ -1368,22 +1390,22 @@ const render = (state: State) => {
 
 
     state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2' &&
-    $('#addCurrentToCustomFarm').on('click', () => {
-        const villages = state.villages
-        let customFarm = {
-            position: {
-                "x": -999,
-                "y": -999
-            },
-            type: FarmType.RAID,
-            farmIntervalMinutes: {
-                "min": 999,
-                "max": 999
-            },
-            troops: {}
-        } as CustomFarm
+        $('#addCurrentToCustomFarm').on('click', () => {
+            const villages = state.villages
+            let customFarm = {
+                position: {
+                    "x": -999,
+                    "y": -999
+                },
+                type: FarmType.RAID,
+                farmIntervalMinutes: {
+                    "min": 999,
+                    "max": 999
+                },
+                troops: {}
+            } as CustomFarm
 
-        $("#troops > tbody").find("td").each((column, td) => {
+            $("#troops > tbody").find("td").each((column, td) => {
                 const troopInput = $(td).find("input")
                 const troopKey = troopInput.attr('name')
                 const troopCount = troopInput.val() as string
@@ -1392,22 +1414,22 @@ const render = (state: State) => {
                     customFarm.troops[troopKey] = troopCount
                 }
             }
-        )
+            )
 
-        const typeString = $('input[type=radio]:checked').parent().text()
-        customFarm.type = typeString.includes('Normal') ? FarmType.ATTACK : FarmType.RAID
+            const typeString = $('input[type=radio]:checked').parent().text()
+            customFarm.type = typeString.includes('Normal') ? FarmType.ATTACK : FarmType.RAID
 
-        customFarm.position.x = parseInt($("#xCoordInput").val() as string)
-        customFarm.position.y = parseInt($("#yCoordInput").val() as string)
+            customFarm.position.x = parseInt($("#xCoordInput").val() as string)
+            customFarm.position.y = parseInt($("#yCoordInput").val() as string)
 
-        customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val() as string)
-        customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val() as string)
+            customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val() as string)
+            customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val() as string)
 
-        customFarm.nextCustomFarmTime = new Date()
+            customFarm.nextCustomFarmTime = new Date()
 
-        currentVillage.customFarms = (currentVillage.customFarms || []).concat(customFarm)
-        state.villages = villages
-    })
+            currentVillage.customFarms = (currentVillage.customFarms || []).concat(customFarm)
+            state.villages = villages
+        })
 
     $('.removeCustomFarm').on('click', (ele) => {
         const idx = ele.target.attributes.getNamedItem('idx')?.value
@@ -1505,6 +1527,7 @@ const render = (state: State) => {
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue')
     handleFeatureToggle('#toggleAlertResourceCapacityFull', state, 'alertResourceCapacityFull')
+    handleFeatureToggle('#toggleRandomAction', state, 'randomAction')
     handleFeatureToggle('#toggleDebug', state, 'debug')
 }
 
@@ -1516,6 +1539,13 @@ const run = async (state: State) => {
         if ([CurrentPageEnum.LOGIN].includes(state.currentPage) && state.feature.autoLogin) {
             state.feature.debug && console.log("Attempt login")
             await login(state)
+        }
+
+        if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
+            if (state.currentPage === CurrentPageEnum.FIELDS)
+                state.currentAction = CurrentActionEnum.IDLE
+            else
+                await Navigation.goToFields(state, CurrentActionEnum.IDLE)
         }
 
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN, CurrentPageEnum.BUILDING, CurrentPageEnum.REPORT, CurrentPageEnum.OFF_REPORT, CurrentPageEnum.SCOUT_REPORT].includes(state.currentPage)) {
@@ -1542,13 +1572,6 @@ const run = async (state: State) => {
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.BUILD].includes(state.currentAction) && state.feature.autoBuild) {
                 state.feature.debug && console.log("Attempting build")
                 await build(state)
-            }
-
-            if (CurrentActionEnum.NAVIGATE_TO_FIELDS === state.currentAction) {
-                if (state.currentPage === CurrentPageEnum.FIELDS)
-                    state.currentAction = CurrentActionEnum.IDLE
-                else
-                    await Navigation.goToFields(state, CurrentActionEnum.IDLE)
             }
 
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.SCOUT].includes(state.currentAction)) {
@@ -1581,6 +1604,11 @@ const run = async (state: State) => {
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.autoScan) {
                 state.feature.debug && console.log("Try next village")
                 await nextVillage(state)
+            }
+
+            if (state.currentAction === CurrentActionEnum.IDLE && state.feature.randomAction) {
+                if (Math.random() > 0.8)
+                    await randomAction(state)
             }
         }
 
