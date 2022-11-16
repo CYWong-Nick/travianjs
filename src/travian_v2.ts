@@ -1291,6 +1291,8 @@ const render = (state: State) => {
         <div>
             <h4>Action</h4>
             ${state.currentPage === CurrentPageEnum.FIELDS ? '<button id="addAllFields">Add all fields</button>' : ''}
+            <button id="copyState">Copy State</button>
+            <button id="pasteState">Paste State</button>
         </div>
         <br />
         <div class="flex-row">
@@ -1515,6 +1517,21 @@ const render = (state: State) => {
         };
         state.farmIntervalMinutes = farmIntervalMinutes;
     });
+
+    $('#copyState').on('click', () => {
+        navigator.clipboard.writeText(JSON.stringify(localStorage))
+    })
+
+    $('#pasteState').on('click', () => {
+        navigator.clipboard.readText()
+            .then(JSON.parse)
+            .then(Object.entries)
+            .then(entries =>
+                entries.forEach(([k, v]) =>
+                    localStorage.setItem(k, v)
+                )
+            )
+    })
 
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin')
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan')
