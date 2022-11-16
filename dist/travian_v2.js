@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/16 23:31:21";
+const BUILD_TIME = "2022/11/16 23:37:46";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -830,9 +830,7 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
                     if (customFarm.troops[troopKey]) {
                         state.feature.debug && (console.log("Troop Key: ", troopKey));
                         const troopInputEle = $(`input[name="${troopKey}"]`);
-                        console.log(troopInputEle.parent().find('a').text());
-                        console.log(parseInt(customFarm.troops[troopKey]));
-                        if (troopInputEle.prop('disabled') || parseInt(troopInputEle.parent().find('a').text()) < parseInt(customFarm.troops[troopKey])) {
+                        if (troopInputEle.prop('disabled') || parseInt($('input[name="troop[t1]"]').parent().find('a').text().trim()) < parseInt(customFarm.troops[troopKey])) {
                             village.customFarms[idx].nextCustomFarmTime = Utils.addToDate(new Date(), 0, 1, 0);
                             state.villages = villages;
                             yield Navigation.goToTown(state, CurrentActionEnum.IDLE);
