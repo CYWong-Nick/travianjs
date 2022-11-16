@@ -1011,7 +1011,7 @@ const executeCustomFarm = async (state: State, idx: number) => {
                         state.feature.debug && (console.log("Troop Key: ", troopKey))
                         const troopInputEle = $(`input[name="${troopKey}"]`);
 
-                        if (troopInputEle.prop('disabled') || parseInt($('input[name="troop[t1]"]').parent().find('a').text()) < parseInt(customFarm.troops[troopKey])) {
+                        if (troopInputEle.prop('disabled') || parseInt(troopInputEle.parent().find('a').text()) < parseInt(customFarm.troops[troopKey])) {
                             village.customFarms![idx].nextCustomFarmTime = Utils.addToDate(
                                 new Date(),
                                 0,
