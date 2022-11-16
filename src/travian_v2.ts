@@ -1520,6 +1520,7 @@ const render = (state: State) => {
 
     $('#copyState').on('click', () => {
         navigator.clipboard.writeText(JSON.stringify(localStorage))
+        alert("Copied!")
     })
 
     $('#pasteState').on('click', () => {
