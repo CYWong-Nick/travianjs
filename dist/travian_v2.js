@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/16 11:25:06";
+const BUILD_TIME = "2022/11/16 11:37:19";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1274,7 +1274,7 @@ const render = (state) => {
         navigator.clipboard.readText()
             .then(JSON.parse)
             .then(Object.entries)
-            .then(entries => entries.forEach(([k, v]) => localStorage.setItem(k, v))).then(window.location.reload);
+            .then(entries => entries.forEach(([k, v]) => localStorage.setItem(k, v))).then(() => window.location.reload());
     });
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin');
     handleFeatureToggle('#toggleAutoScan', state, 'autoScan');

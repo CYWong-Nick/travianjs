@@ -1531,7 +1531,7 @@ const render = (state: State) => {
                 entries.forEach(([k, v]) =>
                     localStorage.setItem(k, v)
                 )
-            ).then(window.location.reload)
+            ).then(() => window.location.reload())
     })
 
     handleFeatureToggle('#toggleAutoLogin', state, 'autoLogin')
