@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/17 11:12:22";
+const BUILD_TIME = "2022/11/17 18:31:36";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1356,7 +1356,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 yield nextVillage(state);
             }
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.randomAction) {
-                if (Math.random() > 0.8)
+                if (Math.random() > 0.9)
                     yield randomAction(state);
             }
         }
