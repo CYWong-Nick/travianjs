@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/16 11:37:19";
+const BUILD_TIME = "2022/11/17 11:04:43";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1267,8 +1267,8 @@ const render = (state) => {
         state.farmIntervalMinutes = farmIntervalMinutes;
     });
     $('#copyState').on('click', () => {
-        navigator.clipboard.writeText(JSON.stringify(localStorage));
-        alert("Copied!");
+        navigator.clipboard.writeText(JSON.stringify(localStorage))
+            .then(() => alert("Copied!"));
     });
     $('#pasteState').on('click', () => {
         navigator.clipboard.readText()
