@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/16 23:54:23";
+const BUILD_TIME = "2022/11/19 23:17:12";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -770,18 +770,25 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
             const sendTroopButton = $("#ok");
             const confirmButton = $("#checksum");
             if (sendTroopButton.length > 0) {
+                let needSendTroop = false;
                 $("#troops > tbody").find("td").each((column, td) => {
                     const troopInput = $(td).find("input");
                     if (!troopInput.prop('disabled')) {
                         troopInput.val('99999');
+                        needSendTroop = true;
                     }
                 });
                 if (((_c = villageRequireEvade.evadeRaidPosition) === null || _c === void 0 ? void 0 : _c.x) && ((_d = villageRequireEvade.evadeRaidPosition) === null || _d === void 0 ? void 0 : _d.y)) {
                     $("#xCoordInput").val(villageRequireEvade.evadeRaidPosition.x);
                     $("#yCoordInput").val(villageRequireEvade.evadeRaidPosition.y);
                 }
-                $('.radio')[2].click();
-                sendTroopButton[0].click();
+                if (needSendTroop) {
+                    $('.radio')[2].click();
+                    sendTroopButton[0].click();
+                }
+                else {
+                    delete villageRequireEvade.evadeTime;
+                }
             }
             else if (confirmButton.length > 0) {
                 yield Utils.delayClick();

@@ -940,22 +940,26 @@ const checkAutoEvade = async (state: State) => {
             const confirmButton = $("#checksum")
 
             if (sendTroopButton.length > 0) {
+                let needSendTroop = false
                 $("#troops > tbody").find("td").each((column, td) => {
                     const troopInput = $(td).find("input")
                     if (!troopInput.prop('disabled')) {
                         troopInput.val('99999')
+                        needSendTroop = true
                     }
-                }
-                )
+                })
 
                 if (villageRequireEvade.evadeRaidPosition?.x && villageRequireEvade.evadeRaidPosition?.y) {
                     $("#xCoordInput").val(villageRequireEvade.evadeRaidPosition.x)
                     $("#yCoordInput").val(villageRequireEvade.evadeRaidPosition.y)
                 }
 
-                $('.radio')[2].click()
-
-                sendTroopButton[0].click();
+                if (needSendTroop) {
+                    $('.radio')[2].click()
+                    sendTroopButton[0].click();
+                } else {
+                    delete villageRequireEvade.evadeTime
+                }
 
             } else if (confirmButton.length > 0) {
                 await Utils.delayClick()
