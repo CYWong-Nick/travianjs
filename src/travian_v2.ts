@@ -1524,7 +1524,9 @@ const render = (state: State) => {
 
     $('#copyState').on('click', () => {
         navigator.clipboard.writeText(JSON.stringify(localStorage))
-        alert("Copied!")
+        .then(() =>
+            alert("Copied!")
+        )
     })
 
     $('#pasteState').on('click', () => {
@@ -1629,7 +1631,7 @@ const run = async (state: State) => {
             }
 
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.randomAction) {
-                if (Math.random() > 0.8)
+                if (Math.random() > 0.9)
                     await randomAction(state)
             }
         }

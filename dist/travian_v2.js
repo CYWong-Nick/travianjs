@@ -1274,8 +1274,8 @@ const render = (state) => {
         state.farmIntervalMinutes = farmIntervalMinutes;
     });
     $('#copyState').on('click', () => {
-        navigator.clipboard.writeText(JSON.stringify(localStorage));
-        alert("Copied!");
+        navigator.clipboard.writeText(JSON.stringify(localStorage))
+            .then(() => alert("Copied!"));
     });
     $('#pasteState').on('click', () => {
         navigator.clipboard.readText()
@@ -1363,7 +1363,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 yield nextVillage(state);
             }
             if (state.currentAction === CurrentActionEnum.IDLE && state.feature.randomAction) {
-                if (Math.random() > 0.8)
+                if (Math.random() > 0.9)
                     yield randomAction(state);
             }
         }
