@@ -80,6 +80,7 @@ interface Feature {
     alertResourceCapacityFull: boolean
     autoScout: boolean
     autoFarm: boolean
+    autoFarmOasis: boolean
     disableReportChecking: boolean
     disableStopOnLoss: boolean
     autoCustomFarm: boolean
@@ -135,6 +136,7 @@ class StateHandler implements ProxyHandler<State> {
             alertResourceCapacityFull: false,
             autoScout: false,
             autoFarm: false,
+            autoFarmOasis: false,
             disableReportChecking: false,
             disableStopOnLoss: false,
             autoCustomFarm: false,
@@ -1288,6 +1290,7 @@ const render = (state: State) => {
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAutoScout" class="ml-5" type="checkbox" ${state.feature.autoScout ? 'checked' : ''}/> Auto scout
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
+            <input id="toggleAutoFarmOasis" class="ml-5" type="checkbox" ${state.feature.autoFarmOasis ? 'checked' : ''}/> Auto farm oasis
             <input id="toggleDisableReportChecking" class="ml-5" type="checkbox" ${state.feature.disableReportChecking ? 'checked' : ''}/> Disable report checking
             <input id="toggleDisableStopOnLoss" class="ml-5" type="checkbox" ${state.feature.disableStopOnLoss ? 'checked' : ''}/> Disable stop on loss
             <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
@@ -1577,6 +1580,7 @@ const render = (state: State) => {
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild')
     handleFeatureToggle('#toggleAutoScout', state, 'autoScout')
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm')
+    handleFeatureToggle('#toggleAutoFarmOasis', state, 'autoFarmOasis')
     handleFeatureToggle('#toggleDisableReportChecking', state, 'disableReportChecking')
     handleFeatureToggle('#toggleDisableStopOnLoss', state, 'disableStopOnLoss');
     handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm')
@@ -1649,7 +1653,7 @@ const run = async (state: State) => {
             }
 
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.OASIS_FARM].includes(state.currentAction)) {
-                if (state.feature.autoFarm) {
+                if (state.feature.autoFarmOasis) {
                     state.feature.debug && console.log("Attempting farm oasis")
                     await farm(state, "Oasis")
                 } else {

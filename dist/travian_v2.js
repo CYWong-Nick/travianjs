@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/20 20:16:09";
+const BUILD_TIME = "2022/11/20 20:18:07";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -126,6 +126,7 @@ StateHandler.INITIAL_STATE = {
         alertResourceCapacityFull: false,
         autoScout: false,
         autoFarm: false,
+        autoFarmOasis: false,
         disableReportChecking: false,
         disableStopOnLoss: false,
         autoCustomFarm: false,
@@ -1063,6 +1064,7 @@ const render = (state) => {
             <input id="toggleAutoBuild" class="ml-5" type="checkbox" ${state.feature.autoBuild ? 'checked' : ''}/> Auto build
             <input id="toggleAutoScout" class="ml-5" type="checkbox" ${state.feature.autoScout ? 'checked' : ''}/> Auto scout
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
+            <input id="toggleAutoFarmOasis" class="ml-5" type="checkbox" ${state.feature.autoFarmOasis ? 'checked' : ''}/> Auto farm oasis
             <input id="toggleDisableReportChecking" class="ml-5" type="checkbox" ${state.feature.disableReportChecking ? 'checked' : ''}/> Disable report checking
             <input id="toggleDisableStopOnLoss" class="ml-5" type="checkbox" ${state.feature.disableStopOnLoss ? 'checked' : ''}/> Disable stop on loss
             <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
@@ -1317,6 +1319,7 @@ const render = (state) => {
     handleFeatureToggle('#toggleAutoBuild', state, 'autoBuild');
     handleFeatureToggle('#toggleAutoScout', state, 'autoScout');
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm');
+    handleFeatureToggle('#toggleAutoFarmOasis', state, 'autoFarmOasis');
     handleFeatureToggle('#toggleDisableReportChecking', state, 'disableReportChecking');
     handleFeatureToggle('#toggleDisableStopOnLoss', state, 'disableStopOnLoss');
     handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm');
@@ -1379,7 +1382,7 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 }
             }
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.OASIS_FARM].includes(state.currentAction)) {
-                if (state.feature.autoFarm) {
+                if (state.feature.autoFarmOasis) {
                     state.feature.debug && console.log("Attempting farm oasis");
                     yield farm(state, "Oasis");
                 }
