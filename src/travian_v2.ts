@@ -66,6 +66,7 @@ enum CurrentActionEnum {
     NAVIGATE_TO_FIELDS = "NAVIGATE_TO_FIELDS",
     SCOUT = "SCOUT",
     FARM = "FARM",
+    OASIS_FARM = "OASIS_FARM",
     EVADE = "EVADE",
     CUSTOM_FARM = "CUSTOM_FARM"
 }
@@ -108,8 +109,10 @@ interface State {
     nextVillageRotationTime: Date
     nextScoutTime: Date
     nextFarmTime: Date
+    nextFarmOasisTime: Date
     nextCheckReportTime: Date
     farmIntervalMinutes: { min: number, max: number }
+    farmOasisIntervalMinutes: { min: number, max: number }
     plusEnabled: boolean
     telegramChatId: string
     telegramToken: string
@@ -141,8 +144,10 @@ class StateHandler implements ProxyHandler<State> {
         nextVillageRotationTime: new Date(),
         nextScoutTime: new Date(),
         nextFarmTime: new Date(),
+        nextFarmOasisTime: new Date(),
         nextCheckReportTime: new Date(),
-        farmIntervalMinutes: { min: 2, max: 4 },
+        farmIntervalMinutes: { min: 8, max: 12 },
+        farmOasisIntervalMinutes: { min: 2, max: 4 },
         plusEnabled: false,
         telegramChatId: '',
         telegramToken: '',
@@ -858,8 +863,8 @@ const scout = async (state: State) => {
     }
 }
 
-const farm = async (state: State) => {
-    if (new Date(state.nextFarmTime) < new Date()) {
+const farm = async (state: State, targetPrefix?: "Oasis") => {
+    if ((new Date(state.nextFarmTime) < new Date() && !targetPrefix) || (new Date(state.nextFarmOasisTime) < new Date() && targetPrefix)) {
         const params = new URLSearchParams(window.location.search);
         if (state.currentPage === CurrentPageEnum.REPORT) {
             await Utils.delayClick()
@@ -883,13 +888,18 @@ const farm = async (state: State) => {
             return
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
             const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
-                return $(button).parent().parent().find('.listName').find('span').text() !== "Scout"
+                const text = $(button).parent().parent().find('.listName').find('span').text();
+                return text !== "Scout" && ((!targetPrefix && !text.startsWith("Oasis")) || (!!targetPrefix && text.startsWith(targetPrefix)))
             })
             for (let i = 0; i < startButtonEle.length; i++) {
                 await Utils.delayClick()
                 startButtonEle[i].click()
             }
-            state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59))
+            if (!targetPrefix) {
+                state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59))
+            } else if (targetPrefix === "Oasis") {
+                state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 59))
+            }
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
@@ -1268,7 +1278,9 @@ const render = (state: State) => {
         }
     }
 
-    $('#console').html(`
+    Object.values(villages).forEach(village => {
+
+        $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
             <input id="toggleAutoLogin" class="ml-5" type="checkbox" ${state.feature.autoLogin ? 'checked' : ''}/> Auto login
@@ -1289,15 +1301,22 @@ const render = (state: State) => {
             <h4>Summary (Build: ${BUILD_TIME})</h4>
             <div>Current Page: ${state.currentPage} (Last render: ${Utils.formatDate(new Date())})</div>
             <div>Current Action: ${state.currentAction}</div>
-            <div>Interval Range: ${state.farmIntervalMinutes.min}mins - ${state.farmIntervalMinutes.max}mins</div>
+            <div>Interval Range [Farm]: ${state.farmIntervalMinutes.min}mins - ${state.farmIntervalMinutes.max}mins</div>
             <div class="flex-row">
                 <input id="minFarmMinutes" style="width: 5%">min</input>
                 <input id="maxFarmMinutes" style="width: 5%">max</input>
                 <button id="updateFarmInterval" class="ml-5">Update</button>
             </div>
+            <div>Interval Range [Oasis]: ${state.farmOasisIntervalMinutes.min}mins - ${state.farmOasisIntervalMinutes.max}mins</div>
+            <div class="flex-row">
+                <input id="minFarmOasisMinutes" style="width: 5%">min</input>
+                <input id="maxFarmOasisMinutes" style="width: 5%">max</input>
+                <button id="updateFarmOasisInterval" class="ml-5">Update</button>
+            </div>
             <div>Next rotation: ${Utils.formatDate(state.nextVillageRotationTime)}</div>
             <div>Next scout: ${Utils.formatDate(state.nextScoutTime)}</div>
             <div>Next farm: ${Utils.formatDate(state.nextFarmTime)}</div>
+            <div>Next farm oasis: ${Utils.formatDate(state.nextFarmOasisTime)}</div>
         </div>
         <div>
             <h4>Action</h4>
@@ -1379,8 +1398,6 @@ const render = (state: State) => {
             `).join('')}
         </div>
     `)
-
-    Object.values(villages).forEach(village => {
         $(`#updateEvadeRaidTarget-${village.id}`).on('click', () => {
             const villages = state.villages
             const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val() as string)
@@ -1529,6 +1546,14 @@ const render = (state: State) => {
         state.farmIntervalMinutes = farmIntervalMinutes;
     });
 
+    $('#updateFarmOasisInterval').on('click', () => {
+        const farmOasisIntervalMinutes = {
+            min: parseInt($("#minFarmOasisMinutes").val() as string),
+            max: parseInt($("#maxFarmOasisMinutes").val() as string)
+        }
+        state.farmOasisIntervalMinutes = farmOasisIntervalMinutes
+    })
+
     $('#copyState').on('click', () => {
         navigator.clipboard.writeText(JSON.stringify(localStorage))
         .then(() =>
@@ -1617,7 +1642,16 @@ const run = async (state: State) => {
             if ([CurrentActionEnum.IDLE, CurrentActionEnum.FARM].includes(state.currentAction)) {
                 if (state.feature.autoFarm) {
                     state.feature.debug && console.log("Attempting farm")
-                    await farm(state)
+                    await farm(state, undefined)
+                } else {
+                    state.currentAction = CurrentActionEnum.IDLE
+                }
+            }
+
+            if ([CurrentActionEnum.IDLE, CurrentActionEnum.OASIS_FARM].includes(state.currentAction)) {
+                if (state.feature.autoFarm) {
+                    state.feature.debug && console.log("Attempting farm oasis")
+                    await farm(state, "Oasis")
                 } else {
                     state.currentAction = CurrentActionEnum.IDLE
                 }
