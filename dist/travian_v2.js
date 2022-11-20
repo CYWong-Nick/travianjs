@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/19 23:31:03";
+const BUILD_TIME = "2022/11/20 12:17:25";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -773,7 +773,7 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
                 let needSendTroop = false;
                 $("#troops > tbody").find("td").each((column, td) => {
                     const troopInput = $(td).find("input");
-                    if (!troopInput.prop('disabled')) {
+                    if (troopInput.length > 0 || !troopInput.prop('disabled')) {
                         troopInput.val('99999');
                         needSendTroop = true;
                     }
@@ -957,6 +957,12 @@ const randomAction = (state) => __awaiter(void 0, void 0, void 0, function* () {
     state.feature.debug && console.log(`Go to ${target}`);
     $(`a[href='${target}']`)[0].click();
 });
+// const autoAdventure = () => {
+//     const adventureButton = $('a[href="/hero/adventures"]')
+//     const adventureCount = adventureButton.parent().find('div[class="content"]')
+//
+//
+// }
 const render = (state) => {
     if (state.currentPage === CurrentPageEnum.BUILDING) {
         const btn = '<button id="addCurrentToPendingInBuilding" class="tjs-btn addCurrentToPending">Add to queue</button>';

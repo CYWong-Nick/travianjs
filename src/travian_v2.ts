@@ -943,7 +943,7 @@ const checkAutoEvade = async (state: State) => {
                 let needSendTroop = false
                 $("#troops > tbody").find("td").each((column, td) => {
                     const troopInput = $(td).find("input")
-                    if (!troopInput.prop('disabled')) {
+                    if (troopInput.length > 0 || !troopInput.prop('disabled')) {
                         troopInput.val('99999')
                         needSendTroop = true
                     }
@@ -1167,6 +1167,13 @@ const randomAction = async (state: State) => {
     $(`a[href='${target}']`)[0].click()
 
 }
+
+// const autoAdventure = () => {
+//     const adventureButton = $('a[href="/hero/adventures"]')
+//     const adventureCount = adventureButton.parent().find('div[class="content"]')
+//
+//
+// }
 
 const render = (state: State) => {
     if (state.currentPage === CurrentPageEnum.BUILDING) {
