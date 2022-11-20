@@ -884,7 +884,7 @@ const farm = async (state: State, targetPrefix?: "Oasis") => {
                 fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`)
             }
             state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0)
-            await Navigation.goToTown(state, CurrentActionEnum.FARM)
+            await Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
             return
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
             const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
@@ -908,16 +908,16 @@ const farm = async (state: State, targetPrefix?: "Oasis") => {
             return
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
             if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
-                await Navigation.goToReport(state, CurrentActionEnum.FARM)
+                await Navigation.goToReport(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
             } else {
-                await Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM)
+                await Navigation.goToBuilding(state, 39, 16, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
             }
             return
         } else {
             if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
-                await Navigation.goToReport(state, CurrentActionEnum.FARM)
+                await Navigation.goToReport(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
             } else {
-                await Navigation.goToTown(state, CurrentActionEnum.FARM)
+                await Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
             }
             return
         }

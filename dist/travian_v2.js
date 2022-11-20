@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/20 20:03:35";
+const BUILD_TIME = "2022/11/20 20:16:09";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -709,7 +709,7 @@ const farm = (state, targetPrefix) => __awaiter(void 0, void 0, void 0, function
                 fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`);
             }
             state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0);
-            yield Navigation.goToTown(state, CurrentActionEnum.FARM);
+            yield Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
             return;
         }
         else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
@@ -737,19 +737,19 @@ const farm = (state, targetPrefix) => __awaiter(void 0, void 0, void 0, function
         }
         else if (state.currentPage === CurrentPageEnum.TOWN) {
             if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
-                yield Navigation.goToReport(state, CurrentActionEnum.FARM);
+                yield Navigation.goToReport(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
             }
             else {
-                yield Navigation.goToBuilding(state, 39, 16, CurrentActionEnum.FARM);
+                yield Navigation.goToBuilding(state, 39, 16, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
             }
             return;
         }
         else {
             if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
-                yield Navigation.goToReport(state, CurrentActionEnum.FARM);
+                yield Navigation.goToReport(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
             }
             else {
-                yield Navigation.goToTown(state, CurrentActionEnum.FARM);
+                yield Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
             }
             return;
         }
