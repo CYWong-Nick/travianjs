@@ -881,6 +881,7 @@ const farm = async (state: State, targetPrefix?: "Oasis") => {
                 if (!state.feature.disableStopOnLoss) {
                     const feature = state.feature;
                     feature.autoFarm = false;
+                    feature.autoFarmOasis = false;
                     state.feature = feature;
                 }
                 fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`)

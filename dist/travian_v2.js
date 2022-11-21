@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/20 20:18:07";
+const BUILD_TIME = "2022/11/21 18:27:32";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -705,6 +705,7 @@ const farm = (state, targetPrefix) => __awaiter(void 0, void 0, void 0, function
                 if (!state.feature.disableStopOnLoss) {
                     const feature = state.feature;
                     feature.autoFarm = false;
+                    feature.autoFarmOasis = false;
                     state.feature = feature;
                 }
                 fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`);
