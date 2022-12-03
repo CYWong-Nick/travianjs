@@ -1403,6 +1403,7 @@ const render = (state: State) => {
         </div>
     `)
         $(`#updateEvadeRaidTarget-${village.id}`).on('click', () => {
+            console.log("CLICK UPDATE")
             const villages = state.villages
             const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val() as string)
             const positionY = parseInt($(`#evadeRaidTargetY-${village.id}`).val() as string)

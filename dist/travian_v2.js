@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/11/22 08:31:30";
+const BUILD_TIME = "2022/12/04 02:02:01";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1176,6 +1176,7 @@ const render = (state) => {
         </div>
     `);
         $(`#updateEvadeRaidTarget-${village.id}`).on('click', () => {
+            console.log("CLICK UPDATE");
             const villages = state.villages;
             const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val());
             const positionY = parseInt($(`#evadeRaidTargetY-${village.id}`).val());
