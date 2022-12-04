@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/04 17:10:00";
+const BUILD_TIME = "2022/12/04 17:18:31";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -630,6 +630,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
     const village = villages[state.currentVillageId];
     const task = getNextBuildTask(village, state.plusEnabled);
     if (task) {
+        const taskIdx = village.pendingBuildTasks.findIndex(t => t.aid === task.aid && t.gid === task.gid);
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
             const success = yield Navigation.goToBuilding(state, task.aid, task.gid, CurrentActionEnum.BUILD);
             if (!success) {
@@ -655,14 +656,13 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             const clay = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[1].innerText);
             const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText);
             const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText);
-            village.pendingBuildTasks[0].resources = { lumber, clay, iron, crop };
+            village.pendingBuildTasks[taskIdx].resources = { lumber, clay, iron, crop };
             state.villages = villages;
             const bulidButton = $('.section1 > button.green');
             if (bulidButton.length) {
                 yield Utils.delayClick();
                 state.currentAction = CurrentActionEnum.IDLE;
-                let idx = village.pendingBuildTasks.findIndex(t => t.aid === task.aid && t.gid === task.gid);
-                village.pendingBuildTasks.splice(idx, 1);
+                village.pendingBuildTasks.splice(taskIdx, 1);
                 state.villages = villages;
                 bulidButton.trigger('click');
                 return;

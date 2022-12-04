@@ -801,6 +801,7 @@ const build = async (state: State) => {
     const village = villages[state.currentVillageId]
     const task = getNextBuildTask(village, state.plusEnabled)
     if (task) {
+        const taskIdx = village.pendingBuildTasks.findIndex(t => t.aid === task.aid && t.gid === task.gid)
         if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
             const success = await Navigation.goToBuilding(state, task.aid, task.gid, CurrentActionEnum.BUILD)
             if (!success) {
@@ -832,15 +833,14 @@ const build = async (state: State) => {
             const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText)
             const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText)
 
-            village.pendingBuildTasks[0].resources = { lumber, clay, iron, crop }
+            village.pendingBuildTasks[taskIdx].resources = { lumber, clay, iron, crop }
             state.villages = villages
 
             const bulidButton = $('.section1 > button.green')
             if (bulidButton.length) {
                 await Utils.delayClick()
                 state.currentAction = CurrentActionEnum.IDLE
-                let idx = village.pendingBuildTasks.findIndex(t => t.aid === task.aid && t.gid === task.gid)
-                village.pendingBuildTasks.splice(idx, 1)
+                village.pendingBuildTasks.splice(taskIdx, 1)
                 state.villages = villages
                 bulidButton.trigger('click')
                 return
