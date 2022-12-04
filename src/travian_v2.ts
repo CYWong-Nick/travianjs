@@ -772,18 +772,20 @@ const getNextBuildTask = (village: Village, plusEnabled: boolean) => {
     const effectiveCurrentTasks = village.currentBuildTasks.filter(task => new Date(task.finishTime) > new Date())
     let targetTask
     if (village.isRoman) {
-        let fieldCount = 0
-        let buildingCount = 0
-        effectiveCurrentTasks.forEach(task => {
-            if (["Woodcutter", "Clay Pit", "Iron Mine", "Cropland"].includes(task.name))
-                fieldCount += 1
-            else
-                buildingCount += 1
-        })
+        if (effectiveCurrentTasks.length < 3) {
+            let fieldCount = 0
+            let buildingCount = 0
+            effectiveCurrentTasks.forEach(task => {
+                if (["Woodcutter", "Clay Pit", "Iron Mine", "Cropland"].includes(task.name))
+                    fieldCount += 1
+                else
+                    buildingCount += 1
+            })
 
-        targetTask = village.pendingBuildTasks.find(
-            task => (task.gid <= 4 && fieldCount <= (plusEnabled ? 1 : 0)) || (task.gid > 4 && buildingCount <= (plusEnabled ? 1 : 0))
-        )
+            targetTask = village.pendingBuildTasks.find(
+                task => (task.gid <= 4 && fieldCount <= (plusEnabled ? 1 : 0)) || (task.gid > 4 && buildingCount <= (plusEnabled ? 1 : 0))
+            )
+        }
     } else {
         if (effectiveCurrentTasks.length < (plusEnabled ? 2 : 1))
             targetTask = village.pendingBuildTasks[0]

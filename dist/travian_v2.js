@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/04 16:53:29";
+const BUILD_TIME = "2022/12/04 16:59:25";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -605,15 +605,17 @@ const getNextBuildTask = (village, plusEnabled) => {
     const effectiveCurrentTasks = village.currentBuildTasks.filter(task => new Date(task.finishTime) > new Date());
     let targetTask;
     if (village.isRoman) {
-        let fieldCount = 0;
-        let buildingCount = 0;
-        effectiveCurrentTasks.forEach(task => {
-            if (["Woodcutter", "Clay Pit", "Iron Mine", "Cropland"].includes(task.name))
-                fieldCount += 1;
-            else
-                buildingCount += 1;
-        });
-        targetTask = village.pendingBuildTasks.find(task => (task.gid <= 4 && fieldCount <= (plusEnabled ? 1 : 0)) || (task.gid > 4 && buildingCount <= (plusEnabled ? 1 : 0)));
+        if (effectiveCurrentTasks.length < 3) {
+            let fieldCount = 0;
+            let buildingCount = 0;
+            effectiveCurrentTasks.forEach(task => {
+                if (["Woodcutter", "Clay Pit", "Iron Mine", "Cropland"].includes(task.name))
+                    fieldCount += 1;
+                else
+                    buildingCount += 1;
+            });
+            targetTask = village.pendingBuildTasks.find(task => (task.gid <= 4 && fieldCount <= (plusEnabled ? 1 : 0)) || (task.gid > 4 && buildingCount <= (plusEnabled ? 1 : 0)));
+        }
     }
     else {
         if (effectiveCurrentTasks.length < (plusEnabled ? 2 : 1))
