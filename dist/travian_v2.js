@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/04 17:06:32";
+const BUILD_TIME = "2022/12/04 17:10:00";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -661,7 +661,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             if (bulidButton.length) {
                 yield Utils.delayClick();
                 state.currentAction = CurrentActionEnum.IDLE;
-                let idx = village.pendingBuildTasks.findIndex(t => !(t.aid === task.aid && t.gid === task.gid));
+                let idx = village.pendingBuildTasks.findIndex(t => t.aid === task.aid && t.gid === task.gid);
                 village.pendingBuildTasks.splice(idx, 1);
                 state.villages = villages;
                 bulidButton.trigger('click');

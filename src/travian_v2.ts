@@ -839,7 +839,7 @@ const build = async (state: State) => {
             if (bulidButton.length) {
                 await Utils.delayClick()
                 state.currentAction = CurrentActionEnum.IDLE
-                let idx = village.pendingBuildTasks.findIndex(t => !(t.aid === task.aid && t.gid === task.gid))
+                let idx = village.pendingBuildTasks.findIndex(t => t.aid === task.aid && t.gid === task.gid)
                 village.pendingBuildTasks.splice(idx, 1)
                 state.villages = villages
                 bulidButton.trigger('click')
