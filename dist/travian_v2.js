@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/04 02:02:01";
+const BUILD_TIME = "2022/12/04 12:58:13";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1056,8 +1056,7 @@ const render = (state) => {
                 $('#custom-farm-warning').replaceWith(customFarmWarning);
         }
     }
-    Object.values(villages).forEach(village => {
-        $('#console').html(`
+    $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
             <input id="toggleAutoLogin" class="ml-5" type="checkbox" ${state.feature.autoLogin ? 'checked' : ''}/> Auto login
@@ -1116,12 +1115,12 @@ const render = (state) => {
                     </div>`}
                     <br />
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
-            `<div class="flex-row">
+        `<div class="flex-row">
                             <input id="minCustomFarmMinutes" style="width: 5%">min</input>
                             <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
                             <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
                         </div>`
-            : ''}
+        : ''}
                     ${(village.customFarms || []).map((customFarm, idx) => `                    
                     <div class="flex-row">
                         <div>Next custom farm time: ${Utils.formatDate(customFarm.nextCustomFarmTime)}</div>
@@ -1175,8 +1174,8 @@ const render = (state) => {
             `).join('')}
         </div>
     `);
+    Object.values(villages).forEach(village => {
         $(`#updateEvadeRaidTarget-${village.id}`).on('click', () => {
-            console.log("CLICK UPDATE");
             const villages = state.villages;
             const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val());
             const positionY = parseInt($(`#evadeRaidTargetY-${village.id}`).val());

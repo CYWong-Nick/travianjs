@@ -1281,9 +1281,8 @@ const render = (state: State) => {
         }
     }
 
-    Object.values(villages).forEach(village => {
 
-        $('#console').html(`
+    $('#console').html(`
         <div class="flex-row">
             <h4>Console</h4>
             <input id="toggleAutoLogin" class="ml-5" type="checkbox" ${state.feature.autoLogin ? 'checked' : ''}/> Auto login
@@ -1402,8 +1401,9 @@ const render = (state: State) => {
             `).join('')}
         </div>
     `)
+
+    Object.values(villages).forEach(village => {
         $(`#updateEvadeRaidTarget-${village.id}`).on('click', () => {
-            console.log("CLICK UPDATE")
             const villages = state.villages
             const positionX = parseInt($(`#evadeRaidTargetX-${village.id}`).val() as string)
             const positionY = parseInt($(`#evadeRaidTargetY-${village.id}`).val() as string)
