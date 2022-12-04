@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/04 12:58:13";
+const BUILD_TIME = "2022/12/04 16:53:29";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -491,6 +491,11 @@ const updateCurrentVillageStatus = (state) => {
         villages[currentVillageId].outgoingTroops = outgoingTroops;
         villages[currentVillageId].lastUpdatedTime = new Date();
     }
+    else if (state.currentPage === CurrentPageEnum.TOWN) {
+        const mainBuilding = $('.buildingSlot.g15')[0];
+        if (mainBuilding)
+            villages[currentVillageId].isRoman = mainBuilding.className.includes('roman');
+    }
     state.villages = villages;
 };
 const alertAttack = (state, village, attackTime) => {
@@ -596,16 +601,34 @@ const alertResourceCapacityFull = (state) => {
         }
     }
 };
+const getNextBuildTask = (village, plusEnabled) => {
+    const effectiveCurrentTasks = village.currentBuildTasks.filter(task => new Date(task.finishTime) > new Date());
+    let targetTask;
+    if (village.isRoman) {
+        let fieldCount = 0;
+        let buildingCount = 0;
+        effectiveCurrentTasks.forEach(task => {
+            if (["Woodcutter", "Clay Pit", "Iron Mine", "Cropland"].includes(task.name))
+                fieldCount += 1;
+            else
+                buildingCount += 1;
+        });
+        targetTask = village.pendingBuildTasks.find(task => (task.gid <= 4 && fieldCount <= (plusEnabled ? 1 : 0)) || (task.gid > 4 && buildingCount <= (plusEnabled ? 1 : 0)));
+    }
+    else {
+        if (effectiveCurrentTasks.length < (plusEnabled ? 2 : 1))
+            targetTask = village.pendingBuildTasks[0];
+    }
+    if (targetTask && Utils.isSufficientResources(targetTask.resources, village.resources))
+        return targetTask;
+};
 const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
     // Try building in current village
     const villages = state.villages;
     const village = villages[state.currentVillageId];
-    const buildQueueThreshold = state.plusEnabled ? 2 : 1;
-    if (village.pendingBuildTasks.length > 0) {
-        const task = village.pendingBuildTasks[0];
-        if (village.currentBuildTasks.length < buildQueueThreshold
-            && [CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)
-            && Utils.isSufficientResources(task.resources, village.resources)) {
+    const task = getNextBuildTask(village, state.plusEnabled);
+    if (task) {
+        if ([CurrentPageEnum.FIELDS, CurrentPageEnum.TOWN].includes(state.currentPage)) {
             const success = yield Navigation.goToBuilding(state, task.aid, task.gid, CurrentActionEnum.BUILD);
             if (!success) {
                 if (state.currentPage === CurrentPageEnum.FIELDS)
@@ -645,9 +668,7 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
     }
     // Check if need to build in another village
     const nextVillageIdToBuild = Object.entries(state.villages)
-        .filter(([_, village]) => village.pendingBuildTasks.length > 0
-        && village.currentBuildTasks.filter(task => new Date(task.finishTime) > new Date()).length < buildQueueThreshold
-        && Utils.isSufficientResources(village.pendingBuildTasks[0].resources, village.resources))
+        .filter(([_, village]) => getNextBuildTask(village, state.plusEnabled))
         .map(([id, _]) => id)
         .find(_ => true);
     if (nextVillageIdToBuild) {
