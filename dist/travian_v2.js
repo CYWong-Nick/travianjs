@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/04 17:18:31";
+const BUILD_TIME = "2022/12/06 02:01:52";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -722,17 +722,24 @@ const farm = (state, targetPrefix) => __awaiter(void 0, void 0, void 0, function
         }
         else if (state.currentPage === CurrentPageEnum.OFF_REPORT) {
             const unreadReports = $("#overview > tbody").find(".messageStatusUnread");
-            // const unreadReports = $("#overview > tbody").find(".messageStatusUnread")
-            //     .filter((_, msg) => !$($(msg).parent().parent().find('a')[2]).text().includes("Unoccupied oasis"))
+            const unreadOasisReports = unreadReports.filter((_, msg) => $(msg).parent().parent().find('div > a').text().includes("oasis"));
+            const unreadNonOasisReports = unreadReports.filter((_, msg) => !$(msg).parent().parent().find('div > a').text().includes("oasis"));
             state.feature.debug && console.log("Unread report: " + unreadReports.length);
-            if (unreadReports.length > 0) {
+            if (unreadOasisReports.length > 0) {
                 if (!state.feature.disableStopOnLoss) {
                     const feature = state.feature;
-                    feature.autoFarm = false;
                     feature.autoFarmOasis = false;
                     state.feature = feature;
                 }
-                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred, please check the offensive report`);
+                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred during oasis farm, please check the offensive report`);
+            }
+            if (unreadNonOasisReports.length > 0) {
+                if (!state.feature.disableStopOnLoss) {
+                    const feature = state.feature;
+                    feature.autoFarm = false;
+                    state.feature = feature;
+                }
+                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred during farm, please check the offensive report`);
             }
             state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0);
             yield Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
