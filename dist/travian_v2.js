@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/06 02:01:52";
+const BUILD_TIME = "2022/12/06 02:23:59";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -758,7 +758,7 @@ const farm = (state, targetPrefix) => __awaiter(void 0, void 0, void 0, function
                 state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59));
             }
             else if (targetPrefix === "Oasis") {
-                state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 59));
+                state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 30));
             }
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;

@@ -935,7 +935,7 @@ const farm = async (state: State, targetPrefix?: "Oasis") => {
             if (!targetPrefix) {
                 state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59))
             } else if (targetPrefix === "Oasis") {
-                state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 59))
+                state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 30))
             }
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return
