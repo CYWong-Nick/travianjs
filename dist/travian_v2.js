@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/06 02:23:59";
+const BUILD_TIME = "2022/12/08 23:30:53";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -298,6 +298,9 @@ const createStyle = () => {
 
         .tjs-pending {
             background: lightblue;
+            left: 30px;
+            position: absolute;
+            top: -10px;
         }
     `;
     document.head.append(style);

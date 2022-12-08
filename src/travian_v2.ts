@@ -417,6 +417,9 @@ const createStyle = () => {
 
         .tjs-pending {
             background: lightblue;
+            left: 30px;
+            position: absolute;
+            top: -10px;
         }
     `;
     document.head.append(style);
