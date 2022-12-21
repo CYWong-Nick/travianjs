@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/08 23:30:53";
+const BUILD_TIME = "2022/12/21 12:53:07";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -250,7 +250,6 @@ Navigation.goToTown = (state, action) => __awaiter(void 0, void 0, void 0, funct
     return true;
 });
 Navigation.goToReport = (state, action) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Utils.delayClick();
     state.currentAction = action;
     state.feature.debug && console.log('Go to report');
     $('.reports')[0].click();

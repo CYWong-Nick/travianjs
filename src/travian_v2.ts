@@ -315,7 +315,6 @@ class Navigation {
     }
 
     static goToReport = async (state: State, action: CurrentActionEnum): Promise<boolean> => {
-        await Utils.delayClick()
         state.currentAction = action
         state.feature.debug && console.log('Go to report')
         $('.reports')[0].click()
