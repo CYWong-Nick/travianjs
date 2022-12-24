@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/24 23:06:37";
+const BUILD_TIME = "2022/12/24 23:15:28";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1450,7 +1450,6 @@ const render = (state) => {
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
-            // <input id="toggleDisableDelayClick" class="ml-5" type="checkbox" ${state.feature.disableDelayClick ? 'checked' : ''}/> Disable Delay Click
             <input id="toggleRemoveLostFromFarmList" class="ml-5" type="checkbox" ${state.feature.removeLostFromFarmList ? 'checked' : ''}> Remove Lost From Farm List
             <input id="toggleRandomAction" class="ml-5" type="checkbox" ${state.feature.randomAction ? 'checked' : ''}/> Random Action
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug

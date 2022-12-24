@@ -1709,7 +1709,6 @@ const render = (state: State) => {
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
-            // <input id="toggleDisableDelayClick" class="ml-5" type="checkbox" ${state.feature.disableDelayClick ? 'checked' : ''}/> Disable Delay Click
             <input id="toggleRemoveLostFromFarmList" class="ml-5" type="checkbox" ${state.feature.removeLostFromFarmList ? 'checked' : ''}> Remove Lost From Farm List
             <input id="toggleRandomAction" class="ml-5" type="checkbox" ${state.feature.randomAction ? 'checked' : ''}/> Random Action
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
