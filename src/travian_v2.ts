@@ -49,6 +49,309 @@ const GID_NAME_MAP: Record<string, string> = {
     "46": "Hospital"
 }
 
+const NEW_VILLAGE_LIST = [
+    // {
+    //     aid: 26,
+    //     gid: 15,
+    //     resources: {
+    //         lumber: 70,
+    //         clay: 40,
+    //         iron: 60,
+    //         crop: 20
+    //     }
+    // },
+    {
+        aid: 39,
+        gid: 16,
+        resources: {
+            lumber: 110,
+            clay: 160,
+            iron: 90,
+            crop: 70
+        }
+    },
+    {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 90,
+            clay: 50,
+            iron: 75,
+            crop: 25
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 115,
+            clay: 65,
+            iron: 100,
+            crop: 25
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 145,
+            clay: 85,
+            iron: 125,
+            crop: 40
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 190,
+            clay: 105,
+            iron: 160,
+            crop: 55
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 130,
+            clay: 160,
+            iron: 90,
+            crop: 40
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 165,
+            clay: 205,
+            iron: 115,
+            crop: 50
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 215,
+            clay: 260,
+            iron: 145,
+            crop: 65
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 80,
+            clay: 100,
+            iron: 70,
+            crop: 20
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 100,
+            clay: 130,
+            iron: 90,
+            crop: 25
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 275,
+            clay: 335,
+            iron: 190,
+            crop: 85
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 350,
+            clay: 430,
+            iron: 240,
+            crop: 105
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 445,
+            clay: 550,
+            iron: 310,
+            crop: 135
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 130,
+            clay: 165,
+            iron: 115,
+            crop: 35
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 170,
+            clay: 210,
+            iron: 145,
+            crop: 40
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 240,
+            clay: 135,
+            iron: 205,
+            crop: 70
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 310,
+            clay: 175,
+            iron: 265,
+            crop: 90
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 395,
+            clay: 225,
+            iron: 340,
+            crop: 115
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 505,
+            clay: 290,
+            iron: 430,
+            crop: 145
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 645,
+            clay: 370,
+            iron: 555,
+            crop: 185
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 570,
+            clay: 705,
+            iron: 375,
+            crop: 175
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 730,
+            clay: 900,
+            iron: 505,
+            crop: 225
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 935,
+            clay: 1155,
+            iron: 650,
+            crop: 290
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 215,
+            clay: 270,
+            iron: 190,
+            crop: 55
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 275,
+            clay: 345,
+            iron: 240,
+            crop: 70
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 80,
+            clay: 70,
+            iron: 120,
+            crop: 70
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 100,
+            clay: 90,
+            iron: 155,
+            crop: 90
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 130,
+            clay: 115,
+            iron: 195,
+            crop: 115
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 170,
+            clay: 145,
+            iron: 250,
+            crop: 145
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 215,
+            clay: 190,
+            iron: 320,
+            crop: 190
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 275,
+            clay: 240,
+            iron: 410,
+            crop: 240
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 350,
+            clay: 310,
+            iron: 530,
+            crop: 310
+        }
+    },
+]
+
 enum CurrentPageEnum {
     LOGIN = "LOGIN",
     FIELDS = "FIELDS",
@@ -57,6 +360,7 @@ enum CurrentPageEnum {
     REPORT = "REPORT",
     OFF_REPORT = "OFF_REPORT",
     SCOUT_REPORT = "SCOUT_REPORT",
+    POSITION_DETAILS = "POSITION_DETAILS",
     UNKNOWN = "UNKNOWN"
 }
 
@@ -69,6 +373,11 @@ enum CurrentActionEnum {
     OASIS_FARM = "OASIS_FARM",
     EVADE = "EVADE",
     CUSTOM_FARM = "CUSTOM_FARM"
+}
+
+type BuildingResources = {
+    name: string,
+    resources: Resource
 }
 
 interface Feature {
@@ -85,6 +394,8 @@ interface Feature {
     disableStopOnLoss: boolean
     autoCustomFarm: boolean
     randomAction: boolean
+    disableDelayClick: boolean
+    removeLostFromFarmList: boolean
     debug: boolean
 }
 
@@ -141,6 +452,8 @@ class StateHandler implements ProxyHandler<State> {
             disableStopOnLoss: false,
             autoCustomFarm: false,
             randomAction: false,
+            disableDelayClick: false,
+            removeLostFromFarmList: false,
             debug: false
         },
         nextVillageRotationTime: new Date(),
@@ -148,8 +461,8 @@ class StateHandler implements ProxyHandler<State> {
         nextFarmTime: new Date(),
         nextFarmOasisTime: new Date(),
         nextCheckReportTime: new Date(),
-        farmIntervalMinutes: { min: 8, max: 12 },
-        farmOasisIntervalMinutes: { min: 2, max: 4 },
+        farmIntervalMinutes: {min: 8, max: 12},
+        farmOasisIntervalMinutes: {min: 2, max: 4},
         plusEnabled: false,
         telegramChatId: '',
         telegramToken: '',
@@ -205,8 +518,8 @@ class Utils {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    static delayClick = async () => {
-        await Utils.sleep(Utils.randInt(1000, 2000))
+    static delayClick = async (enabled?: boolean) => {
+        if (enabled) await Utils.sleep(Utils.randInt(1000, 1000))
     }
 
     static addToDate = (date: Date, hour: number, minute: number, second: number): Date => {
@@ -264,11 +577,46 @@ class Utils {
     static groupByAndSum = (records: Record<string, string>[]): Record<string, string> => {
         return records.reduce((res, value) => Utils.sumRecord(res, value), {});
     }
+
+    static waitForElement = (selector: string, timeout: number = 5000): Promise<JQuery<HTMLElement>> => {
+        return new Promise(resolve => {
+            if ($(selector) && $(selector).length > 0) {
+                return resolve($(selector));
+            }
+
+            const timeoutCallback = setTimeout(
+                () => {
+                    observer.disconnect()
+                    Promise.reject()
+                },
+                timeout
+            )
+
+            const onDomChange = (mutations: MutationRecord[], observer: MutationObserver) => {
+                if ($(selector) && $(selector).length > 0) {
+                    console.log("Found")
+                    resolve($(selector))
+                    clearTimeout(timeoutCallback)
+                    observer.disconnect();
+                } else {
+                    console.log("Checking")
+                }
+            }
+
+            const observer = new MutationObserver(onDomChange);
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+
+        });
+    }
 }
 
 class Navigation {
     static goToVillage = async (state: State, id: string, action: CurrentActionEnum): Promise<boolean> => {
-        await Utils.delayClick()
+        await Utils.delayClick(!state.feature.disableDelayClick)
         state.currentAction = action
         state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`)
         $(`.listEntry[data-did="${id}"] > a`)[0].click()
@@ -277,19 +625,19 @@ class Navigation {
 
     static goToBuilding = async (state: State, aid: number, gid: number, action: CurrentActionEnum): Promise<boolean> => {
         if (aid <= 18 && state.currentPage === CurrentPageEnum.FIELDS) {
-            await Utils.delayClick()
+            await Utils.delayClick(!state.feature.disableDelayClick)
             state.currentAction = action
             state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
             $(`a[href="/build.php?id=${aid}"]`)[0].click()
             return true
         } else if (aid > 18 && state.currentPage === CurrentPageEnum.TOWN) {
-            await Utils.delayClick()
+            await Utils.delayClick(!state.feature.disableDelayClick)
             state.currentAction = action
             state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`)
             if (aid === 40) { // Special case for wall
                 $('#villageContent > div.buildingSlot.a40.top > svg > g.hoverShape > path').trigger('click')
             } else {
-                $(`a[href="/build.php?id=${aid}&gid=${gid}"]`)[0].click()
+                window.location.href = `/build.php?id=${aid}`
             }
             return true
         } else {
@@ -299,7 +647,7 @@ class Navigation {
     }
 
     static goToFields = async (state: State, action: CurrentActionEnum): Promise<boolean> => {
-        await Utils.delayClick()
+        await Utils.delayClick(!state.feature.disableDelayClick)
         state.currentAction = action
         state.feature.debug && console.log('Go to fields')
         $('.village.resourceView')[0].click()
@@ -307,7 +655,7 @@ class Navigation {
     }
 
     static goToTown = async (state: State, action: CurrentActionEnum): Promise<boolean> => {
-        await Utils.delayClick()
+        await Utils.delayClick(!state.feature.disableDelayClick)
         state.currentAction = action
         state.feature.debug && console.log('Go to town')
         $('.village.buildingView')[0].click()
@@ -349,6 +697,7 @@ interface TroopMovement {
 interface Village {
     id: string
     name: string
+    checksum: string
     position: Position
     index: number
     currentBuildTasks: CurrentBuildTask[]
@@ -476,7 +825,7 @@ const login = async (state: State) => {
 
     $('input[name=name]').val(state.username)
     $('input[name=password]').val(state.password)
-    await Utils.delayClick()
+    await Utils.delayClick(!state.feature.disableDelayClick)
     $('button[type=submit]').trigger('click')
 }
 
@@ -507,7 +856,8 @@ const updateVillageList = (state: State) => {
         const villageDefaults: Village = {
             id: '',
             name: '',
-            position: { x: 0, y: 0 },
+            position: {x: 0, y: 0},
+            checksum: '',
             index: -1,
             currentBuildTasks: [],
             pendingBuildTasks: [],
@@ -535,7 +885,7 @@ const updateVillageList = (state: State) => {
             id,
             name,
             index,
-            position: { x, y },
+            position: {x, y},
         }
     })
 
@@ -553,7 +903,7 @@ const updateCurrentVillageStatus = (state: State) => {
     let iron = Utils.parseIntIgnoreNonNumeric($('#l3')[0].innerText)
     let crop = Utils.parseIntIgnoreNonNumeric($('#l4')[0].innerText)
 
-    villages[currentVillageId].resources = { lumber, clay, iron, crop }
+    villages[currentVillageId].resources = {lumber, clay, iron, crop}
 
     const warehouseCapacity = Utils.parseIntIgnoreNonNumeric($('.warehouse .capacity > div').text())
     const granaryCapacity = Utils.parseIntIgnoreNonNumeric($('.granary .capacity > div').text())
@@ -691,6 +1041,15 @@ const informTroopsEvaded = (state: State, village?: Village) => {
     } else {
         fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Troops evaded at ${new Date()}`)
     }
+}
+
+const informFarmListInactivated = (state: State, target: string) => {
+    if (!state.telegramChatId || !state.telegramToken) {
+        state.feature.debug && console.log("Telegram chat id or token not set")
+        return
+    }
+
+    fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Target: ${target} lost as attacker in the latest report, inactivated from farm list`)
 }
 
 const checkIncomingAttack = (state: State) => {
@@ -835,17 +1194,26 @@ const build = async (state: State) => {
             const iron = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[2].innerText)
             const crop = Utils.parseIntIgnoreNonNumeric(resourceRequirementEle[3].innerText)
 
-            village.pendingBuildTasks[taskIdx].resources = { lumber, clay, iron, crop }
+            village.pendingBuildTasks[taskIdx].resources = {lumber, clay, iron, crop}
             state.villages = villages
 
             const bulidButton = $('.section1 > button.green')
             if (bulidButton.length) {
-                await Utils.delayClick()
+                const villageChecksum = bulidButton.attr('onclick')?.split('checksum=')[1].split("'")[0]
+                village.checksum = villageChecksum || ''
+
+                await Utils.delayClick(!state.feature.disableDelayClick)
                 state.currentAction = CurrentActionEnum.IDLE
                 village.pendingBuildTasks.splice(taskIdx, 1)
                 state.villages = villages
                 bulidButton.trigger('click')
                 return
+            }
+        } else if (state.currentPage === CurrentPageEnum.BUILDING
+            && !gid) {
+            const checksum = village.checksum
+            if (checksum) {
+                window.location.href = `/dorf2.php?id=${task.aid}&gid=${task.gid}&action=build&checksum=${checksum}`
             }
         }
     }
@@ -872,14 +1240,14 @@ const scout = async (state: State) => {
                 return $(button).parent().parent().find('.listName').find('span').text() === "Scout"
             })
             for (let i = 0; i < startButtonEle.length; i++) {
-                await Utils.delayClick()
+                await Utils.delayClick(!state.feature.disableDelayClick)
                 startButtonEle[i].click()
             }
             state.nextScoutTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0)
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
-            await Utils.delayClick()
+            await Utils.delayClick(!state.feature.disableDelayClick)
             $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click()
             return
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
@@ -895,70 +1263,80 @@ const scout = async (state: State) => {
 const farm = async (state: State, targetPrefix?: "Oasis") => {
     if ((new Date(state.nextFarmTime) < new Date() && !targetPrefix) || (new Date(state.nextFarmOasisTime) < new Date() && targetPrefix)) {
         const params = new URLSearchParams(window.location.search);
-        if (state.currentPage === CurrentPageEnum.REPORT) {
-            await Utils.delayClick()
-            $('a[href="/report/offensive"]')[0].click()
-            return
-        } else if (state.currentPage === CurrentPageEnum.OFF_REPORT) {
-            const unreadReports = $("#overview > tbody").find(".messageStatusUnread")
-            const unreadOasisReports = unreadReports.filter((_, msg) => $(msg).parent().parent().find('div > a').text().includes("oasis"))
-            const unreadNonOasisReports = unreadReports.filter((_, msg) => !$(msg).parent().parent().find('div > a').text().includes("oasis"))
-            state.feature.debug && console.log("Unread report: " + unreadReports.length)
-            if (unreadOasisReports.length > 0) {
-                if (!state.feature.disableStopOnLoss) {
-                    const feature = state.feature;
-                    feature.autoFarmOasis = false;
+        state.currentAction = !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM
 
-                    state.feature = feature;
-                }
-                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred during oasis farm, please check the offensive report`)
-            }
-            if (unreadNonOasisReports.length > 0) {
-                if (!state.feature.disableStopOnLoss) {
-                    const feature = state.feature;
-                    feature.autoFarm = false;
+        if ([CurrentActionEnum.FARM, CurrentActionEnum.OASIS_FARM].includes(state.currentAction)) {
+            let shortcut = undefined as HTMLElement | undefined
+            $('#sidebarBoxLinklist li').each((_, ele) => {
+                const name = $(ele).find('.name').text().trim()
+                const href = $(ele).find('a').attr('href')
+                if (name === "Farm List") {
+                    shortcut = $(`a[href='${href}']`)[0]
 
-                    state.feature = feature;
+                    return
                 }
-                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred during farm, please check the offensive report`)
-            }
-            state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0)
-            await Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
-            return
-        } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
-            const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
-                const text = $(button).parent().parent().find('.listName').find('span').text();
-                return text !== "Scout" && ((!targetPrefix && !text.startsWith("Oasis")) || (!!targetPrefix && text.startsWith(targetPrefix)))
             })
-            for (let i = 0; i < startButtonEle.length; i++) {
-                await Utils.delayClick()
-                startButtonEle[i].click()
+
+            if (!(state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99')) {
+                if (shortcut) {
+                    state.currentAction = !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM
+                    shortcut.click()
+                } else {
+                    if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
+                        await Utils.delayClick(!state.feature.disableDelayClick)
+                        $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click()
+                        return
+                    } else if (state.currentPage === CurrentPageEnum.TOWN) {
+                        await Navigation.goToBuilding(state, 39, 16, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
+                        return
+                    } else {
+                        await Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
+                        return
+                    }
+                }
             }
-            if (!targetPrefix) {
-                state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59))
-            } else if (targetPrefix === "Oasis") {
-                state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 30))
+
+            if ((state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99')) {
+                await Utils.delayClick(!state.feature.disableDelayClick)
+                const allStartButtons = await Utils.waitForElement('.startButton[value=Start]')
+
+                if (state.feature.removeLostFromFarmList) {
+                    await Utils.delayClick(!state.feature.disableDelayClick)
+                    const lastRaidLost = $('td.lastRaid > div > img.iReport.iReport3').filter((_, ele) => $(ele).parent().parent().css('opacity') !== '0.4')
+
+                    if (lastRaidLost.length > 0) {
+                        lastRaidLost.each((_, ele) => {
+                            const row = $(ele).parent().parent().parent()
+                            const target = row.find('a').first().text().trim()
+                            informFarmListInactivated(state, target)
+
+                            row.find('input')[0].click()
+                        })
+
+                        await Utils.delayClick(!state.feature.disableDelayClick)
+                        const deactivateButtons = await Utils.waitForElement('button:contains("Deactivate selected")')
+                        deactivateButtons.each((_, ele) => $(ele)[0].click())
+                    }
+                }
+
+                const allStartButtonsEle = allStartButtons.filter((_, button) => {
+                    const text = $(button).parent().parent().find('.listName').find('span').text();
+                    return text !== "Scout" && ((!targetPrefix && !text.startsWith("Oasis")) || (!!targetPrefix && text.startsWith(targetPrefix)))
+                })
+
+                for (let i = 0; i < allStartButtonsEle.length; i++) {
+                    await Utils.delayClick(!state.feature.disableDelayClick)
+                    allStartButtonsEle[i].click()
+                }
+                if (!targetPrefix) {
+                    state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59))
+                } else if (targetPrefix === "Oasis") {
+                    state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 30))
+                }
+                await Navigation.goToFields(state, CurrentActionEnum.IDLE);
+                return
             }
-            await Navigation.goToFields(state, CurrentActionEnum.IDLE);
-            return
-        } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
-            await Utils.delayClick()
-            $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click()
-            return
-        } else if (state.currentPage === CurrentPageEnum.TOWN) {
-            if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
-                await Navigation.goToReport(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
-            } else {
-                await Navigation.goToBuilding(state, 39, 16, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
-            }
-            return
-        } else {
-            if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
-                await Navigation.goToReport(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
-            } else {
-                await Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM)
-            }
-            return
+
         }
     }
 }
@@ -970,7 +1348,7 @@ const checkAutoEvade = async (state: State) => {
 
     if (villageRequireEvade) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
-            await Utils.delayClick()
+            await Utils.delayClick(!state.feature.disableDelayClick)
             $('a[href="/build.php?id=39&gid=16&tt=2"]')[0].click()
             return
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
@@ -978,15 +1356,15 @@ const checkAutoEvade = async (state: State) => {
                 await Navigation.goToVillage(state, villageRequireEvade.id, CurrentActionEnum.EVADE)
                 return
             }
-            if ($('.error').length > 0) {
+            if ((await Utils.waitForElement('.error', 2000)).length > 0) {
                 await Navigation.goToFields(state, CurrentActionEnum.IDLE)
                 return
             }
 
-            await Utils.delayClick();
+            await Utils.delayClick(!state.feature.disableDelayClick);
 
-            const sendTroopButton = $("#ok")
-            const confirmButton = $("#checksum")
+            const sendTroopButton = await Utils.waitForElement("#ok", 1000)
+            const confirmButton = await Utils.waitForElement("#checksum", 1000)
 
             if (sendTroopButton.length > 0) {
                 let needSendTroop = false
@@ -1011,7 +1389,7 @@ const checkAutoEvade = async (state: State) => {
                 }
 
             } else if (confirmButton.length > 0) {
-                await Utils.delayClick()
+                await Utils.delayClick(!state.feature.disableDelayClick)
                 confirmButton[0].click()
             }
 
@@ -1023,7 +1401,7 @@ const checkAutoEvade = async (state: State) => {
 
             state.villages = villages
 
-            await Utils.delayClick()
+            await Utils.delayClick(!state.feature.disableDelayClick)
             await Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
         } else if (state.currentPage === CurrentPageEnum.TOWN) {
@@ -1050,14 +1428,14 @@ const executeCustomFarm = async (state: State, idx: number) => {
 
     if (customFarm) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
-            await Utils.delayClick()
+            await Utils.delayClick(!state.feature.disableDelayClick)
             $('a[href="/build.php?id=39&gid=16&tt=2"]')[0].click()
             return
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
-            await Utils.delayClick();
+            await Utils.delayClick(!state.feature.disableDelayClick);
 
-            const sendTroopButton = $("#ok")
-            const confirmButton = $("#checksum")
+            const sendTroopButton = await Utils.waitForElement("#ok")
+            const confirmButton = await Utils.waitForElement("#checksum")
             if (sendTroopButton.length > 0) {
                 for (const troopKey of Object.keys(customFarm.troops)) {
                     if (customFarm.troops[troopKey]) {
@@ -1092,11 +1470,11 @@ const executeCustomFarm = async (state: State, idx: number) => {
                     $('.radio')[2].click()
                 }
 
-                await Utils.delayClick();
+                await Utils.delayClick(!state.feature.disableDelayClick);
                 sendTroopButton[0].click();
 
             } else if (confirmButton.length > 0) {
-                await Utils.delayClick()
+                await Utils.delayClick(!state.feature.disableDelayClick)
                 confirmButton[0].click()
             }
 
@@ -1210,7 +1588,7 @@ const randomAction = async (state: State) => {
     })
 
     const target = actions[Math.floor(Math.random() * actions.length)];
-    await Utils.delayClick()
+    await Utils.delayClick(!state.feature.disableDelayClick)
     state.currentAction = CurrentActionEnum.NAVIGATE_TO_FIELDS
     state.feature.debug && console.log(`Go to ${target}`)
     $(`a[href='${target}']`)[0].click()
@@ -1281,13 +1659,13 @@ const render = (state: State) => {
         //     $('#troops-required-50').replaceWith(troops50);
 
         const troops60 = `<div id="troops-required-60">Troops Required: ${Math.ceil((resourcesFromReport.lumber - cranny) / 60) +
-            Math.ceil((resourcesFromReport.clay - cranny) / 60) +
-            Math.ceil((resourcesFromReport.iron - cranny) / 60) +
-            Math.ceil((resourcesFromReport.crop - cranny) / 60)} | ${Math.ceil((resourcesFromReport.lumber - cranny * 0.8) / 60) +
-            Math.ceil((resourcesFromReport.clay - cranny * 0.8) / 60) +
-            Math.ceil((resourcesFromReport.iron - cranny * 0.8) / 60) +
-            Math.ceil((resourcesFromReport.crop - cranny * 0.8) / 60)
-            } with hero (60 per troop)</div>`;
+        Math.ceil((resourcesFromReport.clay - cranny) / 60) +
+        Math.ceil((resourcesFromReport.iron - cranny) / 60) +
+        Math.ceil((resourcesFromReport.crop - cranny) / 60)} | ${Math.ceil((resourcesFromReport.lumber - cranny * 0.8) / 60) +
+        Math.ceil((resourcesFromReport.clay - cranny * 0.8) / 60) +
+        Math.ceil((resourcesFromReport.iron - cranny * 0.8) / 60) +
+        Math.ceil((resourcesFromReport.crop - cranny * 0.8) / 60)
+        } with hero (60 per troop)</div>`;
         if ($('#troops-required-60').length === 0)
             $(".additionalInformation").after(troops60);
         else
@@ -1327,12 +1705,12 @@ const render = (state: State) => {
             <input id="toggleAutoScout" class="ml-5" type="checkbox" ${state.feature.autoScout ? 'checked' : ''}/> Auto scout
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
             <input id="toggleAutoFarmOasis" class="ml-5" type="checkbox" ${state.feature.autoFarmOasis ? 'checked' : ''}/> Auto farm oasis
-            <input id="toggleDisableReportChecking" class="ml-5" type="checkbox" ${state.feature.disableReportChecking ? 'checked' : ''}/> Disable report checking
-            <input id="toggleDisableStopOnLoss" class="ml-5" type="checkbox" ${state.feature.disableStopOnLoss ? 'checked' : ''}/> Disable stop on loss
             <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
+            // <input id="toggleDisableDelayClick" class="ml-5" type="checkbox" ${state.feature.disableDelayClick ? 'checked' : ''}/> Disable Delay Click
+            <input id="toggleRemoveLostFromFarmList" class="ml-5" type="checkbox" ${state.feature.removeLostFromFarmList ? 'checked' : ''}> Remove Lost From Farm List
             <input id="toggleRandomAction" class="ml-5" type="checkbox" ${state.feature.randomAction ? 'checked' : ''}/> Random Action
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
@@ -1360,6 +1738,7 @@ const render = (state: State) => {
         <div>
             <h4>Action</h4>
             ${state.currentPage === CurrentPageEnum.FIELDS ? '<button id="addAllFields">Add all fields</button>' : ''}
+            <button id="addListBuildings">Add List Buildings</button>
             <button id="copyState">Copy State</button>
             <button id="pasteState">Paste State</button>
         </div>
@@ -1369,6 +1748,7 @@ const render = (state: State) => {
                 <div class="village-container">
                     <h4>${village.name} (id: ${id}) (${village.position.x}, ${village.position.y})</h4>
                     <br />
+                    <div>Checksum: ${village.checksum}</div>
                     <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
@@ -1377,13 +1757,13 @@ const render = (state: State) => {
                     </div>`}
                     <br />
                     ${state.currentPage === CurrentPageEnum.BUILDING && state.currentVillageId === village.id && params.get('gid') === '16' && params.get('tt') === '2' ?
-            `<div class="flex-row">
+        `<div class="flex-row">
                             <input id="minCustomFarmMinutes" style="width: 5%">min</input>
                             <input id="maxCustomFarmMinutes" style="width: 5%">max</input>
                             <button id="addCurrentToCustomFarm" class="ml-5">Add Current</button>
                         </div>`
-            : ''
-        }
+        : ''
+    }
                     ${(village.customFarms || []).map((customFarm, idx) => `                    
                     <div class="flex-row">
                         <div>Next custom farm time: ${Utils.formatDate(customFarm.nextCustomFarmTime)}</div>
@@ -1461,22 +1841,22 @@ const render = (state: State) => {
 
 
     state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2' &&
-        $('#addCurrentToCustomFarm').on('click', () => {
-            const villages = state.villages
-            let customFarm = {
-                position: {
-                    "x": -999,
-                    "y": -999
-                },
-                type: FarmType.RAID,
-                farmIntervalMinutes: {
-                    "min": 999,
-                    "max": 999
-                },
-                troops: {}
-            } as CustomFarm
+    $('#addCurrentToCustomFarm').on('click', () => {
+        const villages = state.villages
+        let customFarm = {
+            position: {
+                "x": -999,
+                "y": -999
+            },
+            type: FarmType.RAID,
+            farmIntervalMinutes: {
+                "min": 999,
+                "max": 999
+            },
+            troops: {}
+        } as CustomFarm
 
-            $("#troops > tbody").find("td").each((column, td) => {
+        $("#troops > tbody").find("td").each((column, td) => {
                 const troopInput = $(td).find("input")
                 const troopKey = troopInput.attr('name')
                 const troopCount = troopInput.val() as string
@@ -1485,22 +1865,22 @@ const render = (state: State) => {
                     customFarm.troops[troopKey] = troopCount
                 }
             }
-            )
+        )
 
-            const typeString = $('input[type=radio]:checked').parent().text()
-            customFarm.type = typeString.includes('Normal') ? FarmType.ATTACK : FarmType.RAID
+        const typeString = $('input[type=radio]:checked').parent().text()
+        customFarm.type = typeString.includes('Normal') ? FarmType.ATTACK : FarmType.RAID
 
-            customFarm.position.x = parseInt($("#xCoordInput").val() as string)
-            customFarm.position.y = parseInt($("#yCoordInput").val() as string)
+        customFarm.position.x = parseInt($("#xCoordInput").val() as string)
+        customFarm.position.y = parseInt($("#yCoordInput").val() as string)
 
-            customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val() as string)
-            customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val() as string)
+        customFarm.farmIntervalMinutes.min = parseInt($("#minCustomFarmMinutes").val() as string)
+        customFarm.farmIntervalMinutes.max = parseInt($("#maxCustomFarmMinutes").val() as string)
 
-            customFarm.nextCustomFarmTime = new Date()
+        customFarm.nextCustomFarmTime = new Date()
 
-            currentVillage.customFarms = (currentVillage.customFarms || []).concat(customFarm)
-            state.villages = villages
-        })
+        currentVillage.customFarms = (currentVillage.customFarms || []).concat(customFarm)
+        state.villages = villages
+    })
 
     $('.removeCustomFarm').on('click', (ele) => {
         const idx = ele.target.attributes.getNamedItem('idx')?.value
@@ -1579,6 +1959,36 @@ const render = (state: State) => {
         state.villages = villages
     })
 
+    $('#addListBuildings').on('click', (ele) => {
+        const villages = state.villages
+        const pendingBuildTasks = currentVillage.pendingBuildTasks
+
+        let buildingCount = 0
+
+        for (let i = 0; i < 7; i++) {
+            for (let j = 0; j < 5; j++) {
+                if (buildingCount < NEW_VILLAGE_LIST.length) {
+                    pendingBuildTasks.push(NEW_VILLAGE_LIST[buildingCount++])
+                }
+            }
+
+            for (let aid = 1; aid <= 18; aid++) {
+                pendingBuildTasks.push({
+                    aid,
+                    gid: -1,
+                    resources: {
+                        lumber: 0,
+                        clay: 0,
+                        iron: 0,
+                        crop: 0
+                    }
+                })
+            }
+        }
+
+        state.villages = villages
+    })
+
     $('#updateFarmInterval').on('click', () => {
         const farmIntervalMinutes = {
             min: parseInt($("#minFarmMinutes").val() as string),
@@ -1619,13 +2029,13 @@ const render = (state: State) => {
     handleFeatureToggle('#toggleAutoScout', state, 'autoScout')
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm')
     handleFeatureToggle('#toggleAutoFarmOasis', state, 'autoFarmOasis')
-    handleFeatureToggle('#toggleDisableReportChecking', state, 'disableReportChecking')
-    handleFeatureToggle('#toggleDisableStopOnLoss', state, 'disableStopOnLoss');
     handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm')
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack')
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue')
     handleFeatureToggle('#toggleAlertResourceCapacityFull', state, 'alertResourceCapacityFull')
     handleFeatureToggle('#toggleRandomAction', state, 'randomAction')
+    handleFeatureToggle('#toggleDisableDelayClick', state, 'disableDelayClick')
+    handleFeatureToggle('#toggleRemoveLostFromFarmList', state, 'removeLostFromFarmList')
     handleFeatureToggle('#toggleDebug', state, 'debug')
 }
 
@@ -1727,6 +2137,11 @@ const run = async (state: State) => {
 const initialize = () => {
     const handler = new StateHandler()
     const state: State = new Proxy(StateHandler.INITIAL_STATE, handler)
+
+    if ($('#logo').length === 0) {
+        location.reload();
+    }
+
     handler.setCallback(() => render(state))
 
     createStyle()

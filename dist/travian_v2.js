@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/21 12:53:07";
+const BUILD_TIME = "2022/12/24 23:06:37";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -59,6 +59,308 @@ const GID_NAME_MAP = {
     "40": "Wonder of the World",
     "46": "Hospital"
 };
+const NEW_VILLAGE_LIST = [
+    // {
+    //     aid: 26,
+    //     gid: 15,
+    //     resources: {
+    //         lumber: 70,
+    //         clay: 40,
+    //         iron: 60,
+    //         crop: 20
+    //     }
+    // },
+    {
+        aid: 39,
+        gid: 16,
+        resources: {
+            lumber: 110,
+            clay: 160,
+            iron: 90,
+            crop: 70
+        }
+    },
+    {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 90,
+            clay: 50,
+            iron: 75,
+            crop: 25
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 115,
+            clay: 65,
+            iron: 100,
+            crop: 25
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 145,
+            clay: 85,
+            iron: 125,
+            crop: 40
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 190,
+            clay: 105,
+            iron: 160,
+            crop: 55
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 130,
+            clay: 160,
+            iron: 90,
+            crop: 40
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 165,
+            clay: 205,
+            iron: 115,
+            crop: 50
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 215,
+            clay: 260,
+            iron: 145,
+            crop: 65
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 80,
+            clay: 100,
+            iron: 70,
+            crop: 20
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 100,
+            clay: 130,
+            iron: 90,
+            crop: 25
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 275,
+            clay: 335,
+            iron: 190,
+            crop: 85
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 350,
+            clay: 430,
+            iron: 240,
+            crop: 105
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 445,
+            clay: 550,
+            iron: 310,
+            crop: 135
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 130,
+            clay: 165,
+            iron: 115,
+            crop: 35
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 170,
+            clay: 210,
+            iron: 145,
+            crop: 40
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 240,
+            clay: 135,
+            iron: 205,
+            crop: 70
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 310,
+            clay: 175,
+            iron: 265,
+            crop: 90
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 395,
+            clay: 225,
+            iron: 340,
+            crop: 115
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 505,
+            clay: 290,
+            iron: 430,
+            crop: 145
+        }
+    }, {
+        aid: 26,
+        gid: 15,
+        resources: {
+            lumber: 645,
+            clay: 370,
+            iron: 555,
+            crop: 185
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 570,
+            clay: 705,
+            iron: 375,
+            crop: 175
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 730,
+            clay: 900,
+            iron: 505,
+            crop: 225
+        }
+    }, {
+        aid: 33,
+        gid: 10,
+        resources: {
+            lumber: 935,
+            clay: 1155,
+            iron: 650,
+            crop: 290
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 215,
+            clay: 270,
+            iron: 190,
+            crop: 55
+        }
+    }, {
+        aid: 25,
+        gid: 11,
+        resources: {
+            lumber: 275,
+            clay: 345,
+            iron: 240,
+            crop: 70
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 80,
+            clay: 70,
+            iron: 120,
+            crop: 70
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 100,
+            clay: 90,
+            iron: 155,
+            crop: 90
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 130,
+            clay: 115,
+            iron: 195,
+            crop: 115
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 170,
+            clay: 145,
+            iron: 250,
+            crop: 145
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 215,
+            clay: 190,
+            iron: 320,
+            crop: 190
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 275,
+            clay: 240,
+            iron: 410,
+            crop: 240
+        }
+    }, {
+        aid: 27,
+        gid: 17,
+        resources: {
+            lumber: 350,
+            clay: 310,
+            iron: 530,
+            crop: 310
+        }
+    },
+];
 var CurrentPageEnum;
 (function (CurrentPageEnum) {
     CurrentPageEnum["LOGIN"] = "LOGIN";
@@ -68,6 +370,7 @@ var CurrentPageEnum;
     CurrentPageEnum["REPORT"] = "REPORT";
     CurrentPageEnum["OFF_REPORT"] = "OFF_REPORT";
     CurrentPageEnum["SCOUT_REPORT"] = "SCOUT_REPORT";
+    CurrentPageEnum["POSITION_DETAILS"] = "POSITION_DETAILS";
     CurrentPageEnum["UNKNOWN"] = "UNKNOWN";
 })(CurrentPageEnum || (CurrentPageEnum = {}));
 var CurrentActionEnum;
@@ -131,6 +434,8 @@ StateHandler.INITIAL_STATE = {
         disableStopOnLoss: false,
         autoCustomFarm: false,
         randomAction: false,
+        disableDelayClick: false,
+        removeLostFromFarmList: false,
         debug: false
     },
     nextVillageRotationTime: new Date(),
@@ -158,8 +463,9 @@ Utils.randInt = (x, y) => {
 Utils.sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
-Utils.delayClick = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield Utils.sleep(Utils.randInt(1000, 2000));
+Utils.delayClick = (enabled) => __awaiter(void 0, void 0, void 0, function* () {
+    if (enabled)
+        yield Utils.sleep(Utils.randInt(1000, 1000));
 });
 Utils.addToDate = (date, hour, minute, second) => {
     return new Date(date.getTime() + hour * 60 * 60 * 1000 + minute * 60 * 1000 + second * 1000);
@@ -200,11 +506,38 @@ Utils.sumRecord = (r1, r2) => {
 Utils.groupByAndSum = (records) => {
     return records.reduce((res, value) => Utils.sumRecord(res, value), {});
 };
+Utils.waitForElement = (selector, timeout = 5000) => {
+    return new Promise(resolve => {
+        if ($(selector) && $(selector).length > 0) {
+            return resolve($(selector));
+        }
+        const timeoutCallback = setTimeout(() => {
+            observer.disconnect();
+            Promise.reject();
+        }, timeout);
+        const onDomChange = (mutations, observer) => {
+            if ($(selector) && $(selector).length > 0) {
+                console.log("Found");
+                resolve($(selector));
+                clearTimeout(timeoutCallback);
+                observer.disconnect();
+            }
+            else {
+                console.log("Checking");
+            }
+        };
+        const observer = new MutationObserver(onDomChange);
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
+};
 class Navigation {
 }
 _b = Navigation;
 Navigation.goToVillage = (state, id, action) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Utils.delayClick();
+    yield Utils.delayClick(!state.feature.disableDelayClick);
     state.currentAction = action;
     state.feature.debug && console.log(`Go to village - [${id}]${state.villages[id].name}`);
     $(`.listEntry[data-did="${id}"] > a`)[0].click();
@@ -212,21 +545,21 @@ Navigation.goToVillage = (state, id, action) => __awaiter(void 0, void 0, void 0
 });
 Navigation.goToBuilding = (state, aid, gid, action) => __awaiter(void 0, void 0, void 0, function* () {
     if (aid <= 18 && state.currentPage === CurrentPageEnum.FIELDS) {
-        yield Utils.delayClick();
+        yield Utils.delayClick(!state.feature.disableDelayClick);
         state.currentAction = action;
         state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
         $(`a[href="/build.php?id=${aid}"]`)[0].click();
         return true;
     }
     else if (aid > 18 && state.currentPage === CurrentPageEnum.TOWN) {
-        yield Utils.delayClick();
+        yield Utils.delayClick(!state.feature.disableDelayClick);
         state.currentAction = action;
         state.feature.debug && console.log(`Go to building - [aid=${aid},gid=${gid}]${GID_NAME_MAP[gid]}`);
         if (aid === 40) { // Special case for wall
             $('#villageContent > div.buildingSlot.a40.top > svg > g.hoverShape > path').trigger('click');
         }
         else {
-            $(`a[href="/build.php?id=${aid}&gid=${gid}"]`)[0].click();
+            window.location.href = `/build.php?id=${aid}`;
         }
         return true;
     }
@@ -236,14 +569,14 @@ Navigation.goToBuilding = (state, aid, gid, action) => __awaiter(void 0, void 0,
     }
 });
 Navigation.goToFields = (state, action) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Utils.delayClick();
+    yield Utils.delayClick(!state.feature.disableDelayClick);
     state.currentAction = action;
     state.feature.debug && console.log('Go to fields');
     $('.village.resourceView')[0].click();
     return true;
 });
 Navigation.goToTown = (state, action) => __awaiter(void 0, void 0, void 0, function* () {
-    yield Utils.delayClick();
+    yield Utils.delayClick(!state.feature.disableDelayClick);
     state.currentAction = action;
     state.feature.debug && console.log('Go to town');
     $('.village.buildingView')[0].click();
@@ -353,7 +686,7 @@ const login = (state) => __awaiter(void 0, void 0, void 0, function* () {
     }
     $('input[name=name]').val(state.username);
     $('input[name=password]').val(state.password);
-    yield Utils.delayClick();
+    yield Utils.delayClick(!state.feature.disableDelayClick);
     $('button[type=submit]').trigger('click');
 });
 const updateVillageList = (state) => {
@@ -380,6 +713,7 @@ const updateVillageList = (state) => {
             id: '',
             name: '',
             position: { x: 0, y: 0 },
+            checksum: '',
             index: -1,
             currentBuildTasks: [],
             pendingBuildTasks: [],
@@ -534,6 +868,13 @@ const informTroopsEvaded = (state, village) => {
         fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Troops evaded at ${new Date()}`);
     }
 };
+const informFarmListInactivated = (state, target) => {
+    if (!state.telegramChatId || !state.telegramToken) {
+        state.feature.debug && console.log("Telegram chat id or token not set");
+        return;
+    }
+    fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Target: ${target} lost as attacker in the latest report, inactivated from farm list`);
+};
 const checkIncomingAttack = (state) => {
     var _c;
     const villages = state.villages;
@@ -627,6 +968,7 @@ const getNextBuildTask = (village, plusEnabled) => {
         return targetTask;
 };
 const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
     // Try building in current village
     const villages = state.villages;
     const village = villages[state.currentVillageId];
@@ -662,12 +1004,21 @@ const build = (state) => __awaiter(void 0, void 0, void 0, function* () {
             state.villages = villages;
             const bulidButton = $('.section1 > button.green');
             if (bulidButton.length) {
-                yield Utils.delayClick();
+                const villageChecksum = (_c = bulidButton.attr('onclick')) === null || _c === void 0 ? void 0 : _c.split('checksum=')[1].split("'")[0];
+                village.checksum = villageChecksum || '';
+                yield Utils.delayClick(!state.feature.disableDelayClick);
                 state.currentAction = CurrentActionEnum.IDLE;
                 village.pendingBuildTasks.splice(taskIdx, 1);
                 state.villages = villages;
                 bulidButton.trigger('click');
                 return;
+            }
+        }
+        else if (state.currentPage === CurrentPageEnum.BUILDING
+            && !gid) {
+            const checksum = village.checksum;
+            if (checksum) {
+                window.location.href = `/dorf2.php?id=${task.aid}&gid=${task.gid}&action=build&checksum=${checksum}`;
             }
         }
     }
@@ -692,7 +1043,7 @@ const scout = (state) => __awaiter(void 0, void 0, void 0, function* () {
                 return $(button).parent().parent().find('.listName').find('span').text() === "Scout";
             });
             for (let i = 0; i < startButtonEle.length; i++) {
-                yield Utils.delayClick();
+                yield Utils.delayClick(!state.feature.disableDelayClick);
                 startButtonEle[i].click();
             }
             state.nextScoutTime = Utils.addToDate(new Date(), 0, Utils.randInt(30, 40), 0);
@@ -700,7 +1051,7 @@ const scout = (state) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
-            yield Utils.delayClick();
+            yield Utils.delayClick(!state.feature.disableDelayClick);
             $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click();
             return;
         }
@@ -717,87 +1068,84 @@ const scout = (state) => __awaiter(void 0, void 0, void 0, function* () {
 const farm = (state, targetPrefix) => __awaiter(void 0, void 0, void 0, function* () {
     if ((new Date(state.nextFarmTime) < new Date() && !targetPrefix) || (new Date(state.nextFarmOasisTime) < new Date() && targetPrefix)) {
         const params = new URLSearchParams(window.location.search);
-        if (state.currentPage === CurrentPageEnum.REPORT) {
-            yield Utils.delayClick();
-            $('a[href="/report/offensive"]')[0].click();
-            return;
-        }
-        else if (state.currentPage === CurrentPageEnum.OFF_REPORT) {
-            const unreadReports = $("#overview > tbody").find(".messageStatusUnread");
-            const unreadOasisReports = unreadReports.filter((_, msg) => $(msg).parent().parent().find('div > a').text().includes("oasis"));
-            const unreadNonOasisReports = unreadReports.filter((_, msg) => !$(msg).parent().parent().find('div > a').text().includes("oasis"));
-            state.feature.debug && console.log("Unread report: " + unreadReports.length);
-            if (unreadOasisReports.length > 0) {
-                if (!state.feature.disableStopOnLoss) {
-                    const feature = state.feature;
-                    feature.autoFarmOasis = false;
-                    state.feature = feature;
+        state.currentAction = !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM;
+        if ([CurrentActionEnum.FARM, CurrentActionEnum.OASIS_FARM].includes(state.currentAction)) {
+            let shortcut = undefined;
+            $('#sidebarBoxLinklist li').each((_, ele) => {
+                const name = $(ele).find('.name').text().trim();
+                const href = $(ele).find('a').attr('href');
+                if (name === "Farm List") {
+                    shortcut = $(`a[href='${href}']`)[0];
+                    return;
                 }
-                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred during oasis farm, please check the offensive report`);
-            }
-            if (unreadNonOasisReports.length > 0) {
-                if (!state.feature.disableStopOnLoss) {
-                    const feature = state.feature;
-                    feature.autoFarm = false;
-                    state.feature = feature;
-                }
-                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Losses occurred during farm, please check the offensive report`);
-            }
-            state.nextCheckReportTime = Utils.addToDate(new Date(), 0, 1, 0);
-            yield Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
-            return;
-        }
-        else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99') {
-            const startButtonEle = $('.startButton[value=Start]').filter((_, button) => {
-                const text = $(button).parent().parent().find('.listName').find('span').text();
-                return text !== "Scout" && ((!targetPrefix && !text.startsWith("Oasis")) || (!!targetPrefix && text.startsWith(targetPrefix)));
             });
-            for (let i = 0; i < startButtonEle.length; i++) {
-                yield Utils.delayClick();
-                startButtonEle[i].click();
+            if (!(state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99')) {
+                if (shortcut) {
+                    state.currentAction = !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM;
+                    shortcut.click();
+                }
+                else {
+                    if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
+                        yield Utils.delayClick(!state.feature.disableDelayClick);
+                        $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click();
+                        return;
+                    }
+                    else if (state.currentPage === CurrentPageEnum.TOWN) {
+                        yield Navigation.goToBuilding(state, 39, 16, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
+                        return;
+                    }
+                    else {
+                        yield Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
+                        return;
+                    }
+                }
             }
-            if (!targetPrefix) {
-                state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59));
+            if ((state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') === '99')) {
+                yield Utils.delayClick(!state.feature.disableDelayClick);
+                const allStartButtons = yield Utils.waitForElement('.startButton[value=Start]');
+                if (state.feature.removeLostFromFarmList) {
+                    yield Utils.delayClick(!state.feature.disableDelayClick);
+                    const lastRaidLost = $('td.lastRaid > div > img.iReport.iReport3').filter((_, ele) => $(ele).parent().parent().css('opacity') !== '0.4');
+                    if (lastRaidLost.length > 0) {
+                        lastRaidLost.each((_, ele) => {
+                            const row = $(ele).parent().parent().parent();
+                            const target = row.find('a').first().text().trim();
+                            informFarmListInactivated(state, target);
+                            row.find('input')[0].click();
+                        });
+                        yield Utils.delayClick(!state.feature.disableDelayClick);
+                        const deactivateButtons = yield Utils.waitForElement('button:contains("Deactivate selected")');
+                        deactivateButtons.each((_, ele) => $(ele)[0].click());
+                    }
+                }
+                const allStartButtonsEle = allStartButtons.filter((_, button) => {
+                    const text = $(button).parent().parent().find('.listName').find('span').text();
+                    return text !== "Scout" && ((!targetPrefix && !text.startsWith("Oasis")) || (!!targetPrefix && text.startsWith(targetPrefix)));
+                });
+                for (let i = 0; i < allStartButtonsEle.length; i++) {
+                    yield Utils.delayClick(!state.feature.disableDelayClick);
+                    allStartButtonsEle[i].click();
+                }
+                if (!targetPrefix) {
+                    state.nextFarmTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmIntervalMinutes.min, state.farmIntervalMinutes.max), Utils.randInt(0, 59));
+                }
+                else if (targetPrefix === "Oasis") {
+                    state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 30));
+                }
+                yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
+                return;
             }
-            else if (targetPrefix === "Oasis") {
-                state.nextFarmOasisTime = Utils.addToDate(new Date(), 0, Utils.randInt(state.farmOasisIntervalMinutes.min, state.farmOasisIntervalMinutes.max), Utils.randInt(0, 30));
-            }
-            yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
-            return;
-        }
-        else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '99') {
-            yield Utils.delayClick();
-            $('a[href="/build.php?id=39&gid=16&tt=99"]')[0].click();
-            return;
-        }
-        else if (state.currentPage === CurrentPageEnum.TOWN) {
-            if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
-                yield Navigation.goToReport(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
-            }
-            else {
-                yield Navigation.goToBuilding(state, 39, 16, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
-            }
-            return;
-        }
-        else {
-            if (new Date(state.nextCheckReportTime) < new Date() && !state.feature.disableReportChecking) {
-                yield Navigation.goToReport(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
-            }
-            else {
-                yield Navigation.goToTown(state, !targetPrefix ? CurrentActionEnum.FARM : CurrentActionEnum.OASIS_FARM);
-            }
-            return;
         }
     }
 });
 const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c, _d;
+    var _d, _e;
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages;
     const villageRequireEvade = Object.values(villages).filter(v => !!v.evadeTime).find(v => v.autoEvade && new Date(v.evadeTime) < new Date());
     if (villageRequireEvade) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
-            yield Utils.delayClick();
+            yield Utils.delayClick(!state.feature.disableDelayClick);
             $('a[href="/build.php?id=39&gid=16&tt=2"]')[0].click();
             return;
         }
@@ -806,13 +1154,13 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
                 yield Navigation.goToVillage(state, villageRequireEvade.id, CurrentActionEnum.EVADE);
                 return;
             }
-            if ($('.error').length > 0) {
+            if ((yield Utils.waitForElement('.error', 2000)).length > 0) {
                 yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
                 return;
             }
-            yield Utils.delayClick();
-            const sendTroopButton = $("#ok");
-            const confirmButton = $("#checksum");
+            yield Utils.delayClick(!state.feature.disableDelayClick);
+            const sendTroopButton = yield Utils.waitForElement("#ok", 1000);
+            const confirmButton = yield Utils.waitForElement("#checksum", 1000);
             if (sendTroopButton.length > 0) {
                 let needSendTroop = false;
                 $("#troops > tbody").find("td").each((column, td) => {
@@ -822,7 +1170,7 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
                         needSendTroop = true;
                     }
                 });
-                if (((_c = villageRequireEvade.evadeRaidPosition) === null || _c === void 0 ? void 0 : _c.x) && ((_d = villageRequireEvade.evadeRaidPosition) === null || _d === void 0 ? void 0 : _d.y)) {
+                if (((_d = villageRequireEvade.evadeRaidPosition) === null || _d === void 0 ? void 0 : _d.x) && ((_e = villageRequireEvade.evadeRaidPosition) === null || _e === void 0 ? void 0 : _e.y)) {
                     $("#xCoordInput").val(villageRequireEvade.evadeRaidPosition.x);
                     $("#yCoordInput").val(villageRequireEvade.evadeRaidPosition.y);
                 }
@@ -835,7 +1183,7 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
                 }
             }
             else if (confirmButton.length > 0) {
-                yield Utils.delayClick();
+                yield Utils.delayClick(!state.feature.disableDelayClick);
                 confirmButton[0].click();
             }
             return;
@@ -845,7 +1193,7 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
             informTroopsEvaded(state, villageRequireEvade);
             delete villageRequireEvade.evadeTime;
             state.villages = villages;
-            yield Utils.delayClick();
+            yield Utils.delayClick(!state.feature.disableDelayClick);
             yield Navigation.goToFields(state, CurrentActionEnum.IDLE);
             return;
         }
@@ -861,21 +1209,21 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, function* () {
-    var _e;
+    var _f;
     const params = new URLSearchParams(window.location.search);
     const villages = state.villages;
     const village = villages[state.currentVillageId];
-    const customFarm = (_e = village.customFarms) === null || _e === void 0 ? void 0 : _e[idx];
+    const customFarm = (_f = village.customFarms) === null || _f === void 0 ? void 0 : _f[idx];
     if (customFarm) {
         if (state.currentPage === CurrentPageEnum.BUILDING && params.get('id') === '39' && params.get('gid') === '16' && params.get('tt') !== '2') {
-            yield Utils.delayClick();
+            yield Utils.delayClick(!state.feature.disableDelayClick);
             $('a[href="/build.php?id=39&gid=16&tt=2"]')[0].click();
             return;
         }
         else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
-            yield Utils.delayClick();
-            const sendTroopButton = $("#ok");
-            const confirmButton = $("#checksum");
+            yield Utils.delayClick(!state.feature.disableDelayClick);
+            const sendTroopButton = yield Utils.waitForElement("#ok");
+            const confirmButton = yield Utils.waitForElement("#checksum");
             if (sendTroopButton.length > 0) {
                 for (const troopKey of Object.keys(customFarm.troops)) {
                     if (customFarm.troops[troopKey]) {
@@ -899,11 +1247,11 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
                 else {
                     $('.radio')[2].click();
                 }
-                yield Utils.delayClick();
+                yield Utils.delayClick(!state.feature.disableDelayClick);
                 sendTroopButton[0].click();
             }
             else if (confirmButton.length > 0) {
-                yield Utils.delayClick();
+                yield Utils.delayClick(!state.feature.disableDelayClick);
                 confirmButton[0].click();
             }
             return;
@@ -996,7 +1344,7 @@ const randomAction = (state) => __awaiter(void 0, void 0, void 0, function* () {
         }
     });
     const target = actions[Math.floor(Math.random() * actions.length)];
-    yield Utils.delayClick();
+    yield Utils.delayClick(!state.feature.disableDelayClick);
     state.currentAction = CurrentActionEnum.NAVIGATE_TO_FIELDS;
     state.feature.debug && console.log(`Go to ${target}`);
     $(`a[href='${target}']`)[0].click();
@@ -1098,12 +1446,12 @@ const render = (state) => {
             <input id="toggleAutoScout" class="ml-5" type="checkbox" ${state.feature.autoScout ? 'checked' : ''}/> Auto scout
             <input id="toggleAutoFarm" class="ml-5" type="checkbox" ${state.feature.autoFarm ? 'checked' : ''}/> Auto farm
             <input id="toggleAutoFarmOasis" class="ml-5" type="checkbox" ${state.feature.autoFarmOasis ? 'checked' : ''}/> Auto farm oasis
-            <input id="toggleDisableReportChecking" class="ml-5" type="checkbox" ${state.feature.disableReportChecking ? 'checked' : ''}/> Disable report checking
-            <input id="toggleDisableStopOnLoss" class="ml-5" type="checkbox" ${state.feature.disableStopOnLoss ? 'checked' : ''}/> Disable stop on loss
             <input id="toggleAutoCustomFarm" class="ml-5" type="checkbox" ${state.feature.autoCustomFarm ? 'checked' : ''}/> Auto custom farm
             <input id="toggleAlertAttack" class="ml-5" type="checkbox" ${state.feature.alertAttack ? 'checked' : ''}/> Alert attack
             <input id="toggleAlertEmptyBuildQueue" class="ml-5" type="checkbox" ${state.feature.alertEmptyBuildQueue ? 'checked' : ''}/> Alert empty build queue
             <input id="toggleAlertResourceCapacityFull" class="ml-5" type="checkbox" ${state.feature.alertResourceCapacityFull ? 'checked' : ''}/> Alert resource capacity full
+            // <input id="toggleDisableDelayClick" class="ml-5" type="checkbox" ${state.feature.disableDelayClick ? 'checked' : ''}/> Disable Delay Click
+            <input id="toggleRemoveLostFromFarmList" class="ml-5" type="checkbox" ${state.feature.removeLostFromFarmList ? 'checked' : ''}> Remove Lost From Farm List
             <input id="toggleRandomAction" class="ml-5" type="checkbox" ${state.feature.randomAction ? 'checked' : ''}/> Random Action
             <input id="toggleDebug" class="ml-5" type="checkbox" ${state.feature.debug ? 'checked' : ''}/> Debug
         </div>
@@ -1131,6 +1479,7 @@ const render = (state) => {
         <div>
             <h4>Action</h4>
             ${state.currentPage === CurrentPageEnum.FIELDS ? '<button id="addAllFields">Add all fields</button>' : ''}
+            <button id="addListBuildings">Add List Buildings</button>
             <button id="copyState">Copy State</button>
             <button id="pasteState">Paste State</button>
         </div>
@@ -1140,6 +1489,7 @@ const render = (state) => {
                 <div class="village-container">
                     <h4>${village.name} (id: ${id}) (${village.position.x}, ${village.position.y})</h4>
                     <br />
+                    <div>Checksum: ${village.checksum}</div>
                     <div>Last update: ${Utils.formatDate(village.lastUpdatedTime)}</div>
                     <div>Attack alert backoff: ${Utils.formatDate(village.attackAlertBackoff)}</div>
                     <div>Empty build queue alert backoff: ${Utils.formatDate(village.emptyBuildQueueAlertBackoff)}</div>
@@ -1324,6 +1674,31 @@ const render = (state) => {
         }
         state.villages = villages;
     });
+    $('#addListBuildings').on('click', (ele) => {
+        const villages = state.villages;
+        const pendingBuildTasks = currentVillage.pendingBuildTasks;
+        let buildingCount = 0;
+        for (let i = 0; i < 7; i++) {
+            for (let j = 0; j < 5; j++) {
+                if (buildingCount < NEW_VILLAGE_LIST.length) {
+                    pendingBuildTasks.push(NEW_VILLAGE_LIST[buildingCount++]);
+                }
+            }
+            for (let aid = 1; aid <= 18; aid++) {
+                pendingBuildTasks.push({
+                    aid,
+                    gid: -1,
+                    resources: {
+                        lumber: 0,
+                        clay: 0,
+                        iron: 0,
+                        crop: 0
+                    }
+                });
+            }
+        }
+        state.villages = villages;
+    });
     $('#updateFarmInterval').on('click', () => {
         const farmIntervalMinutes = {
             min: parseInt($("#minFarmMinutes").val()),
@@ -1354,13 +1729,13 @@ const render = (state) => {
     handleFeatureToggle('#toggleAutoScout', state, 'autoScout');
     handleFeatureToggle('#toggleAutoFarm', state, 'autoFarm');
     handleFeatureToggle('#toggleAutoFarmOasis', state, 'autoFarmOasis');
-    handleFeatureToggle('#toggleDisableReportChecking', state, 'disableReportChecking');
-    handleFeatureToggle('#toggleDisableStopOnLoss', state, 'disableStopOnLoss');
     handleFeatureToggle('#toggleAutoCustomFarm', state, 'autoCustomFarm');
     handleFeatureToggle('#toggleAlertAttack', state, 'alertAttack');
     handleFeatureToggle('#toggleAlertEmptyBuildQueue', state, 'alertEmptyBuildQueue');
     handleFeatureToggle('#toggleAlertResourceCapacityFull', state, 'alertResourceCapacityFull');
     handleFeatureToggle('#toggleRandomAction', state, 'randomAction');
+    handleFeatureToggle('#toggleDisableDelayClick', state, 'disableDelayClick');
+    handleFeatureToggle('#toggleRemoveLostFromFarmList', state, 'removeLostFromFarmList');
     handleFeatureToggle('#toggleDebug', state, 'debug');
 };
 const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
@@ -1449,6 +1824,9 @@ const run = (state) => __awaiter(void 0, void 0, void 0, function* () {
 const initialize = () => {
     const handler = new StateHandler();
     const state = new Proxy(StateHandler.INITIAL_STATE, handler);
+    if ($('#logo').length === 0) {
+        location.reload();
+    }
     handler.setCallback(() => render(state));
     createStyle();
     createContainer();
