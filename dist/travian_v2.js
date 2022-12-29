@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/24 23:15:28";
+const BUILD_TIME = "2022/12/30 01:42:58";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -1159,8 +1159,8 @@ const checkAutoEvade = (state) => __awaiter(void 0, void 0, void 0, function* ()
                 return;
             }
             yield Utils.delayClick(!state.feature.disableDelayClick);
-            const sendTroopButton = yield Utils.waitForElement("#ok", 1000);
-            const confirmButton = yield Utils.waitForElement("#checksum", 1000);
+            const sendTroopButton = $("#ok");
+            const confirmButton = $("#checksum");
             if (sendTroopButton.length > 0) {
                 let needSendTroop = false;
                 $("#troops > tbody").find("td").each((column, td) => {
@@ -1222,8 +1222,8 @@ const executeCustomFarm = (state, idx) => __awaiter(void 0, void 0, void 0, func
         }
         else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
             yield Utils.delayClick(!state.feature.disableDelayClick);
-            const sendTroopButton = yield Utils.waitForElement("#ok");
-            const confirmButton = yield Utils.waitForElement("#checksum");
+            const sendTroopButton = $("#ok");
+            const confirmButton = $("#checksum");
             if (sendTroopButton.length > 0) {
                 for (const troopKey of Object.keys(customFarm.troops)) {
                     if (customFarm.troops[troopKey]) {

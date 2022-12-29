@@ -1363,8 +1363,8 @@ const checkAutoEvade = async (state: State) => {
 
             await Utils.delayClick(!state.feature.disableDelayClick);
 
-            const sendTroopButton = await Utils.waitForElement("#ok", 1000)
-            const confirmButton = await Utils.waitForElement("#checksum", 1000)
+            const sendTroopButton = $("#ok")
+            const confirmButton = $("#checksum")
 
             if (sendTroopButton.length > 0) {
                 let needSendTroop = false
@@ -1434,8 +1434,8 @@ const executeCustomFarm = async (state: State, idx: number) => {
         } else if (state.currentPage === CurrentPageEnum.BUILDING && params.get('gid') === '16' && params.get('tt') === '2') {
             await Utils.delayClick(!state.feature.disableDelayClick);
 
-            const sendTroopButton = await Utils.waitForElement("#ok")
-            const confirmButton = await Utils.waitForElement("#checksum")
+            const sendTroopButton = $("#ok")
+            const confirmButton = $("#checksum")
             if (sendTroopButton.length > 0) {
                 for (const troopKey of Object.keys(customFarm.troops)) {
                     if (customFarm.troops[troopKey]) {
