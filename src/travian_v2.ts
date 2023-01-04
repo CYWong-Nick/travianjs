@@ -1020,7 +1020,7 @@ const alertAttack = (state: State, village?: Village, attackTime?: Date) => {
                 village.attackAlertBackoff = Utils.addToDate(new Date(), 0, 5, 0)
                 state.villages = villages
 
-                const message = `[${$('.playerName').text()}] Village ${village.name} under attack${attackTime ? ` at ${Utils.formatDate(attackTime)}`: ""}`
+                const message = `[${$('.playerName').text()}] \n>> Current Time: ${Utils.formatDate(new Date())} << \nVillage ${village.name} under attack${attackTime ? ` at ${Utils.formatDate(attackTime)}`: ""}`
                 fetch(state.discordWebhookUrl, {
                     method: 'POST',
                     headers: {
@@ -1033,7 +1033,7 @@ const alertAttack = (state: State, village?: Village, attackTime?: Date) => {
                 state.feature.debug && console.log(`Not alerting attack due to backoff at ${Utils.formatDate(village.attackAlertBackoff)}`)
             }
         } else {
-            const message = `[${$('.playerName').text()}] Village is under attack`
+            const message = `[${$('.playerName').text()}] \n>> Current Time: ${Utils.formatDate(new Date())} << \nVillage is under attack`
             fetch(state.discordWebhookUrl, {
                 method: 'POST',
                 headers: {
