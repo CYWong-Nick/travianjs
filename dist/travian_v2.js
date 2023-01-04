@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var _a, _b;
-const BUILD_TIME = "2022/12/30 01:42:58";
+const BUILD_TIME = "2023/01/04 22:46:24";
 const RUN_INTERVAL = 10000;
 const GID_NAME_MAP = {
     "-1": "Unknown",
@@ -448,6 +448,7 @@ StateHandler.INITIAL_STATE = {
     plusEnabled: false,
     telegramChatId: '',
     telegramToken: '',
+    discordWebhookUrl: '',
     username: '',
     password: ''
 };
@@ -836,23 +837,53 @@ const updateCurrentVillageStatus = (state) => {
 };
 const alertAttack = (state, village, attackTime) => {
     const villages = state.villages;
-    if (!state.telegramChatId || !state.telegramToken) {
-        state.feature.debug && console.log("Telegram chat id or token not set");
-        return;
-    }
-    if (village) {
-        if (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date()) {
-            state.feature.debug && console.log(`Send alert for attack at village ${village.name}`);
-            village.attackAlertBackoff = Utils.addToDate(new Date(), 0, 5, 0);
-            state.villages = villages;
-            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} under attack ${attackTime && `at ${Utils.formatDate(attackTime)}`}`);
+    if (state.discordWebhookUrl) {
+        if (village) {
+            if (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date()) {
+                state.feature.debug && console.log(`Send alert for attack at village ${village.name}`);
+                village.attackAlertBackoff = Utils.addToDate(new Date(), 0, 5, 0);
+                state.villages = villages;
+                const message = `[${$('.playerName').text()}] Village ${village.name} under attack${attackTime ? ` at ${Utils.formatDate(attackTime)}` : ""}`;
+                fetch(state.discordWebhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ content: message })
+                });
+            }
+            else {
+                state.feature.debug && console.log(`Not alerting attack due to backoff at ${Utils.formatDate(village.attackAlertBackoff)}`);
+            }
         }
         else {
-            state.feature.debug && console.log(`Not alerting attack due to backoff at ${Utils.formatDate(village.attackAlertBackoff)}`);
+            const message = `[${$('.playerName').text()}] Village is under attack`;
+            fetch(state.discordWebhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: message })
+            });
         }
     }
-    else {
-        fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village is under attack`);
+    else if (state.telegramChatId && state.telegramToken) {
+        if (village) {
+            if (!village.attackAlertBackoff || new Date(village.attackAlertBackoff) < new Date()) {
+                state.feature.debug && console.log(`Send alert for attack at village ${village.name}`);
+                village.attackAlertBackoff = Utils.addToDate(new Date(), 0, 5, 0);
+                state.villages = villages;
+                fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village ${village.name} under attack ${attackTime && `at ${Utils.formatDate(attackTime)}`}`);
+            }
+            else {
+                state.feature.debug && console.log(`Not alerting attack due to backoff at ${Utils.formatDate(village.attackAlertBackoff)}`);
+            }
+        }
+        else {
+            fetch(`https://api.telegram.org/bot${state.telegramToken}/sendMessage?chat_id=${state.telegramChatId}&text=Village is under attack`);
+        }
     }
 };
 const informTroopsEvaded = (state, village) => {
